@@ -1,0 +1,13 @@
+[x-cloak=''] {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+@media screen and (max-width: theme('screens.lg')) {
+    [x-cloak='lg'] {
+        display: none;
+    }
+}
