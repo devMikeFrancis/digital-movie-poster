@@ -1,19 +1,17 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\PosterController;
+use App\Http\Controllers\SettingController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::get('/posters', [PosterController::class, 'index']);
+Route::get('/cache-posters', [PosterController::class, 'cache']);
+Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/settings', [SettingController::class, 'index']);
+Route::put('/settings', [SettingController::class, 'update']);
+Route::post('/posters', [PosterController::class, 'store']);
+Route::post('/posters-sort', [PosterController::class, 'sort']);
+Route::put('/posters/{id}', [PosterController::class, 'update']);
+Route::delete('/posters/{id}', [PosterController::class, 'delete']);

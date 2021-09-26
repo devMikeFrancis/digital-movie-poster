@@ -29,6 +29,9 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
-        "vue-click-outside": "^1.1.0"
+        "vue-click-outside": "^1.1.0",
+        "vue-router": "^3.5.2",
+        "vue-star-rating": "^1.7.0",
+        "vuedraggable": "^2.24.3"
     }
 }

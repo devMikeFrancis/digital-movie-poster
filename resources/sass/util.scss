@@ -1,3 +1,17 @@
+input[type='text'] {
+    height: 32px;
+    border-radius: 4px;
+}
+
+a {
+    transition: color 0.2s ease;
+}
+
+button {
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
 [x-cloak=''] {
     display: none;
 }
