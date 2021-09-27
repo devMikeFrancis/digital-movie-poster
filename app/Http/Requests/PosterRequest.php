@@ -24,7 +24,7 @@ class PosterRequest extends FormRequest
     public function rules()
     {
         return [
-            'image' => 'nullable|file|image|max:8192|dimensions:max_width=3000,max_height=6000'
+            'image' => 'sometimes|image|max:8192|dimensions:max_width=3000,max_height=6000'
         ];
     }
 }

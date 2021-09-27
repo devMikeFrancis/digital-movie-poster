@@ -42,7 +42,10 @@
                                         py-1
                                         hover:bg-blue-400
                                     "
-                                    @click.prevent="showPosterModal = true"
+                                    @click.prevent="
+                                        showPosterModal = true;
+                                        edit = false;
+                                    "
                                 >
                                     <span>&plus; Add Poster</span>
                                 </button>
@@ -93,10 +96,23 @@
                                             "
                                         ></div>
                                     </div>
-                                    <div class="col-span-9 flex items-center">
-                                        <span class="text-gray-300 font-bold">{{
-                                            poster.name
-                                        }}</span>
+                                    <div class="col-span-6 flex items-center">
+                                        <span
+                                            class="text-gray-300 font-bold cursor-pointer"
+                                            @click="editPoster(poster)"
+                                            >{{ poster.name }}</span
+                                        >
+                                    </div>
+
+                                    <div class="col-span-3 flex items-center">
+                                        <label class="text-white"
+                                            ><input
+                                                type="checkbox"
+                                                v-model="poster.show_in_rotation"
+                                                @change="updateShowInRotation(poster)"
+                                            />
+                                            Show in rotation</label
+                                        >
                                     </div>
 
                                     <div class="col-span-2 flex items-center justify-end pr-4">
@@ -116,7 +132,15 @@
 
             <div class="poster-form-model" v-bind:class="{ show: showPosterModal }">
                 <div class="inner">
-                    <a href="#" class="close" @click.prevent="showPosterModal = false">&times;</a>
+                    <a
+                        href="#"
+                        class="close"
+                        @click.prevent="
+                            showPosterModal = false;
+                            edit = false;
+                        "
+                        >&times;</a
+                    >
 
                     <div class="mb-5">
                         <label for="movie-title" class="text-gray-300 block mb-2 font-bold"
@@ -131,7 +155,7 @@
                             required
                         />
                         <div id="movie-posterHelp" class="text-gray-400 text-sm">
-                            If this is used the poster image and data will be pulled from TMDB API.
+                            If used, TMDB API will override all other data for this poster.
                         </div>
                     </div>
 
@@ -139,14 +163,14 @@
 
                     <div class="mb-5">
                         <label for="movie-title" class="text-gray-300 block mb-2 font-bold"
-                            >Movie Title</label
+                            >Poster Name</label
                         >
 
                         <input
                             type="text"
                             class="text-black w-full"
                             id="movie-title"
-                            v-model="poster.title"
+                            v-model="poster.name"
                             required
                         />
                     </div>
@@ -162,9 +186,59 @@
                             id="movie-poster"
                             aria-describedby="movie-posterHelp"
                             @change="selectFile"
-                            required
                         />
                         <div id="movie-posterHelp" class="text-gray-400 text-sm"></div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="content-rating" class="text-gray-300 block mb-2 font-bold"
+                            >Content Rating</label
+                        >
+
+                        <select
+                            class="text-black w-full"
+                            id="mpaa-rating"
+                            v-model="poster.mpaa_rating"
+                        >
+                            <option value="">Not Rated</option>
+                            <option value="G">G</option>
+                            <option value="PG">PG</option>
+                            <option value="PG-13">PG-13</option>
+                            <option value="R">R</option>
+                            <option value="NC-17">NC-17</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="audience-rating" class="text-gray-300 block mb-2 font-bold"
+                            >Audience Rating</label
+                        >
+
+                        <input
+                            type="number"
+                            class="text-black w-full"
+                            id="audience-rating"
+                            v-model="poster.audience_rating"
+                            step="0.01"
+                            min="0"
+                            max="10"
+                        />
+                        <div id="audience-ratingHelp" class="text-gray-400 text-sm">
+                            Audience rating. 1-10.
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="trailer-path" class="text-gray-300 block mb-2 font-bold"
+                            >YouTube Movie ID</label
+                        >
+
+                        <input
+                            type="text"
+                            class="text-black w-full"
+                            id="trailer-path"
+                            v-model="poster.trailer_path"
+                        />
                     </div>
 
                     <div class="py-3 text-white">
@@ -201,8 +275,13 @@ export default {
             formMessage: '',
             settings: {},
             poster: {
-                title: '',
-                image: '',
+                id: '',
+                imdb_id: '',
+                name: '',
+                image: null,
+                mpaa_rating: '',
+                audience_rating: '',
+                trailer_path: '',
             },
             savePosterBtn: 'Save Poster',
         };
@@ -271,14 +350,29 @@ export default {
                 1000
             );
         },
+        updateShowInRotation(poster) {
+            const params = {
+                _method: 'put',
+                show_in_rotation: poster.show_in_rotation,
+            };
+            axios
+                .post('/api/posters/' + poster.id + '/update-rotation', params)
+                .then((response) => {})
+                .catch((e) => {});
+        },
         selectFile() {
             this.poster.image = event.target.files[0];
+        },
+        editPoster(poster) {
+            this.poster = Object.assign({}, poster);
+            this.edit = true;
+            this.showPosterModal = true;
         },
         createPoster() {
             this.errors = [];
             this.saving = true;
             this.savePosterBtn = 'Saving ...';
-
+            let url = '';
             const error = this.validated();
 
             if (error) {
@@ -286,21 +380,50 @@ export default {
             }
 
             const params = new FormData();
-            params.append('image', this.poster.image);
-            params.append('title', this.poster.title);
-            params.append('imdb_id', this.poster.imdb_id);
+            if (this.poster.image) {
+                params.append('image', this.poster.image);
+            }
+
+            if (this.poster.name) {
+                params.append('title', this.poster.name);
+            }
+            if (this.poster.imdb_id) {
+                params.append('imdb_id', this.poster.imdb_id);
+            }
+            if (this.poster.mpaa_rating) {
+                params.append('mpaa_rating', this.poster.mpaa_rating);
+            }
+            if (this.poster.audience_rating) {
+                params.append('audience_rating', this.poster.audience_rating);
+            }
+            if (this.poster.trailer_path) {
+                params.append('trailer_path', this.poster.trailer_path);
+            }
+
+            if (this.edit) {
+                params.append('_method', 'put');
+                url = '/api/posters/' + this.poster.id;
+            } else {
+                url = '/api/posters';
+            }
 
             axios
-                .post('/api/posters', params)
+                .post(url, params)
                 .then((response) => {
-                    this.posters.unshift(response.data.poster);
                     this.saving = false;
                     this.savePosterBtn = 'Saved Poster!';
-                    this.poster.title = '';
-                    this.poster.image = '';
-                    this.poster.imdb_id = '';
+                    if (!this.edit) {
+                        this.posters.unshift(response.data.poster);
+                    }
 
                     setTimeout(() => {
+                        this.poster.name = '';
+                        this.poster.image = null;
+                        this.poster.imdb_id = '';
+                        this.poster.id = '';
+                        this.poster.mpaa_rating = '';
+                        this.poster.audience_rating = '';
+                        this.poster.trailer_path = '';
                         this.showPosterModal = false;
                         this.savePosterBtn = 'Save Poster';
                     }, 3000);
@@ -309,8 +432,7 @@ export default {
                     console.log(e.message);
                     this.saving = false;
                     this.savePosterBtn = 'Save Poster';
-
-                    this.errors = e.data.errors;
+                    this.errors = e.response.data.errors;
                 });
         },
         validated() {
@@ -333,24 +455,6 @@ export default {
             }
 
             return error;
-        },
-        updateSettings() {
-            /*this.settingsMessage = '';
-
-            const params = {
-                _method: 'put',
-                plex_token: this.settings.plex_token,
-                plex_ip_address: this.settings.plex_ip_address,
-            };
-
-            axios
-                .post('/api/settings', params)
-                .then((response) => {
-                    this.settingsMessage = 'Settings saved.';
-                })
-                .catch((e) => {
-                    this.settingsMessage = e.message;
-                });*/
         },
     },
     created() {},
@@ -418,8 +522,8 @@ export default {
 
         .close {
             position: absolute;
-            top: -36px;
-            right: -24px;
+            top: -6px;
+            right: 12px;
             color: #fff;
             font-size: 32px;
 

@@ -23,7 +23,7 @@ class PosterService
         if ($this->settings->plex_service) {
             $plexService = new PlexService();
             $json = $plexService->apiCall('/library/sections/1/all');
-            $plexService->cacheImages($json);
+            $plexService->save($json);
         }
     }
 
@@ -96,6 +96,13 @@ class PosterService
         $poster->save();
 
         return $poster;
+    }
+
+    public function updateShowInRotation($id, $showInRotation): void
+    {
+        $poster = Poster::findOrFail($id);
+        $poster->show_in_rotation = $showInRotation;
+        $poster->save();
     }
 
     public function delete($id): ?bool

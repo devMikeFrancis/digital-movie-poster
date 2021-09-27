@@ -2220,6 +2220,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2240,7 +2263,9 @@ var $recentAdded = document.querySelector('#recent-added-container');
       transitionImagesInterval: null,
       nowPlaying: false,
       contentRating: '',
+      mpaaRating: '',
       rating: 0,
+      audienceRating: 0,
       currentImage: 0,
       borderWidth: 2,
       starPadding: 2,
@@ -2304,9 +2329,20 @@ var $recentAdded = document.querySelector('#recent-added-container');
           _this2.loadingMessage = 'You do not have any posters loaded yet. Click here to manage your poster library.';
         } else {
           if (_this2.settings.random_order) {
-            _this2.moviePosters[Math.floor(Math.random() * _this2.moviePosters.length)].show = true;
+            var rand = Math.floor(Math.random() * _this2.moviePosters.length);
+            _this2.moviePosters[rand].show = true;
+            _this2.mpaaRating = _this2.moviePosters[rand].mpaa_rating;
+
+            if (_this2.moviePosters[rand].audience_rating) {
+              _this2.audienceRating = _this2.moviePosters[rand].audience_rating / 2;
+            }
           } else {
             _this2.moviePosters[0].show = true;
+            _this2.mpaaRating = _this2.moviePosters[0].mpaa_rating;
+
+            if (_this2.moviePosters[0].audience_rating) {
+              _this2.audienceRating = _this2.moviePosters[0].audience_rating / 2;
+            }
           }
 
           setTimeout(function () {
@@ -2345,7 +2381,10 @@ var $recentAdded = document.querySelector('#recent-added-container');
         if (size > 0) {
           _this4.nowPlayingPoster = 'http://' + _this4.settings.plex_ip_address + ':32400' + response.data.MediaContainer.Metadata[0].thumb + '?X-Plex-Token=' + _this4.settings.plex_token;
           _this4.contentRating = response.data.MediaContainer.Metadata[0].contentRating;
-          _this4.rating = response.data.MediaContainer.Metadata[0].audienceRating / 2;
+
+          if (response.data.MediaContainer.Metadata[0].audienceRating) {
+            _this4.rating = response.data.MediaContainer.Metadata[0].audienceRating / 2;
+          }
         }
       })["catch"](function (e) {
         console.log(e.message);
@@ -2375,6 +2414,11 @@ var $recentAdded = document.querySelector('#recent-added-container');
         }
 
         poster.show = true;
+        this.mpaaRating = poster.mpaa_rating;
+
+        if (poster.audience_rating) {
+          this.audienceRating = poster.audience_rating / 2;
+        }
       }
     },
     startTransitionImages: function startTransitionImages() {
@@ -2670,6 +2714,80 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -2684,8 +2802,13 @@ __webpack_require__.r(__webpack_exports__);
       formMessage: '',
       settings: {},
       poster: {
-        title: '',
-        image: ''
+        id: '',
+        imdb_id: '',
+        name: '',
+        image: null,
+        mpaa_rating: '',
+        audience_rating: '',
+        trailer_path: ''
       },
       savePosterBtn: 'Save Poster'
     };
@@ -2749,8 +2872,20 @@ __webpack_require__.r(__webpack_exports__);
         });
       }.bind(this, params), 1000);
     },
+    updateShowInRotation: function updateShowInRotation(poster) {
+      var params = {
+        _method: 'put',
+        show_in_rotation: poster.show_in_rotation
+      };
+      axios.post('/api/posters/' + poster.id + '/update-rotation', params).then(function (response) {})["catch"](function (e) {});
+    },
     selectFile: function selectFile() {
       this.poster.image = event.target.files[0];
+    },
+    editPoster: function editPoster(poster) {
+      this.poster = Object.assign({}, poster);
+      this.edit = true;
+      this.showPosterModal = true;
     },
     createPoster: function createPoster() {
       var _this4 = this;
@@ -2758,6 +2893,7 @@ __webpack_require__.r(__webpack_exports__);
       this.errors = [];
       this.saving = true;
       this.savePosterBtn = 'Saving ...';
+      var url = '';
       var error = this.validated();
 
       if (error) {
@@ -2765,18 +2901,54 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       var params = new FormData();
-      params.append('image', this.poster.image);
-      params.append('title', this.poster.title);
-      params.append('imdb_id', this.poster.imdb_id);
-      axios.post('/api/posters', params).then(function (response) {
-        _this4.posters.unshift(response.data.poster);
 
+      if (this.poster.image) {
+        params.append('image', this.poster.image);
+      }
+
+      if (this.poster.name) {
+        params.append('title', this.poster.name);
+      }
+
+      if (this.poster.imdb_id) {
+        params.append('imdb_id', this.poster.imdb_id);
+      }
+
+      if (this.poster.mpaa_rating) {
+        params.append('mpaa_rating', this.poster.mpaa_rating);
+      }
+
+      if (this.poster.audience_rating) {
+        params.append('audience_rating', this.poster.audience_rating);
+      }
+
+      if (this.poster.trailer_path) {
+        params.append('trailer_path', this.poster.trailer_path);
+      }
+
+      if (this.edit) {
+        params.append('_method', 'put');
+        url = '/api/posters/' + this.poster.id;
+      } else {
+        url = '/api/posters';
+      }
+
+      axios.post(url, params).then(function (response) {
         _this4.saving = false;
         _this4.savePosterBtn = 'Saved Poster!';
-        _this4.poster.title = '';
-        _this4.poster.image = '';
-        _this4.poster.imdb_id = '';
+
+        if (!_this4.edit) {
+          _this4.posters.unshift(response.data.poster);
+        }
+
         setTimeout(function () {
+          _this4.poster.name = '';
+          _this4.poster.image = null;
+          _this4.poster.imdb_id = '';
+          _this4.poster.id = '';
+          _this4.poster.mpaa_rating = '';
+          _this4.poster.audience_rating = '';
+          _this4.poster.trailer_path = '';
           _this4.showPosterModal = false;
           _this4.savePosterBtn = 'Save Poster';
         }, 3000);
@@ -2784,7 +2956,7 @@ __webpack_require__.r(__webpack_exports__);
         console.log(e.message);
         _this4.saving = false;
         _this4.savePosterBtn = 'Save Poster';
-        _this4.errors = e.data.errors;
+        _this4.errors = e.response.data.errors;
       });
     },
     validated: function validated() {
@@ -2807,22 +2979,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return error;
-    },
-    updateSettings: function updateSettings() {
-      /*this.settingsMessage = '';
-       const params = {
-          _method: 'put',
-          plex_token: this.settings.plex_token,
-          plex_ip_address: this.settings.plex_ip_address,
-      };
-       axios
-          .post('/api/settings', params)
-          .then((response) => {
-              this.settingsMessage = 'Settings saved.';
-          })
-          .catch((e) => {
-              this.settingsMessage = e.message;
-          });*/
     }
   },
   created: function created() {},
@@ -3814,7 +3970,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n}\n.dolby-logos {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 6px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 200px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 200px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 160px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 160px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 140px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n}\n.dolby-logos {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-grow: 2;\n}\n.dolby-logos img {\n  margin: 0 6px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 200px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 200px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 160px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 160px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3838,7 +3994,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".cache-overlay {\n  position: absolute;\n  top: 60px;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  display: flex;\n  padding: 48px;\n  background-color: rgba(0, 0, 0, 0.75);\n  align-items: center;\n  justify-content: center;\n  z-index: 2;\n}\n.cache-overlay span {\n  font-size: 48px;\n  letter-spacing: 1px;\n  font-weight: 700;\n  color: #fff;\n  text-transform: uppercase;\n}\n.handle {\n  cursor: ns-resize;\n}\n.v-draggable__placeholder {\n  background: #888;\n}\n.poster-form-model {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  background-color: rgba(0, 0, 0, 0.75);\n  align-items: center;\n  justify-content: center;\n  display: hidden;\n  opacity: 0;\n  transition: opacity 0.3s ease;\n  z-index: -2;\n}\n.poster-form-model.show {\n  display: flex;\n  opacity: 1;\n  z-index: 1000;\n}\n.poster-form-model .inner {\n  position: relative;\n  padding: 24px;\n  background-color: #444;\n}\n.poster-form-model .inner .close {\n  position: absolute;\n  top: -36px;\n  right: -24px;\n  color: #fff;\n  font-size: 32px;\n}\n.poster-form-model .inner .close:hover {\n  color: #999;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".cache-overlay {\n  position: absolute;\n  top: 60px;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  display: flex;\n  padding: 48px;\n  background-color: rgba(0, 0, 0, 0.75);\n  align-items: center;\n  justify-content: center;\n  z-index: 2;\n}\n.cache-overlay span {\n  font-size: 48px;\n  letter-spacing: 1px;\n  font-weight: 700;\n  color: #fff;\n  text-transform: uppercase;\n}\n.handle {\n  cursor: ns-resize;\n}\n.v-draggable__placeholder {\n  background: #888;\n}\n.poster-form-model {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  background-color: rgba(0, 0, 0, 0.75);\n  align-items: center;\n  justify-content: center;\n  display: hidden;\n  opacity: 0;\n  transition: opacity 0.3s ease;\n  z-index: -2;\n}\n.poster-form-model.show {\n  display: flex;\n  opacity: 1;\n  z-index: 1000;\n}\n.poster-form-model .inner {\n  position: relative;\n  padding: 24px;\n  background-color: #444;\n}\n.poster-form-model .inner .close {\n  position: absolute;\n  top: -6px;\n  right: 12px;\n  color: #fff;\n  font-size: 32px;\n}\n.poster-form-model .inner .close:hover {\n  color: #999;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -8597,6 +8753,19 @@ var render = function() {
               ),
               _vm._v(" "),
               _c("footer", { staticClass: "coming-soon-footer" }, [
+                _vm.settings.show_mpaa_rating
+                  ? _c("div", { staticClass: "content-rating" }, [
+                      _vm.mpaaRating
+                        ? _c("img", {
+                            attrs: {
+                              src: "/images/" + _vm.mpaaRating + ".svg",
+                              alt: "Content Rating"
+                            }
+                          })
+                        : _vm._e()
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _vm.settings.show_processing_logos
                   ? _c("div", { staticClass: "dolby-logos" }, [
                       _vm.settings.show_imax
@@ -8653,6 +8822,32 @@ var render = function() {
                           })
                         : _vm._e()
                     ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.settings.show_audience_rating
+                  ? _c(
+                      "div",
+                      { staticClass: "audience-rating" },
+                      [
+                        _vm.audienceRating
+                          ? _c("star-rating", {
+                              attrs: {
+                                increment: 0.1,
+                                "max-rating": 5,
+                                "inactive-color": "#000",
+                                "active-color": "#fff",
+                                "star-size": 24,
+                                rating: _vm.audienceRating,
+                                "border-color": "#fff",
+                                "border-width": _vm.borderWidth,
+                                "show-rating": false,
+                                "read-only": true
+                              }
+                            })
+                          : _vm._e()
+                      ],
+                      1
+                    )
                   : _vm._e()
               ])
             ]
@@ -8898,6 +9093,7 @@ var render = function() {
                           click: function($event) {
                             $event.preventDefault()
                             _vm.showPosterModal = true
+                            _vm.edit = false
                           }
                         }
                       },
@@ -8999,13 +9195,91 @@ var render = function() {
                           _vm._v(" "),
                           _c(
                             "div",
-                            { staticClass: "col-span-9 flex items-center" },
+                            { staticClass: "col-span-6 flex items-center" },
                             [
                               _c(
                                 "span",
-                                { staticClass: "text-gray-300 font-bold" },
+                                {
+                                  staticClass:
+                                    "text-gray-300 font-bold cursor-pointer",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.editPoster(poster)
+                                    }
+                                  }
+                                },
                                 [_vm._v(_vm._s(poster.name))]
                               )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "col-span-3 flex items-center" },
+                            [
+                              _c("label", { staticClass: "text-white" }, [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: poster.show_in_rotation,
+                                      expression: "poster.show_in_rotation"
+                                    }
+                                  ],
+                                  attrs: { type: "checkbox" },
+                                  domProps: {
+                                    checked: Array.isArray(
+                                      poster.show_in_rotation
+                                    )
+                                      ? _vm._i(poster.show_in_rotation, null) >
+                                        -1
+                                      : poster.show_in_rotation
+                                  },
+                                  on: {
+                                    change: [
+                                      function($event) {
+                                        var $$a = poster.show_in_rotation,
+                                          $$el = $event.target,
+                                          $$c = $$el.checked ? true : false
+                                        if (Array.isArray($$a)) {
+                                          var $$v = null,
+                                            $$i = _vm._i($$a, $$v)
+                                          if ($$el.checked) {
+                                            $$i < 0 &&
+                                              _vm.$set(
+                                                poster,
+                                                "show_in_rotation",
+                                                $$a.concat([$$v])
+                                              )
+                                          } else {
+                                            $$i > -1 &&
+                                              _vm.$set(
+                                                poster,
+                                                "show_in_rotation",
+                                                $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1))
+                                              )
+                                          }
+                                        } else {
+                                          _vm.$set(
+                                            poster,
+                                            "show_in_rotation",
+                                            $$c
+                                          )
+                                        }
+                                      },
+                                      function($event) {
+                                        return _vm.updateShowInRotation(poster)
+                                      }
+                                    ]
+                                  }
+                                }),
+                                _vm._v(
+                                  "\n                                        Show in rotation"
+                                )
+                              ])
                             ]
                           ),
                           _vm._v(" "),
@@ -9068,6 +9342,7 @@ var render = function() {
                   click: function($event) {
                     $event.preventDefault()
                     _vm.showPosterModal = false
+                    _vm.edit = false
                   }
                 }
               },
@@ -9114,7 +9389,7 @@ var render = function() {
                 },
                 [
                   _vm._v(
-                    "\n                        If this is used the poster image and data will be pulled from TMDB API.\n                    "
+                    "\n                        If used, TMDB API will override all other data for this poster.\n                    "
                   )
                 ]
               )
@@ -9129,7 +9404,7 @@ var render = function() {
                   staticClass: "text-gray-300 block mb-2 font-bold",
                   attrs: { for: "movie-title" }
                 },
-                [_vm._v("Movie Title")]
+                [_vm._v("Poster Name")]
               ),
               _vm._v(" "),
               _c("input", {
@@ -9137,19 +9412,19 @@ var render = function() {
                   {
                     name: "model",
                     rawName: "v-model",
-                    value: _vm.poster.title,
-                    expression: "poster.title"
+                    value: _vm.poster.name,
+                    expression: "poster.name"
                   }
                 ],
                 staticClass: "text-black w-full",
                 attrs: { type: "text", id: "movie-title", required: "" },
-                domProps: { value: _vm.poster.title },
+                domProps: { value: _vm.poster.name },
                 on: {
                   input: function($event) {
                     if ($event.target.composing) {
                       return
                     }
-                    _vm.$set(_vm.poster, "title", $event.target.value)
+                    _vm.$set(_vm.poster, "name", $event.target.value)
                   }
                 }
               })
@@ -9170,8 +9445,7 @@ var render = function() {
                 attrs: {
                   type: "file",
                   id: "movie-poster",
-                  "aria-describedby": "movie-posterHelp",
-                  required: ""
+                  "aria-describedby": "movie-posterHelp"
                 },
                 on: { change: _vm.selectFile }
               }),
@@ -9179,6 +9453,152 @@ var render = function() {
               _c("div", {
                 staticClass: "text-gray-400 text-sm",
                 attrs: { id: "movie-posterHelp" }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "mb-5" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "text-gray-300 block mb-2 font-bold",
+                  attrs: { for: "content-rating" }
+                },
+                [_vm._v("Content Rating")]
+              ),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.poster.mpaa_rating,
+                      expression: "poster.mpaa_rating"
+                    }
+                  ],
+                  staticClass: "text-black w-full",
+                  attrs: { id: "mpaa-rating" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.poster,
+                        "mpaa_rating",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [
+                  _c("option", { attrs: { value: "" } }, [_vm._v("Not Rated")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "G" } }, [_vm._v("G")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "PG" } }, [_vm._v("PG")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "PG-13" } }, [
+                    _vm._v("PG-13")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "R" } }, [_vm._v("R")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "NC-17" } }, [_vm._v("NC-17")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "mb-5" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "text-gray-300 block mb-2 font-bold",
+                  attrs: { for: "audience-rating" }
+                },
+                [_vm._v("Audience Rating")]
+              ),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.poster.audience_rating,
+                    expression: "poster.audience_rating"
+                  }
+                ],
+                staticClass: "text-black w-full",
+                attrs: {
+                  type: "number",
+                  id: "audience-rating",
+                  step: "0.01",
+                  min: "0",
+                  max: "10"
+                },
+                domProps: { value: _vm.poster.audience_rating },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.poster, "audience_rating", $event.target.value)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "text-gray-400 text-sm",
+                  attrs: { id: "audience-ratingHelp" }
+                },
+                [
+                  _vm._v(
+                    "\n                        Audience rating. 1-10.\n                    "
+                  )
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "mb-5" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "text-gray-300 block mb-2 font-bold",
+                  attrs: { for: "trailer-path" }
+                },
+                [_vm._v("YouTube Movie ID")]
+              ),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.poster.trailer_path,
+                    expression: "poster.trailer_path"
+                  }
+                ],
+                staticClass: "text-black w-full",
+                attrs: { type: "text", id: "trailer-path" },
+                domProps: { value: _vm.poster.trailer_path },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.poster, "trailer_path", $event.target.value)
+                  }
+                }
               })
             ]),
             _vm._v(" "),

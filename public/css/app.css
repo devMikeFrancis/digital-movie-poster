@@ -705,6 +705,9 @@ select{
 .col-span-9{
 	grid-column: span 9 / span 9;
 }
+.col-span-3{
+	grid-column: span 3 / span 3;
+}
 .mx-auto{
 	margin-left: auto;
 	margin-right: auto;
@@ -816,6 +819,9 @@ select{
 }
 .cursor-default{
 	cursor: default;
+}
+.cursor-pointer{
+	cursor: pointer;
 }
 .grid-cols-1{
 	grid-template-columns: repeat(1, minmax(0, 1fr));

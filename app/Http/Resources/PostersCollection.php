@@ -22,11 +22,12 @@ class PostersCollection extends ResourceCollection
                 'show_in_rotation' => $poster->show_in_rotation,
                 'ordinal' => $poster->ordinal,
                 'can_delete' => $poster->can_delete,
-                'imdb_id' => $poster->imdb,
+                'imdb_id' => $poster->imdb_id,
                 'mpaa_rating' => $poster->mpaa_rating,
                 'audience_rating' => $poster->audience_rating,
-                'youtube_id' => $poster->trailer_path,
+                'trailer_path' => $poster->trailer_path,
                 'show' => false,
+                'image' => null,
             ];
         });
     }

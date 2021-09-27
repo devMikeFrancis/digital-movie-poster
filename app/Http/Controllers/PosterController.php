@@ -26,7 +26,7 @@ class PosterController extends Controller
     public function cache(PosterService $service)
     {
         $service->cache();
-        $posters = new PostersCollection(Poster::orderBy('ordinal')->orderBy('name')->get());
+        $posters = new PostersCollection(Poster::where('show_in_rotation', true)->orderBy('ordinal')->orderBy('name')->get());
         return response()->json(['posters' => $posters]);
     }
 
@@ -39,7 +39,13 @@ class PosterController extends Controller
 
     public function update(PosterRequest $request, PosterService $service, $id)
     {
-        $service->update($request, $id);
+        $poster = $service->update($request, $id);
+        return response()->json(['poster' => $poster]);
+    }
+
+    public function updateShowInRotation(PosterRequest $request, PosterService $service, $id)
+    {
+        $service->updateShowInRotation($id, $request->boolean('show_in_rotation'));
         return response()->json(['success' => true]);
     }
 

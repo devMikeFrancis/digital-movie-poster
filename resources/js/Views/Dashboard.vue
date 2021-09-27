@@ -17,6 +17,14 @@
                 ></div>
             </div>
             <footer class="coming-soon-footer">
+                <div class="content-rating" v-if="settings.show_mpaa_rating">
+                    <img
+                        v-if="mpaaRating"
+                        :src="'/images/' + mpaaRating + '.svg'"
+                        alt="Content Rating"
+                        v-cloak
+                    />
+                </div>
                 <div class="dolby-logos" v-if="settings.show_processing_logos">
                     <img class="imax" src="/images/imax.png" alt="IMAX" v-if="settings.show_imax" />
                     <img
@@ -44,6 +52,21 @@
                         v-if="settings.show_dolby_atmos_vertical"
                     />
                     <img class="dts" src="/images/dts-x.svg" alt="DTS" v-if="settings.show_dts" />
+                </div>
+                <div class="audience-rating" v-if="settings.show_audience_rating">
+                    <star-rating
+                        v-if="audienceRating"
+                        v-bind:increment="0.1"
+                        v-bind:max-rating="5"
+                        inactive-color="#000"
+                        active-color="#fff"
+                        v-bind:star-size="24"
+                        v-bind:rating="audienceRating"
+                        border-color="#fff"
+                        :border-width="borderWidth"
+                        v-bind:show-rating="false"
+                        v-bind:read-only="true"
+                    />
                 </div>
             </footer>
         </div>
@@ -149,7 +172,9 @@ export default {
             transitionImagesInterval: null,
             nowPlaying: false,
             contentRating: '',
+            mpaaRating: '',
             rating: 0,
+            audienceRating: 0,
             currentImage: 0,
             borderWidth: 2,
             starPadding: 2,
@@ -210,11 +235,18 @@ export default {
                             'You do not have any posters loaded yet. Click here to manage your poster library.';
                     } else {
                         if (this.settings.random_order) {
-                            this.moviePosters[
-                                Math.floor(Math.random() * this.moviePosters.length)
-                            ].show = true;
+                            const rand = Math.floor(Math.random() * this.moviePosters.length);
+                            this.moviePosters[rand].show = true;
+                            this.mpaaRating = this.moviePosters[rand].mpaa_rating;
+                            if (this.moviePosters[rand].audience_rating) {
+                                this.audienceRating = this.moviePosters[rand].audience_rating / 2;
+                            }
                         } else {
                             this.moviePosters[0].show = true;
+                            this.mpaaRating = this.moviePosters[0].mpaa_rating;
+                            if (this.moviePosters[0].audience_rating) {
+                                this.audienceRating = this.moviePosters[0].audience_rating / 2;
+                            }
                         }
 
                         setTimeout(() => {
@@ -257,7 +289,10 @@ export default {
                             '?X-Plex-Token=' +
                             this.settings.plex_token;
                         this.contentRating = response.data.MediaContainer.Metadata[0].contentRating;
-                        this.rating = response.data.MediaContainer.Metadata[0].audienceRating / 2;
+                        if (response.data.MediaContainer.Metadata[0].audienceRating) {
+                            this.rating =
+                                response.data.MediaContainer.Metadata[0].audienceRating / 2;
+                        }
                     }
                 })
                 .catch((e) => {
@@ -287,6 +322,10 @@ export default {
                     poster = this.moviePosters[activeIndex];
                 }
                 poster.show = true;
+                this.mpaaRating = poster.mpaa_rating;
+                if (poster.audience_rating) {
+                    this.audienceRating = poster.audience_rating / 2;
+                }
             }
         },
         startTransitionImages() {
@@ -510,6 +549,7 @@ body {
 .now-playing-footer,
 .coming-soon-footer {
     width: 100%;
+    min-height: 140px;
     display: flex;
     flex-grow: 1;
     flex-direction: row;
@@ -523,6 +563,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     margin-right: auto;
+    flex-grow: 1;
 
     img {
         width: 100%;
@@ -536,12 +577,14 @@ body {
     align-items: center;
     justify-content: flex-end;
     margin-left: auto;
+    flex-grow: 1;
 }
 
 .dolby-logos {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-grow: 2;
 
     img {
         margin: 0 6px;

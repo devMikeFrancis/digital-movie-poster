@@ -39,9 +39,9 @@ class PlexService
         return $response->json();
     }
 
-    public function processImages($movies)
+    public function processMovie($movies)
     {
-        foreach ($movies as $key => $movie) {
+        foreach ($movies as $movie) {
             if ($movie['type'] === 'movie') {
                 $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$movie['thumb'].'?X-Plex-Token='.$this->plexToken;
 
@@ -63,17 +63,17 @@ class PlexService
                         'can_delete' => false,
                         'created_at' => now(),
                         'updated_at' => now(),
-                        'mpaa_rating' => $movie['content_rating'],
-                        'audience_rating' => $movie['audience_rating'],
+                        'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
+                        'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
                     ]
                 );
             }
         }
     }
 
-    public function cacheImages($data)
+    public function save($data)
     {
         $movies = $data['MediaContainer']['Metadata'];
-        $this->processImages($movies);
+        $this->processMovie($movies);
     }
 }
