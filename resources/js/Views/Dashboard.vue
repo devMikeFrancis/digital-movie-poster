@@ -587,7 +587,7 @@ body {
     flex-grow: 2;
 
     img {
-        margin: 0 6px;
+        margin: 0 10px;
     }
 }
 
@@ -604,12 +604,12 @@ body {
 
 .dolby-atmos-stacked {
     width: 100%;
-    max-width: 160px;
+    max-width: 140px;
     height: auto;
 }
 .dolby-vision-stacked {
     width: 100%;
-    max-width: 160px;
+    max-width: 140px;
     height: auto;
 }
 
