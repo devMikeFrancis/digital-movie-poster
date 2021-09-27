@@ -1,25 +1,32 @@
-## About Laravel
+## Digital Movie Poster (DMP)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The web application creates a digital movie poster display for use on LED screens. Intended to run on a Raspberry Pi 4, but will run on any web server with Apache/NGINX, PHP 7.3+, and MySQL/Postgres.
 
--   [Simple, fast routing engine](https://laravel.com/docs/routing).
--   [Powerful dependency injection container](https://laravel.com/docs/container).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   Create/Edit movie posters
+-   Show content ratings, processing logos, audience ratings
+-   Random order or drag-and-drop ordering
+-   Pull posters from Plex and show currently playing
+-   Automatically fill in data using IMDB ID
+-   Control settings such as playing speed, transition speed, etc ...
+-   Control display power using HDMI-CEC control
+-   Movie trailers coming soon ...
 
-## Learning Laravel
+Open to new feature suggestions/requests. Please use Github issues.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Self Installation
 
-### Premium Partners
+1. Clone this repo to your web server.
+2. Run `composer install`.
+3. Point your web root to the `public` folder of the application.
+4. Increase PHP ini `max_execution_time` to at least 600.
+5. Run `php artisan migrate` to create the database tables.
 
--   **[Vehikl](https://vehikl.com/)**
--   **[Tighten Co.](https://tighten.co)**
+Make sure your web server supports mod rewrites.
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+NGINX configuration may need to be updated to support Laravel mod rewrites.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+DMP open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
