@@ -8,13 +8,18 @@
                 <h1>{{ settings.coming_soon_text }}</h1>
             </header>
             <div class="recent-poster-container">
-                <div
-                    v-for="(poster, index) in moviePosters"
-                    class="recent-poster"
-                    v-bind:class="{ show: poster.show, hide: !poster.show }"
-                    :style="'background-image: url(storage/posters/' + poster.file_name + ')'"
-                    v-bind:key="`key-${index}`"
-                ></div>
+                <div class="trailer-container">
+                    <div
+                        v-for="(poster, index) in moviePosters"
+                        class="recent-poster"
+                        v-bind:class="{ show: poster.show, hide: !poster.show }"
+                        :style="'background-image: url(storage/posters/' + poster.file_name + ')'"
+                        v-bind:key="`key-${index}`"
+                    ></div>
+                    <div id="trailer">
+                        <div ref="videoPlayer" id="youtube-player"></div>
+                    </div>
+                </div>
             </div>
             <footer class="coming-soon-footer">
                 <div class="content-rating" v-if="settings.show_mpaa_rating">
@@ -155,6 +160,7 @@ import StarRating from 'vue-star-rating';
 import EventEmitter from 'eventemitter3';
 
 const $recentAdded = document.querySelector('#recent-added-container');
+let $video = document.getElementById('youtube-player');
 
 export default {
     data: function () {
@@ -182,6 +188,10 @@ export default {
             settings: {
                 poster_display_speed: 15000,
             },
+            YTplayer: '',
+            showYTplayer: false,
+            videoPlaying: false,
+            iframeEl: '',
         };
     },
     components: {
@@ -241,11 +251,17 @@ export default {
                             if (this.moviePosters[rand].audience_rating) {
                                 this.audienceRating = this.moviePosters[rand].audience_rating / 2;
                             }
+                            if (this.moviePosters[rand].trailer_path) {
+                                this.playTrailer(this.moviePosters[rand].trailer_path);
+                            }
                         } else {
                             this.moviePosters[0].show = true;
                             this.mpaaRating = this.moviePosters[0].mpaa_rating;
                             if (this.moviePosters[0].audience_rating) {
                                 this.audienceRating = this.moviePosters[0].audience_rating / 2;
+                            }
+                            if (this.moviePosters[0].trailer_path) {
+                                this.playTrailer(this.moviePosters[0].trailer_path);
                             }
                         }
 
@@ -302,6 +318,8 @@ export default {
         transitionImages() {
             let poster = '';
             let activeIndex = 0;
+            this.$refs.videoPlayer.innerHTML = '';
+
             if (this.moviePosters.length > 0) {
                 if (this.settings.random_order) {
                     this.moviePosters.forEach((item) => {
@@ -325,6 +343,9 @@ export default {
                 this.mpaaRating = poster.mpaa_rating;
                 if (poster.audience_rating) {
                     this.audienceRating = poster.audience_rating / 2;
+                }
+                if (poster.trailer_path) {
+                    this.playTrailer(poster.trailer_path);
                 }
             }
         },
@@ -361,6 +382,29 @@ export default {
                     this.nowPlaying = false;
                     break;
             }
+        },
+        playTrailer(youTubeId) {
+            console.log('PLAY TRAILER');
+
+            this.iframeEl = document.createElement('iframe');
+            this.iframeEl.setAttribute(
+                'src',
+                `https://www.youtube.com/embed/${youTubeId}?enablejsapi=1&autoplay=1&mute=1&autohide=2&modestbranding=1&showinfo=0&controls=0&rel=0&border=0&wmode=opaque`
+            );
+            this.iframeEl.setAttribute('frameborder', '0');
+            this.iframeEl.setAttribute('allow', 'autoplay; encrypted-media;');
+            this.iframeEl.addEventListener('load', this.playVideo);
+            this.$refs.videoPlayer.appendChild(this.iframeEl);
+            this.iframeEl.focus();
+        },
+        playVideo(e) {
+            console.log('PLAY VIDEO');
+            console.log(e);
+            this.videoPlaying = true;
+            this.iframeEl.contentWindow.postMessage(
+                '{"event":"command","func":"playVideo","args":""}',
+                '*'
+            );
         },
         isOnTime() {
             let presentDate = new Date();
@@ -473,6 +517,31 @@ body {
     max-height: 1589px;
     position: relative;
     overflow: hidden;
+}
+
+.trailer-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#trailer {
+    height: 580px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: -44px;
+    z-index: 4;
+
+    #youtube-player {
+        width: 100%;
+        height: 100%;
+
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+    }
 }
 
 .recent-poster {
