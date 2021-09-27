@@ -1,8 +1,13 @@
 {
-    "name": "laravel/laravel",
+    "name": "newelement/digital-movie-poster",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "description": "Movie Poster App",
+    "keywords": [
+        "movie",
+        "poster",
+        "plex",
+        "tmdb"
+    ],
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
