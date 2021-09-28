@@ -2270,6 +2270,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -3638,6 +3641,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -4218,7 +4243,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n.trailer-container.has-trailer {\n  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, black 60%);\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n.recent-poster.has-trailer {\n  width: 702px;\n  height: 1052px;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 150px;\n  max-height: 150px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n.trailer-container.has-trailer {\n  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, black 60%);\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n.recent-poster.has-trailer {\n  width: 702px;\n  height: 1052px;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  width: 100%;\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n  position: relative;\n}\n.now-playing-header .runtime,\n.coming-soon-header .runtime {\n  position: absolute;\n  top: 60px;\n  left: 32px;\n  color: #fff;\n  font-size: 32px;\n  font-weight: 400;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 150px;\n  max-height: 150px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -9053,6 +9078,12 @@ var render = function() {
             },
             [
               _c("header", { staticClass: "coming-soon-header" }, [
+                _vm.settings.show_runtime && _vm.runtime
+                  ? _c("span", { staticClass: "runtime" }, [
+                      _vm._v(_vm._s(_vm.runtime) + " min")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("h1", [_vm._v(_vm._s(_vm.settings.coming_soon_text))])
               ]),
               _vm._v(" "),
@@ -10559,58 +10590,63 @@ var render = function() {
                         staticClass: "text-gray-300 block mb-2 font-bold",
                         attrs: { for: "plex-service" }
                       },
-                      [_vm._v("Enable Plex Service")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.plex_service,
-                          expression: "settings.plex_service"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "plex-service",
-                        "aria-describedby": "plex-serviceHelp"
-                      },
-                      domProps: {
-                        checked: Array.isArray(_vm.settings.plex_service)
-                          ? _vm._i(_vm.settings.plex_service, null) > -1
-                          : _vm.settings.plex_service
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.plex_service,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "plex_service",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "plex_service",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.plex_service,
+                              expression: "settings.plex_service"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "plex_service", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "plex-service",
+                            "aria-describedby": "plex-serviceHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(_vm.settings.plex_service)
+                              ? _vm._i(_vm.settings.plex_service, null) > -1
+                              : _vm.settings.plex_service
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.plex_service,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "plex_service",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "plex_service",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.settings, "plex_service", $$c)
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Enable Plex Service"
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -10732,58 +10768,63 @@ var render = function() {
                         staticClass: "text-gray-300 block mb-2 font-bold",
                         attrs: { for: "random" }
                       },
-                      [_vm._v("Randomize Poster Order")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.random_order,
-                          expression: "settings.random_order"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "random",
-                        "aria-describedby": "randomHelp"
-                      },
-                      domProps: {
-                        checked: Array.isArray(_vm.settings.random_order)
-                          ? _vm._i(_vm.settings.random_order, null) > -1
-                          : _vm.settings.random_order
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.random_order,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "random_order",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "random_order",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.random_order,
+                              expression: "settings.random_order"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "random_order", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "random",
+                            "aria-describedby": "randomHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(_vm.settings.random_order)
+                              ? _vm._i(_vm.settings.random_order, null) > -1
+                              : _vm.settings.random_order
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.random_order,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "random_order",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "random_order",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.settings, "random_order", $$c)
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Randomize Poster Order\n                            "
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -10954,60 +10995,142 @@ var render = function() {
                       "label",
                       {
                         staticClass: "text-gray-300 block mb-2 font-bold",
-                        attrs: { for: "mpaa-rating" }
+                        attrs: { for: "show-runtime" }
                       },
-                      [_vm._v("Show MPAA Rating")]
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.show_runtime,
+                              expression: "settings.show_runtime"
+                            }
+                          ],
+                          staticClass: "text-black",
+                          attrs: { type: "checkbox", id: "show-runtime" },
+                          domProps: {
+                            checked: Array.isArray(_vm.settings.show_runtime)
+                              ? _vm._i(_vm.settings.show_runtime, null) > -1
+                              : _vm.settings.show_runtime
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.show_runtime,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_runtime",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_runtime",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.settings, "show_runtime", $$c)
+                              }
+                            }
+                          }
+                        }),
+                        _vm._v(
+                          "\n                                Show Runtime\n                            "
+                        )
+                      ]
                     ),
                     _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.show_mpaa_rating,
-                          expression: "settings.show_mpaa_rating"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "mpaa-rating",
-                        "aria-describedby": "mpaa-ratingHelp"
+                    _c(
+                      "div",
+                      {
+                        staticClass: "text-gray-400 text-sm",
+                        attrs: { id: "show-runtimeHelp" }
                       },
-                      domProps: {
-                        checked: Array.isArray(_vm.settings.show_mpaa_rating)
-                          ? _vm._i(_vm.settings.show_mpaa_rating, null) > -1
-                          : _vm.settings.show_mpaa_rating
+                      [
+                        _vm._v(
+                          "\n                                Displays the movie runtime in the top left corner.\n                            "
+                        )
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "mb-5" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "text-gray-300 block mb-2 font-bold",
+                        attrs: { for: "mpaa-rating" }
                       },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.show_mpaa_rating,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_mpaa_rating",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_mpaa_rating",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.show_mpaa_rating,
+                              expression: "settings.show_mpaa_rating"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "show_mpaa_rating", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "mpaa-rating",
+                            "aria-describedby": "mpaa-ratingHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(
+                              _vm.settings.show_mpaa_rating
+                            )
+                              ? _vm._i(_vm.settings.show_mpaa_rating, null) > -1
+                              : _vm.settings.show_mpaa_rating
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.show_mpaa_rating,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_mpaa_rating",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_mpaa_rating",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.settings, "show_mpaa_rating", $$c)
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Show MPAA Rating\n                            "
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -11030,60 +11153,72 @@ var render = function() {
                         staticClass: "text-gray-300 block mb-2 font-bold",
                         attrs: { for: "audience-rating" }
                       },
-                      [_vm._v("Show Audience Rating")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.show_audience_rating,
-                          expression: "settings.show_audience_rating"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "audience-rating",
-                        "aria-describedby": "audience-ratingHelp"
-                      },
-                      domProps: {
-                        checked: Array.isArray(
-                          _vm.settings.show_audience_rating
-                        )
-                          ? _vm._i(_vm.settings.show_audience_rating, null) > -1
-                          : _vm.settings.show_audience_rating
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.show_audience_rating,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_audience_rating",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_audience_rating",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.show_audience_rating,
+                              expression: "settings.show_audience_rating"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "show_audience_rating", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "audience-rating",
+                            "aria-describedby": "audience-ratingHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(
+                              _vm.settings.show_audience_rating
+                            )
+                              ? _vm._i(
+                                  _vm.settings.show_audience_rating,
+                                  null
+                                ) > -1
+                              : _vm.settings.show_audience_rating
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.show_audience_rating,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_audience_rating",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_audience_rating",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(
+                                  _vm.settings,
+                                  "show_audience_rating",
+                                  $$c
+                                )
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Show Audience Rating"
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -11106,61 +11241,72 @@ var render = function() {
                         staticClass: "text-gray-300 block mb-2 font-bold",
                         attrs: { for: "processing-logos" }
                       },
-                      [_vm._v("Show Processing Logos")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.show_processing_logos,
-                          expression: "settings.show_processing_logos"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "processing-logos",
-                        "aria-describedby": "processing-logosHelp"
-                      },
-                      domProps: {
-                        checked: Array.isArray(
-                          _vm.settings.show_processing_logos
-                        )
-                          ? _vm._i(_vm.settings.show_processing_logos, null) >
-                            -1
-                          : _vm.settings.show_processing_logos
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.show_processing_logos,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_processing_logos",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "show_processing_logos",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.show_processing_logos,
+                              expression: "settings.show_processing_logos"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "show_processing_logos", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "processing-logos",
+                            "aria-describedby": "processing-logosHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(
+                              _vm.settings.show_processing_logos
+                            )
+                              ? _vm._i(
+                                  _vm.settings.show_processing_logos,
+                                  null
+                                ) > -1
+                              : _vm.settings.show_processing_logos
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.show_processing_logos,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_processing_logos",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "show_processing_logos",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(
+                                  _vm.settings,
+                                  "show_processing_logos",
+                                  $$c
+                                )
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Show Processing Logos\n                            "
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -11175,6 +11321,8 @@ var render = function() {
                       ]
                     )
                   ]),
+                  _vm._v(" "),
+                  _c("hr", { staticClass: "mt-3 mb-7 border-gray-700" }),
                   _vm._v(" "),
                   _c("div", { staticClass: "mb-5" }, [
                     _c(
@@ -11625,58 +11773,63 @@ var render = function() {
                         staticClass: "text-gray-300 block mb-2 font-bold",
                         attrs: { for: "cec-controls" }
                       },
-                      [_vm._v("Use HDMI CEC Controls")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.use_cec_power,
-                          expression: "settings.use_cec_power"
-                        }
-                      ],
-                      staticClass: "text-black",
-                      attrs: {
-                        type: "checkbox",
-                        id: "cec-controls",
-                        "aria-describedby": "cec-controlsHelp"
-                      },
-                      domProps: {
-                        checked: Array.isArray(_vm.settings.use_cec_power)
-                          ? _vm._i(_vm.settings.use_cec_power, null) > -1
-                          : _vm.settings.use_cec_power
-                      },
-                      on: {
-                        change: function($event) {
-                          var $$a = _vm.settings.use_cec_power,
-                            $$el = $event.target,
-                            $$c = $$el.checked ? true : false
-                          if (Array.isArray($$a)) {
-                            var $$v = null,
-                              $$i = _vm._i($$a, $$v)
-                            if ($$el.checked) {
-                              $$i < 0 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "use_cec_power",
-                                  $$a.concat([$$v])
-                                )
-                            } else {
-                              $$i > -1 &&
-                                _vm.$set(
-                                  _vm.settings,
-                                  "use_cec_power",
-                                  $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                                )
+                      [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.settings.use_cec_power,
+                              expression: "settings.use_cec_power"
                             }
-                          } else {
-                            _vm.$set(_vm.settings, "use_cec_power", $$c)
+                          ],
+                          staticClass: "text-black",
+                          attrs: {
+                            type: "checkbox",
+                            id: "cec-controls",
+                            "aria-describedby": "cec-controlsHelp"
+                          },
+                          domProps: {
+                            checked: Array.isArray(_vm.settings.use_cec_power)
+                              ? _vm._i(_vm.settings.use_cec_power, null) > -1
+                              : _vm.settings.use_cec_power
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.settings.use_cec_power,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "use_cec_power",
+                                      $$a.concat([$$v])
+                                    )
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      _vm.settings,
+                                      "use_cec_power",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(_vm.settings, "use_cec_power", $$c)
+                              }
+                            }
                           }
-                        }
-                      }
-                    }),
+                        }),
+                        _vm._v(
+                          "\n                                Use HDMI CEC Controls\n                            "
+                        )
+                      ]
+                    ),
                     _vm._v(" "),
                     _c(
                       "div",

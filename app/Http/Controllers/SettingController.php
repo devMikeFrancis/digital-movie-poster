@@ -39,6 +39,7 @@ class SettingController extends Controller
         $settings->show_imax = $request->boolean('show_imax');
         $settings->show_auro_3d = $request->boolean('show_auro_3d');
         $settings->use_cec_power = $request->boolean('use_cec_power');
+        $settings->show_runtime = $request->boolean('show_runtime');
         $settings->save();
 
         return response()->json(['success' => true]);

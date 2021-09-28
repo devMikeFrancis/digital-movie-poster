@@ -88,7 +88,7 @@ On the poster list screen you can drag-and-drop each poster by the thumbnail to 
 
 ### A Note on Deleting Posters
 
-If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every 4 hours when the DMP screen is active`
+If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every 4 hours when the DMP screen is active`. You can always choose which posters you want in the rotation.
 
 ## Updating
 

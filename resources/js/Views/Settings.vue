@@ -28,17 +28,19 @@
                     <div class="lg:col-span-6 p-4" style="background-color: #121212">
                         <form>
                             <div class="mb-5">
-                                <label for="plex-service" class="text-gray-300 block mb-2 font-bold"
-                                    >Enable Plex Service</label
+                                <label
+                                    for="plex-service"
+                                    class="text-gray-300 block mb-2 font-bold"
                                 >
-
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="plex-service"
-                                    aria-describedby="plex-serviceHelp"
-                                    v-model="settings.plex_service"
-                                />
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="plex-service"
+                                        aria-describedby="plex-serviceHelp"
+                                        v-model="settings.plex_service"
+                                    />
+                                    Enable Plex Service</label
+                                >
                                 <div id="plex-serviceHelp" class="text-gray-400 text-sm">
                                     Use Plex media server for posters.
                                 </div>
@@ -85,17 +87,16 @@
                             <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
-                                <label for="random" class="text-gray-300 block mb-2 font-bold"
-                                    >Randomize Poster Order</label
-                                >
-
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="random"
-                                    aria-describedby="randomHelp"
-                                    v-model="settings.random_order"
-                                />
+                                <label for="random" class="text-gray-300 block mb-2 font-bold">
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="random"
+                                        aria-describedby="randomHelp"
+                                        v-model="settings.random_order"
+                                    />
+                                    Randomize Poster Order
+                                </label>
                                 <div id="randomHelp" class="text-gray-400 text-sm">
                                     Randomize poster order or display posters in order you selected.
                                 </div>
@@ -159,17 +160,34 @@
                             <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
-                                <label for="mpaa-rating" class="text-gray-300 block mb-2 font-bold"
-                                    >Show MPAA Rating</label
+                                <label
+                                    for="show-runtime"
+                                    class="text-gray-300 block mb-2 font-bold"
                                 >
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="show-runtime"
+                                        v-model="settings.show_runtime"
+                                    />
+                                    Show Runtime
+                                </label>
+                                <div id="show-runtimeHelp" class="text-gray-400 text-sm">
+                                    Displays the movie runtime in the top left corner.
+                                </div>
+                            </div>
 
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="mpaa-rating"
-                                    aria-describedby="mpaa-ratingHelp"
-                                    v-model="settings.show_mpaa_rating"
-                                />
+                            <div class="mb-5">
+                                <label for="mpaa-rating" class="text-gray-300 block mb-2 font-bold">
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="mpaa-rating"
+                                        aria-describedby="mpaa-ratingHelp"
+                                        v-model="settings.show_mpaa_rating"
+                                    />
+                                    Show MPAA Rating
+                                </label>
                                 <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
                                     Shows the MPAA rating when a movie is playing.
                                 </div>
@@ -179,16 +197,16 @@
                                 <label
                                     for="audience-rating"
                                     class="text-gray-300 block mb-2 font-bold"
-                                    >Show Audience Rating</label
                                 >
-
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="audience-rating"
-                                    aria-describedby="audience-ratingHelp"
-                                    v-model="settings.show_audience_rating"
-                                />
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="audience-rating"
+                                        aria-describedby="audience-ratingHelp"
+                                        v-model="settings.show_audience_rating"
+                                    />
+                                    Show Audience Rating</label
+                                >
                                 <div id="audience-ratingHelp" class="text-gray-400 text-sm">
                                     Shows the audience rating when a movie is playing.
                                 </div>
@@ -198,20 +216,22 @@
                                 <label
                                     for="processing-logos"
                                     class="text-gray-300 block mb-2 font-bold"
-                                    >Show Processing Logos</label
                                 >
-
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="processing-logos"
-                                    aria-describedby="processing-logosHelp"
-                                    v-model="settings.show_processing_logos"
-                                />
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="processing-logos"
+                                        aria-describedby="processing-logosHelp"
+                                        v-model="settings.show_processing_logos"
+                                    />
+                                    Show Processing Logos
+                                </label>
                                 <div id="processing-logosHelp" class="text-gray-400 text-sm">
                                     Shows logos such as Dolby Atmos or Dolby Vision.
                                 </div>
                             </div>
+
+                            <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
                                 <label class="text-gray-300 block mb-2 font-bold"
@@ -275,17 +295,19 @@
                             <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
-                                <label for="cec-controls" class="text-gray-300 block mb-2 font-bold"
-                                    >Use HDMI CEC Controls</label
+                                <label
+                                    for="cec-controls"
+                                    class="text-gray-300 block mb-2 font-bold"
                                 >
-
-                                <input
-                                    type="checkbox"
-                                    class="text-black"
-                                    id="cec-controls"
-                                    aria-describedby="cec-controlsHelp"
-                                    v-model="settings.use_cec_power"
-                                />
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="cec-controls"
+                                        aria-describedby="cec-controlsHelp"
+                                        v-model="settings.use_cec_power"
+                                    />
+                                    Use HDMI CEC Controls
+                                </label>
                                 <div id="cec-controlsHelp" class="text-gray-400 text-sm">
                                     Allow the application to turn on/off your display during certain
                                     time noted below.

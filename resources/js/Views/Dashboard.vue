@@ -5,6 +5,9 @@
         </div>
         <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
             <header class="coming-soon-header">
+                <span class="runtime" v-if="settings.show_runtime && runtime"
+                    >{{ runtime }} min</span
+                >
                 <h1>{{ settings.coming_soon_text }}</h1>
             </header>
             <div class="recent-poster-container">
@@ -645,6 +648,7 @@ body {
 
 .now-playing-header,
 .coming-soon-header {
+    width: 100%;
     display: flex;
     flex-grow: 1;
     max-height: 190px;
@@ -652,6 +656,16 @@ body {
     justify-content: center;
     padding: 24px;
     text-align: center;
+    position: relative;
+
+    .runtime {
+        position: absolute;
+        top: 60px;
+        left: 32px;
+        color: #fff;
+        font-size: 32px;
+        font-weight: 400;
+    }
 
     h1 {
         text-transform: uppercase;
