@@ -247,7 +247,7 @@ export default {
                     this.getMoviePosters();
                     this.recentlyAddedInterval = setInterval(() => {
                         this.cachePosters();
-                    }, 60000 * 60 * 60 * 1000); // Every hour
+                    }, 60000 * 60 * 60 * 1000 * 4); // Every 4 hours
                     this.controlTV('on');
                 })
                 .catch((e) => {
@@ -669,7 +669,8 @@ body {
 .now-playing-footer,
 .coming-soon-footer {
     width: 100%;
-    min-height: 140px;
+    min-height: 150px;
+    max-height: 150px;
     display: flex;
     flex-grow: 1;
     flex-direction: row;

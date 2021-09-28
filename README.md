@@ -68,7 +68,7 @@ sudo chown -R -f www-data:www-data /var/www/html
 
 Once your application is running navigate to either `movieposter.local`, or if you did self-install, `raspberrypi.local`.
 
-On a fresh install with no posters in the database you will see a message asking you to open the application in a browser and start managing posters.
+On a fresh install with no posters in the database you will see a message asking you to open the application in a browser to start managing posters and settings.
 
 **Recommended poster size is 1400x2000 or higher, but retain the same ratio.**
 
@@ -82,13 +82,23 @@ When using the IMDB ID to manage poster data the application will use [TMDB API]
 
 To use Plex, go to the settings configuration, check the checkbox to use the Plex service and enter your Plex IP address and Plex auth token. You can find your Plex auth token [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 
+### Sorting Posters
+
+On the poster list screen you can drag-and-drop each poster by the thumbnail to sort. If you have chosen to use a random order in the settings this list order is ignored.
+
 ### A Note on Deleting Posters
 
-If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every hour when the DMP screen is active`
+If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every 4 hours when the DMP screen is active`
 
-## Sreenshots
+## Updating
 
-Below are some screenshots taken from my local dev environment. On-device screenshots coming soon.
+## Screenshots
+
+Below are some screenshots taken from a local dev environment. IRL screenshots coming soon.
+
+![Basic poster view!](https://newelementdesigns.com/assets/images/screen1.png)
+
+![Poster view with trailer!](https://newelementdesigns.com/assets/images/screen2.png)
 
 ## License
 

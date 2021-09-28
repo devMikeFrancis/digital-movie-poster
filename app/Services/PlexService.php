@@ -39,6 +39,12 @@ class PlexService
         return $response->json();
     }
 
+    public function save($data)
+    {
+        $movies = $data['MediaContainer']['Metadata'];
+        $this->processMovie($movies);
+    }
+
     public function processMovie($movies)
     {
         foreach ($movies as $movie) {
@@ -70,11 +76,5 @@ class PlexService
                 );
             }
         }
-    }
-
-    public function save($data)
-    {
-        $movies = $data['MediaContainer']['Metadata'];
-        $this->processMovie($movies);
     }
 }
