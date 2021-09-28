@@ -49,6 +49,7 @@ class SettingController extends Controller
 
     public function updateApplication()
     {
+        /*
         $process = new Process([app_path().'update.sh']);
         $process->setTimeout(3600);
         $process->run(function ($type, $buffer) {
@@ -61,6 +62,6 @@ class SettingController extends Controller
         // executes after the command finishes
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
-        }
+        }*/
     }
 }

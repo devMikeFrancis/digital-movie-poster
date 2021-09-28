@@ -18,4 +18,4 @@ Route::put('/posters/{id}', [PosterController::class, 'update']);
 Route::put('/posters/{id}/update-rotation', [PosterController::class, 'updateShowInRotation']);
 Route::put('/posters/{id}/{column}', [PosterController::class, 'updateSetting']);
 Route::delete('/posters/{id}', [PosterController::class, 'delete']);
-Route::get('/update', [SettingController::class, 'updateApplication']);
+Route::get('/update-application', [SettingController::class, 'updateApplication']);
