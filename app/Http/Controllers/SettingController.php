@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\Models\Setting;
 
 class SettingController extends Controller
@@ -43,5 +45,22 @@ class SettingController extends Controller
         $settings->save();
 
         return response()->json(['success' => true]);
+    }
+
+    public function updateApplication()
+    {
+        $process = new Process([app_path().'update.sh']);
+        $process->setTimeout(3600);
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                $this->line("<comment>$buffer</comment>");
+            } else {
+                $this->line($buffer);
+            }
+        });
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
     }
 }
