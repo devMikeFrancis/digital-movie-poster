@@ -2342,7 +2342,7 @@ var $video = document.getElementById('youtube-player');
 
         _this.recentlyAddedInterval = setInterval(function () {
           _this.cachePosters();
-        }, 60000 * 60 * 60);
+        }, 60000 * 60 * 60 * 1000); // Every hour
 
         _this.controlTV('on');
       })["catch"](function (e) {
@@ -2357,7 +2357,7 @@ var $video = document.getElementById('youtube-player');
         _this2.moviePosters = response.data.posters;
 
         if (_this2.moviePosters.length === 0) {
-          _this2.loadingMessage = 'You do not have any posters loaded yet. Click here to manage your poster library.';
+          _this2.loadingMessage = 'You do not have any posters loaded yet. Open this application in a browser and click here to manage your poster library.';
         } else {
           if (_this2.settings.random_order) {
             var rand = Math.floor(Math.random() * _this2.moviePosters.length);
@@ -2599,6 +2599,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
 /* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -3083,7 +3102,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -3245,25 +3263,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -4219,7 +4218,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n.recent-poster.has-trailer {\n  width: 700px;\n  height: 1050px;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 140px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n.trailer-container.has-trailer {\n  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, black 60%);\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n.recent-poster.has-trailer {\n  width: 702px;\n  height: 1052px;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 140px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -9028,6 +9027,7 @@ var render = function() {
             _c(
               "div",
               {
+                staticClass: "p-12",
                 on: {
                   click: function($event) {
                     return _vm.gotoPosters()
@@ -9059,7 +9059,7 @@ var render = function() {
               _c("div", { staticClass: "recent-poster-container" }, [
                 _c(
                   "div",
-                  { staticClass: "trailer-container" },
+                  { staticClass: "trailer-container has-trailer" },
                   [
                     _vm._l(_vm.moviePosters, function(poster, index) {
                       return _c("div", {
@@ -9380,32 +9380,13 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "admin" }, [
+    _c("div", { staticClass: "admin py-5" }, [
       _c(
         "div",
         { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
         [
-          _c(
-            "div",
-            { staticClass: "pt-4 pb-4" },
-            [
-              _c(
-                "router-link",
-                { staticClass: "text-white", attrs: { to: "/" } },
-                [_vm._v("← Back to DMP")]
-              )
-            ],
-            1
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
-        [
-          _c("div", { staticClass: "grid grid-cols-12 gap-4" }, [
-            _c("div", { staticClass: "col-span-2 pl-5" }, [
+          _c("div", { staticClass: "grid lg:grid-cols-12 gap-4" }, [
+            _c("div", { staticClass: "lg:col-span-2" }, [
               _c(
                 "ul",
                 {
@@ -9413,6 +9394,22 @@ var render = function() {
                   staticStyle: { "background-color": "#121212" }
                 },
                 [
+                  _c(
+                    "li",
+                    { staticClass: "mb-3" },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "hover:text-gray-500",
+                          attrs: { to: "/" }
+                        },
+                        [_vm._v("← Back to DMP")]
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
                   _c(
                     "li",
                     { staticClass: "mb-3" },
@@ -9450,7 +9447,7 @@ var render = function() {
             _c(
               "div",
               {
-                staticClass: "col-span-10 p-4 relative",
+                staticClass: "lg:col-span-10 p-4 relative",
                 staticStyle: { "background-color": "#121212" }
               },
               [
@@ -9477,11 +9474,15 @@ var render = function() {
                     { staticClass: "col-span-6 flex justify-end mb-4" },
                     [
                       _c(
-                        "button",
+                        "a",
                         {
                           staticClass:
                             "\n                                    btn\n                                    text-black\n                                    bg-gray-300\n                                    text-md\n                                    px-3\n                                    py-1\n                                    hover:bg-gray-100\n                                ",
-                          attrs: { type: "submit", disabled: _vm.recaching },
+                          attrs: {
+                            href: "#",
+                            role: "button",
+                            disabled: _vm.recaching
+                          },
                           on: {
                             click: function($event) {
                               $event.preventDefault()
@@ -9502,7 +9503,7 @@ var render = function() {
                                 }
                               ]
                             },
-                            [_vm._v("Re-cache Posters")]
+                            [_vm._v("Cache Posters")]
                           ),
                           _vm._v(" "),
                           _c(
@@ -9553,202 +9554,240 @@ var render = function() {
                         staticStyle: { "background-color": "#222" }
                       },
                       [
-                        _c("div", { staticClass: "grid grid-cols-12 gap-4" }, [
-                          _c("div", { staticClass: "col-span-1 w-12" }, [
-                            _c("div", {
-                              staticClass: "poster-image-block handle",
-                              style:
-                                "background-image: url(storage/posters/" +
-                                poster.file_name +
-                                ")"
-                            })
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "col-span-5 flex items-center" },
-                            [
-                              _c(
-                                "router-link",
-                                {
-                                  staticClass: "text-white font-bold",
-                                  attrs: { to: "/posters/" + poster.id }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                        " +
-                                      _vm._s(poster.name)
-                                  )
-                                ]
-                              )
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "col-span-2 flex items-center" },
-                            [
-                              _c("label", { staticClass: "text-white" }, [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: poster.show_trailer,
-                                      expression: "poster.show_trailer"
-                                    }
-                                  ],
-                                  attrs: { type: "checkbox" },
-                                  domProps: {
-                                    checked: Array.isArray(poster.show_trailer)
-                                      ? _vm._i(poster.show_trailer, null) > -1
-                                      : poster.show_trailer
+                        _c(
+                          "div",
+                          {
+                            staticClass:
+                              "grid lg:grid-cols-12 gap-4 p-4 lg:p-0 relative"
+                          },
+                          [
+                            _c(
+                              "div",
+                              {
+                                staticClass: "sm:col-span-2 lg:col-span-1 w-12"
+                              },
+                              [
+                                _c("div", {
+                                  staticClass: "poster-image-block handle",
+                                  style:
+                                    "background-image: url(storage/posters/" +
+                                    poster.file_name +
+                                    ")"
+                                })
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "sm:col-span-2 lg:col-span-5 flex items-center"
+                              },
+                              [
+                                _c(
+                                  "router-link",
+                                  {
+                                    staticClass: "text-white font-bold",
+                                    attrs: { to: "/posters/" + poster.id }
                                   },
-                                  on: {
-                                    change: [
-                                      function($event) {
-                                        var $$a = poster.show_trailer,
-                                          $$el = $event.target,
-                                          $$c = $$el.checked ? true : false
-                                        if (Array.isArray($$a)) {
-                                          var $$v = null,
-                                            $$i = _vm._i($$a, $$v)
-                                          if ($$el.checked) {
-                                            $$i < 0 &&
-                                              _vm.$set(
-                                                poster,
-                                                "show_trailer",
-                                                $$a.concat([$$v])
-                                              )
-                                          } else {
-                                            $$i > -1 &&
-                                              _vm.$set(
-                                                poster,
-                                                "show_trailer",
-                                                $$a
-                                                  .slice(0, $$i)
-                                                  .concat($$a.slice($$i + 1))
-                                              )
-                                          }
-                                        } else {
-                                          _vm.$set(poster, "show_trailer", $$c)
-                                        }
-                                      },
-                                      function($event) {
-                                        return _vm.updateSetting(
-                                          poster,
-                                          "show_trailer",
-                                          poster.show_trailer
-                                        )
-                                      }
-                                    ]
-                                  }
-                                }),
-                                _vm._v(
-                                  "\n                                        Show trailer"
-                                )
-                              ])
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "col-span-3 flex items-center" },
-                            [
-                              _c("label", { staticClass: "text-white" }, [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: poster.show_in_rotation,
-                                      expression: "poster.show_in_rotation"
-                                    }
-                                  ],
-                                  attrs: { type: "checkbox" },
-                                  domProps: {
-                                    checked: Array.isArray(
-                                      poster.show_in_rotation
+                                  [
+                                    _vm._v(
+                                      "\n                                        " +
+                                        _vm._s(poster.name)
                                     )
-                                      ? _vm._i(poster.show_in_rotation, null) >
-                                        -1
-                                      : poster.show_in_rotation
-                                  },
-                                  on: {
-                                    change: [
-                                      function($event) {
-                                        var $$a = poster.show_in_rotation,
-                                          $$el = $event.target,
-                                          $$c = $$el.checked ? true : false
-                                        if (Array.isArray($$a)) {
-                                          var $$v = null,
-                                            $$i = _vm._i($$a, $$v)
-                                          if ($$el.checked) {
-                                            $$i < 0 &&
-                                              _vm.$set(
-                                                poster,
-                                                "show_in_rotation",
-                                                $$a.concat([$$v])
-                                              )
+                                  ]
+                                )
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "sm:col-span-2 lg:col-span-2 flex items-center"
+                              },
+                              [
+                                _c("label", { staticClass: "text-white" }, [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: poster.show_trailer,
+                                        expression: "poster.show_trailer"
+                                      }
+                                    ],
+                                    attrs: { type: "checkbox" },
+                                    domProps: {
+                                      checked: Array.isArray(
+                                        poster.show_trailer
+                                      )
+                                        ? _vm._i(poster.show_trailer, null) > -1
+                                        : poster.show_trailer
+                                    },
+                                    on: {
+                                      change: [
+                                        function($event) {
+                                          var $$a = poster.show_trailer,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                _vm.$set(
+                                                  poster,
+                                                  "show_trailer",
+                                                  $$a.concat([$$v])
+                                                )
+                                            } else {
+                                              $$i > -1 &&
+                                                _vm.$set(
+                                                  poster,
+                                                  "show_trailer",
+                                                  $$a
+                                                    .slice(0, $$i)
+                                                    .concat($$a.slice($$i + 1))
+                                                )
+                                            }
                                           } else {
-                                            $$i > -1 &&
-                                              _vm.$set(
-                                                poster,
-                                                "show_in_rotation",
-                                                $$a
-                                                  .slice(0, $$i)
-                                                  .concat($$a.slice($$i + 1))
-                                              )
+                                            _vm.$set(
+                                              poster,
+                                              "show_trailer",
+                                              $$c
+                                            )
                                           }
-                                        } else {
-                                          _vm.$set(
+                                        },
+                                        function($event) {
+                                          return _vm.updateSetting(
                                             poster,
-                                            "show_in_rotation",
-                                            $$c
+                                            "show_trailer",
+                                            poster.show_trailer
                                           )
                                         }
-                                      },
-                                      function($event) {
-                                        return _vm.updateShowInRotation(poster)
-                                      }
-                                    ]
-                                  }
-                                }),
-                                _vm._v(
-                                  "\n                                        Show in rotation"
-                                )
-                              ])
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            {
-                              staticClass:
-                                "col-span-1 flex items-center justify-end pr-4"
-                            },
-                            [
-                              poster.can_delete
-                                ? _c(
-                                    "a",
-                                    {
-                                      staticClass:
-                                        "text-gray-300 font-bold hover:text-gray-50",
-                                      attrs: { href: "#" },
-                                      on: {
-                                        click: function($event) {
-                                          $event.preventDefault()
-                                          return _vm.deletePoster(poster)
-                                        }
-                                      }
-                                    },
-                                    [_vm._v("[X]")]
+                                      ]
+                                    }
+                                  }),
+                                  _vm._v(
+                                    "\n                                        Show trailer"
                                   )
-                                : _vm._e()
-                            ]
-                          )
-                        ])
+                                ])
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "sm:col-span-2 lg:col-span-3 flex items-center"
+                              },
+                              [
+                                _c("label", { staticClass: "text-white" }, [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: poster.show_in_rotation,
+                                        expression: "poster.show_in_rotation"
+                                      }
+                                    ],
+                                    attrs: { type: "checkbox" },
+                                    domProps: {
+                                      checked: Array.isArray(
+                                        poster.show_in_rotation
+                                      )
+                                        ? _vm._i(
+                                            poster.show_in_rotation,
+                                            null
+                                          ) > -1
+                                        : poster.show_in_rotation
+                                    },
+                                    on: {
+                                      change: [
+                                        function($event) {
+                                          var $$a = poster.show_in_rotation,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                _vm.$set(
+                                                  poster,
+                                                  "show_in_rotation",
+                                                  $$a.concat([$$v])
+                                                )
+                                            } else {
+                                              $$i > -1 &&
+                                                _vm.$set(
+                                                  poster,
+                                                  "show_in_rotation",
+                                                  $$a
+                                                    .slice(0, $$i)
+                                                    .concat($$a.slice($$i + 1))
+                                                )
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              poster,
+                                              "show_in_rotation",
+                                              $$c
+                                            )
+                                          }
+                                        },
+                                        function($event) {
+                                          return _vm.updateShowInRotation(
+                                            poster
+                                          )
+                                        }
+                                      ]
+                                    }
+                                  }),
+                                  _vm._v(
+                                    "\n                                        Show in rotation"
+                                  )
+                                ])
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "\n                                        sm:col-span-4\n                                        lg:col-span-1\n                                        flex\n                                        items-center\n                                        justify-end\n                                        lg:pr-4\n                                    "
+                              },
+                              [
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass:
+                                      "\n                                            text-gray-300\n                                            font-bold\n                                            hover:text-gray-50\n                                            absolute\n                                            top-6\n                                            right-6\n                                            lg:relative\n                                            lg:top-auto\n                                            lg:right-auto\n                                        ",
+                                    attrs: { href: "#" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.deletePoster(poster)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    poster.can_delete
+                                      ? _c("span", [_vm._v("[X]")])
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    !poster.can_delete
+                                      ? _c("span", [_vm._v("[X]")])
+                                      : _vm._e()
+                                  ]
+                                )
+                              ]
+                            )
+                          ]
+                        )
                       ]
                     )
                   }),
@@ -9787,32 +9826,13 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "admin" }, [
+    _c("div", { staticClass: "admin py-5" }, [
       _c(
         "div",
         { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
         [
-          _c(
-            "div",
-            { staticClass: "pt-4 pb-4" },
-            [
-              _c(
-                "router-link",
-                { staticClass: "text-white", attrs: { to: "/" } },
-                [_vm._v("← Back to DMP")]
-              )
-            ],
-            1
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
-        [
-          _c("div", { staticClass: "grid grid-cols-12 gap-4" }, [
-            _c("div", { staticClass: "col-span-2 pl-5" }, [
+          _c("div", { staticClass: "grid lg:grid-cols-12 gap-4" }, [
+            _c("div", { staticClass: "lg:col-span-2" }, [
               _c(
                 "ul",
                 {
@@ -9820,6 +9840,22 @@ var render = function() {
                   staticStyle: { "background-color": "#121212" }
                 },
                 [
+                  _c(
+                    "li",
+                    { staticClass: "mb-3" },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "hover:text-gray-500",
+                          attrs: { to: "/" }
+                        },
+                        [_vm._v("← Back to DMP")]
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
                   _c(
                     "li",
                     { staticClass: "mb-3" },
@@ -9857,12 +9893,12 @@ var render = function() {
             _c(
               "div",
               {
-                staticClass: "col-span-10 p-4 relative",
+                staticClass: "lg:col-span-10 p-4 relative",
                 staticStyle: { "background-color": "#121212" }
               },
               [
-                _c("div", { staticClass: "grid grid-cols-12 gap-4" }, [
-                  _c("div", { staticClass: "col-span-4" }, [
+                _c("div", { staticClass: "grid lg:grid-cols-12 gap-4" }, [
+                  _c("div", { staticClass: "lg:col-span-4" }, [
                     _vm.mode === "edit" && _vm.poster.file_name
                       ? _c("img", {
                           staticClass: "mb-5",
@@ -9875,7 +9911,7 @@ var render = function() {
                       : _vm._e()
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "col-span-8" }, [
+                  _c("div", { staticClass: "lg:col-span-8" }, [
                     _c("div", { staticClass: "mb-5" }, [
                       _c(
                         "label",
@@ -10444,32 +10480,13 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "admin" }, [
+    _c("div", { staticClass: "admin py-5" }, [
       _c(
         "div",
         { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
         [
-          _c(
-            "div",
-            { staticClass: "pt-4 pb-4" },
-            [
-              _c(
-                "router-link",
-                { staticClass: "text-white", attrs: { to: "/" } },
-                [_vm._v("← Back to DMP")]
-              )
-            ],
-            1
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "md:container md:mx-auto lg:container lg:mx-auto" },
-        [
-          _c("div", { staticClass: "grid grid-cols-12 gap-4" }, [
-            _c("div", { staticClass: "col-span-2 pl-5" }, [
+          _c("div", { staticClass: "grid lg:grid-cols-12 gap-4" }, [
+            _c("div", { staticClass: "lg:col-span-2" }, [
               _c(
                 "ul",
                 {
@@ -10477,6 +10494,22 @@ var render = function() {
                   staticStyle: { "background-color": "#121212" }
                 },
                 [
+                  _c(
+                    "li",
+                    { staticClass: "mb-3" },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "hover:text-gray-500",
+                          attrs: { to: "/" }
+                        },
+                        [_vm._v("← Back to DMP")]
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
                   _c(
                     "li",
                     { staticClass: "mb-3" },
@@ -10514,7 +10547,7 @@ var render = function() {
             _c(
               "div",
               {
-                staticClass: "col-span-6 p-4",
+                staticClass: "lg:col-span-6 p-4",
                 staticStyle: { "background-color": "#121212" }
               },
               [
@@ -10815,60 +10848,6 @@ var render = function() {
                       [
                         _vm._v(
                           "\n                                Time between each poster. In ms. 15000 = 15 seconds.\n                            "
-                        )
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "mb-5" }, [
-                    _c(
-                      "label",
-                      {
-                        staticClass: "text-gray-300 block mb-2 font-bold",
-                        attrs: { for: "display-limit" }
-                      },
-                      [_vm._v("Poster Display Limit")]
-                    ),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.settings.poster_display_limit,
-                          expression: "settings.poster_display_limit"
-                        }
-                      ],
-                      staticClass: "text-black w-full",
-                      attrs: {
-                        type: "text",
-                        id: "display-limit",
-                        "aria-describedby": "display-limitHelp"
-                      },
-                      domProps: { value: _vm.settings.poster_display_limit },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.settings,
-                            "poster_display_limit",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass: "text-gray-400 text-sm",
-                        attrs: { id: "display-limitHelp" }
-                      },
-                      [
-                        _vm._v(
-                          "\n                                How many posters do you want in the rotation? 0 = all.\n                            "
                         )
                       ]
                     )

@@ -1,18 +1,18 @@
 <template>
     <div>
-        <div class="admin">
+        <div class="admin py-5">
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="pt-4 pb-4">
-                    <router-link class="text-white" to="/">&larr; Back to DMP</router-link>
-                </div>
-            </div>
-            <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-2 pl-5">
+                <div class="grid lg:grid-cols-12 gap-4">
+                    <div class="lg:col-span-2">
                         <ul
                             class="block text-gray-300 p-4 sticky top-0"
                             style="background-color: #121212"
                         >
+                            <li class="mb-3">
+                                <router-link class="hover:text-gray-500" to="/"
+                                    >&larr; Back to DMP</router-link
+                                >
+                            </li>
                             <li class="mb-3">
                                 <router-link class="hover:text-gray-500" to="/posters"
                                     >Posters</router-link
@@ -25,7 +25,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="col-span-6 p-4" style="background-color: #121212">
+                    <div class="lg:col-span-6 p-4" style="background-color: #121212">
                         <form>
                             <div class="mb-5">
                                 <label for="plex-service" class="text-gray-300 block mb-2 font-bold"
@@ -117,25 +117,6 @@
                                 />
                                 <div id="display-speedHelp" class="text-gray-400 text-sm">
                                     Time between each poster. In ms. 15000 = 15 seconds.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="display-limit"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Poster Display Limit</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="display-limit"
-                                    aria-describedby="display-limitHelp"
-                                    v-model="settings.poster_display_limit"
-                                />
-                                <div id="display-limitHelp" class="text-gray-400 text-sm">
-                                    How many posters do you want in the rotation? 0 = all.
                                 </div>
                             </div>
 

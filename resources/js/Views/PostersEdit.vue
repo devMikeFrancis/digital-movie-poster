@@ -1,19 +1,18 @@
 <template>
     <div>
-        <div class="admin">
+        <div class="admin py-5">
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="pt-4 pb-4">
-                    <router-link class="text-white" to="/">&larr; Back to DMP</router-link>
-                </div>
-            </div>
-
-            <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-2 pl-5">
+                <div class="grid lg:grid-cols-12 gap-4">
+                    <div class="lg:col-span-2">
                         <ul
                             class="block text-gray-300 p-4 sticky top-0"
                             style="background-color: #121212"
                         >
+                            <li class="mb-3">
+                                <router-link class="hover:text-gray-500" to="/"
+                                    >&larr; Back to DMP</router-link
+                                >
+                            </li>
                             <li class="mb-3">
                                 <router-link class="hover:text-gray-500" to="/posters"
                                     >Posters</router-link
@@ -26,9 +25,9 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="col-span-10 p-4 relative" style="background-color: #121212">
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-4">
+                    <div class="lg:col-span-10 p-4 relative" style="background-color: #121212">
+                        <div class="grid lg:grid-cols-12 gap-4">
+                            <div class="lg:col-span-4">
                                 <img
                                     v-if="mode === 'edit' && poster.file_name"
                                     :src="'/storage/posters/' + poster.file_name"
@@ -37,7 +36,7 @@
                                     style="max-width: 100%; height: auto"
                                 />
                             </div>
-                            <div class="col-span-8">
+                            <div class="lg:col-span-8">
                                 <div class="mb-5">
                                     <label
                                         for="movie-title"

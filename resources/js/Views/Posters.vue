@@ -1,19 +1,18 @@
 <template>
     <div>
-        <div class="admin">
+        <div class="admin py-5">
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="pt-4 pb-4">
-                    <router-link class="text-white" to="/">&larr; Back to DMP</router-link>
-                </div>
-            </div>
-
-            <div class="md:container md:mx-auto lg:container lg:mx-auto">
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-2 pl-5">
+                <div class="grid lg:grid-cols-12 gap-4">
+                    <div class="lg:col-span-2">
                         <ul
                             class="block text-gray-300 p-4 sticky top-0"
                             style="background-color: #121212"
                         >
+                            <li class="mb-3">
+                                <router-link class="hover:text-gray-500" to="/"
+                                    >&larr; Back to DMP</router-link
+                                >
+                            </li>
                             <li class="mb-3">
                                 <router-link class="hover:text-gray-500 active" to="/posters"
                                     >Posters</router-link
@@ -26,7 +25,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="col-span-10 p-4 relative" style="background-color: #121212">
+                    <div class="lg:col-span-10 p-4 relative" style="background-color: #121212">
                         <div class="grid grid-cols-12 gap-4">
                             <div class="col-span-6">
                                 <router-link
@@ -45,8 +44,9 @@
                                 </router-link>
                             </div>
                             <div class="col-span-6 flex justify-end mb-4">
-                                <button
-                                    type="submit"
+                                <a
+                                    href="#"
+                                    role="button"
                                     class="
                                         btn
                                         text-black
@@ -59,9 +59,9 @@
                                     @click.prevent="cachePosters"
                                     :disabled="recaching"
                                 >
-                                    <span v-show="!recaching">Re-cache Posters</span>
+                                    <span v-show="!recaching">Cache Posters</span>
                                     <span v-show="recaching">Caching Posters ...</span>
-                                </button>
+                                </a>
                             </div>
                         </div>
                         <div class="cache-overlay" v-if="recaching" v-cloak>
@@ -79,8 +79,8 @@
                                 class="mb-5"
                                 style="background-color: #222"
                             >
-                                <div class="grid grid-cols-12 gap-4">
-                                    <div class="col-span-1 w-12">
+                                <div class="grid lg:grid-cols-12 gap-4 p-4 lg:p-0 relative">
+                                    <div class="sm:col-span-2 lg:col-span-1 w-12">
                                         <div
                                             class="poster-image-block handle"
                                             :style="
@@ -90,7 +90,7 @@
                                             "
                                         ></div>
                                     </div>
-                                    <div class="col-span-5 flex items-center">
+                                    <div class="sm:col-span-2 lg:col-span-5 flex items-center">
                                         <router-link
                                             class="text-white font-bold"
                                             :to="'/posters/' + poster.id"
@@ -99,7 +99,7 @@
                                         >
                                     </div>
 
-                                    <div class="col-span-2 flex items-center">
+                                    <div class="sm:col-span-2 lg:col-span-2 flex items-center">
                                         <label class="text-white"
                                             ><input
                                                 type="checkbox"
@@ -116,7 +116,7 @@
                                         >
                                     </div>
 
-                                    <div class="col-span-3 flex items-center">
+                                    <div class="sm:col-span-2 lg:col-span-3 flex items-center">
                                         <label class="text-white"
                                             ><input
                                                 type="checkbox"
@@ -127,13 +127,32 @@
                                         >
                                     </div>
 
-                                    <div class="col-span-1 flex items-center justify-end pr-4">
+                                    <div
+                                        class="
+                                            sm:col-span-4
+                                            lg:col-span-1
+                                            flex
+                                            items-center
+                                            justify-end
+                                            lg:pr-4
+                                        "
+                                    >
                                         <a
-                                            v-if="poster.can_delete"
                                             href="#"
                                             @click.prevent="deletePoster(poster)"
-                                            class="text-gray-300 font-bold hover:text-gray-50"
-                                            >[X]</a
+                                            class="
+                                                text-gray-300
+                                                font-bold
+                                                hover:text-gray-50
+                                                absolute
+                                                top-6
+                                                right-6
+                                                lg:relative
+                                                lg:top-auto
+                                                lg:right-auto
+                                            "
+                                            ><span v-if="poster.can_delete">[X]</span>
+                                            <span v-if="!poster.can_delete">[X]</span></a
                                         >
                                     </div>
                                 </div>

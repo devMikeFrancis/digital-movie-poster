@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="loading-overlay" v-if="loading">
-            <div @click="gotoPosters()">{{ loadingMessage }}</div>
+            <div class="p-12" @click="gotoPosters()">{{ loadingMessage }}</div>
         </div>
         <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
             <header class="coming-soon-header">
                 <h1>{{ settings.coming_soon_text }}</h1>
             </header>
             <div class="recent-poster-container">
-                <div class="trailer-container">
+                <div class="trailer-container has-trailer">
                     <div
                         v-for="(poster, index) in moviePosters"
                         class="recent-poster"
@@ -247,7 +247,7 @@ export default {
                     this.getMoviePosters();
                     this.recentlyAddedInterval = setInterval(() => {
                         this.cachePosters();
-                    }, 60000 * 60 * 60);
+                    }, 60000 * 60 * 60 * 1000); // Every hour
                     this.controlTV('on');
                 })
                 .catch((e) => {
@@ -263,7 +263,7 @@ export default {
 
                     if (this.moviePosters.length === 0) {
                         this.loadingMessage =
-                            'You do not have any posters loaded yet. Click here to manage your poster library.';
+                            'You do not have any posters loaded yet. Open this application in a browser and click here to manage your poster library.';
                     } else {
                         if (this.settings.random_order) {
                             const rand = Math.floor(Math.random() * this.moviePosters.length);
@@ -559,6 +559,14 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
+
+    &.has-trailer {
+        background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(000, 000, 000, 1) 60%
+        );
+    }
 }
 
 #trailer {
@@ -604,8 +612,8 @@ body {
     }
 
     &.has-trailer {
-        width: 700px;
-        height: 1050px;
+        width: 702px;
+        height: 1052px;
         left: 50%;
         transform: translateX(-50%);
     }

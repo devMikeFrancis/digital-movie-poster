@@ -44,13 +44,43 @@ A pre-installed image on a SD card will already be configured. Just plug-in-play
 8. Add your database credentials to the `.env` file.
 9. Add your TMDB API key to the `.env` file using this existing key: `TMDB_API_V3=`
 
-**You will need to lookup tutorials on how to boot your Pi in kiosk mode.**
-
 NOTE: If you alter any of the application files other than the `.env` file the update process will not work as it uses `git pull` to update the application.
 
 Make sure your web server supports/turned on mod_rewrite.
 
 If using NGINX your configuration may need to be updated to support Laravel mod rewrites.
+
+### Permissions
+
+For self installations you will need to make sure you have the correct permissions for your application.
+Below is an example:
+
+```
+sudo usermod -a -G www-data pi
+sudo chown -R -f www-data:www-data /var/www/html
+```
+
+### Kiosk Mode
+
+**You will need to lookup tutorials on how to boot your Pi in kiosk mode using chromium.**
+
+## Usage
+
+Once your application is running navigate to either `movieposter.local`, or if you did self-install, `raspberrypi.local`.
+
+On a fresh install with no posters in the database you will see a message asking you to open the application in a browser and start managing posters.
+
+**Recommended poster size is 1400x2000 or higher, but retain the same ratio.**
+
+After you've added posters and are back on the DMP screen you can always return to the posters and settings configuration by clicking or tapping on the 'Coming Soon/Now Playing' header.
+
+### A Note on Deleting Posters
+
+If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every hour when the DMP screen is active`
+
+## Sreenshots
+
+Below are some screenshots taken from my local dev environment. On-device screenshots coming soon.
 
 ## License
 
