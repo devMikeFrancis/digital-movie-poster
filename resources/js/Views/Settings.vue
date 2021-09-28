@@ -371,23 +371,40 @@
                             >
                                 {{ settingsMessage }}
                             </div>
-
-                            <button
-                                type="submit"
-                                class="
-                                    btn
-                                    text-black
-                                    bg-gray-300
-                                    text-md
-                                    px-3
-                                    py-1
-                                    hover:bg-gray-100
-                                "
-                                @click.prevent="saveSettings"
-                            >
-                                Save Settings
-                            </button>
+                            <div class="grid grid-cols-12">
+                                <div class="col-span-6">
+                                    <button
+                                        type="submit"
+                                        class="
+                                            btn
+                                            text-black
+                                            bg-gray-300
+                                            text-md
+                                            px-3
+                                            py-1
+                                            hover:bg-gray-100
+                                        "
+                                        @click.prevent="saveSettings"
+                                    >
+                                        Save Settings
+                                    </button>
+                                </div>
+                                <div class="col-span-6 text-right">
+                                    <a
+                                        href="#"
+                                        role="button"
+                                        class="text-white"
+                                        @click.prevent="updateApplication"
+                                        >{{ updateBtn }}</a
+                                    >
+                                </div>
+                            </div>
                         </form>
+                        <div
+                            class="update-output text-white p-5"
+                            style="white-space: pre"
+                            v-html="updateOutput"
+                        ></div>
                     </div>
                 </div>
             </div>
@@ -405,6 +422,8 @@ export default {
                 plex_token: '',
                 plex_ip_address: '',
             },
+            updateBtn: 'Update DMP',
+            updateOutput: '',
         };
     },
     components: {},
@@ -422,7 +441,6 @@ export default {
         },
         saveSettings() {
             this.settingsMessage = '';
-
             this.settings._method = 'put';
 
             axios
@@ -432,6 +450,20 @@ export default {
                 })
                 .catch((e) => {
                     this.settingsMessage = e.message;
+                });
+        },
+        updateApplication() {
+            this.updateOutput = '';
+            this.updateBtn = 'Updating ...';
+            axios
+                .get('/api/update-application')
+                .then((response) => {
+                    this.updateOutput = response.data.output;
+                    this.updateBtn = 'Update DMP';
+                })
+                .catch((e) => {
+                    console.log(e.message);
+                    this.updateBtn = 'Update DMP';
                 });
         },
     },

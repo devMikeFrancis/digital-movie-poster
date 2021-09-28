@@ -3663,6 +3663,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -3671,7 +3688,9 @@ __webpack_require__.r(__webpack_exports__);
       settings: {
         plex_token: '',
         plex_ip_address: ''
-      }
+      },
+      updateBtn: 'Update DMP',
+      updateOutput: ''
     };
   },
   components: {},
@@ -3695,6 +3714,19 @@ __webpack_require__.r(__webpack_exports__);
         _this2.settingsMessage = 'Settings saved.';
       })["catch"](function (e) {
         _this2.settingsMessage = e.message;
+      });
+    },
+    updateApplication: function updateApplication() {
+      var _this3 = this;
+
+      this.updateOutput = '';
+      this.updateBtn = 'Updating ...';
+      axios.get('/api/update-application').then(function (response) {
+        _this3.updateOutput = response.data.output;
+        _this3.updateBtn = 'Update DMP';
+      })["catch"](function (e) {
+        console.log(e.message);
+        _this3.updateBtn = 'Update DMP';
       });
     }
   },
@@ -11973,26 +12005,56 @@ var render = function() {
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass:
-                        "\n                                btn\n                                text-black\n                                bg-gray-300\n                                text-md\n                                px-3\n                                py-1\n                                hover:bg-gray-100\n                            ",
-                      attrs: { type: "submit" },
-                      on: {
-                        click: function($event) {
-                          $event.preventDefault()
-                          return _vm.saveSettings.apply(null, arguments)
-                        }
-                      }
-                    },
-                    [
-                      _vm._v(
-                        "\n                            Save Settings\n                        "
+                  _c("div", { staticClass: "grid grid-cols-12" }, [
+                    _c("div", { staticClass: "col-span-6" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass:
+                            "\n                                        btn\n                                        text-black\n                                        bg-gray-300\n                                        text-md\n                                        px-3\n                                        py-1\n                                        hover:bg-gray-100\n                                    ",
+                          attrs: { type: "submit" },
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              return _vm.saveSettings.apply(null, arguments)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                                    Save Settings\n                                "
+                          )
+                        ]
                       )
-                    ]
-                  )
-                ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-span-6 text-right" }, [
+                      _c(
+                        "a",
+                        {
+                          staticClass: "text-white",
+                          attrs: { href: "#", role: "button" },
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              return _vm.updateApplication.apply(
+                                null,
+                                arguments
+                              )
+                            }
+                          }
+                        },
+                        [_vm._v(_vm._s(_vm.updateBtn))]
+                      )
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", {
+                  staticClass: "update-output text-white p-5",
+                  staticStyle: { "white-space": "pre" },
+                  domProps: { innerHTML: _vm._s(_vm.updateOutput) }
+                })
               ]
             )
           ])
