@@ -340,10 +340,16 @@ export default {
                             response.data.MediaContainer.Metadata[0].thumb +
                             '?X-Plex-Token=' +
                             this.settings.plex_token;
-                        this.contentRating = response.data.MediaContainer.Metadata[0].contentRating;
-                        if (response.data.MediaContainer.Metadata[0].audienceRating) {
-                            this.rating =
-                                response.data.MediaContainer.Metadata[0].audienceRating / 2;
+
+                        let data = response.data.MediaContainer.Metadata[0];
+                        this.contentRating = data.contentRating;
+
+                        if (data.audienceRating) {
+                            this.rating = data.audienceRating / 2;
+                        }
+
+                        if (data.duration && this.settings.show_runtime) {
+                            this.runtime = data.duration / 1000 / 60;
                         }
                     }
                 })
