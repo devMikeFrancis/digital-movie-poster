@@ -49,19 +49,17 @@ class SettingController extends Controller
 
     public function updateApplication()
     {
-        /*
-        $process = new Process([app_path().'update.sh']);
+        $success = true;
+        $process = new Process(['sh', base_path().'/update.sh']);
         $process->setTimeout(3600);
-        $process->run(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                $this->line("<comment>$buffer</comment>");
-            } else {
-                $this->line($buffer);
-            }
-        });
-        // executes after the command finishes
+        $process->run();
+
         if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }*/
+            $success = false;
+        }
+
+        $output = $process->getOutput();
+
+        return response()->json(['success' => $success, 'output' => $output]);
     }
 }
