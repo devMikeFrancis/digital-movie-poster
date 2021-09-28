@@ -65,6 +65,7 @@ class PlexService
                         'updated_at' => now(),
                         'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
                         'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
+                        'runtime' => is_numeric($movie['duration']) ? $movie['duration']/1000/60 : null
                     ]
                 );
             }

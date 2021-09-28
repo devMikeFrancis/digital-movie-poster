@@ -26,6 +26,9 @@ class PostersCollection extends ResourceCollection
                 'mpaa_rating' => $poster->mpaa_rating,
                 'audience_rating' => $poster->audience_rating,
                 'trailer_path' => $poster->trailer_path,
+                'show_runtime' => $poster->show_runtime,
+                'show_trailer' => $poster->show_trailer,
+                'runtime' => $poster->runtime,
                 'show' => false,
                 'image' => null,
             ];

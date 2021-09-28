@@ -13,6 +13,7 @@ Route::get('/settings', [SettingController::class, 'index']);
 Route::put('/settings', [SettingController::class, 'update']);
 Route::post('/posters', [PosterController::class, 'store']);
 Route::post('/posters-sort', [PosterController::class, 'sort']);
+Route::get('/posters/{id}', [PosterController::class, 'show']);
 Route::put('/posters/{id}', [PosterController::class, 'update']);
 Route::put('/posters/{id}/update-rotation', [PosterController::class, 'updateShowInRotation']);
 Route::delete('/posters/{id}', [PosterController::class, 'delete']);

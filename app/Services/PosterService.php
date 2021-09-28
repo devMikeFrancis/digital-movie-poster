@@ -33,17 +33,23 @@ class PosterService
         $orginalName = Str::slug($request->title);
         $fileName = $orginalName.'.jpg';
         $imageLocation = $request->image;
-        $audienceRating = 0;
-        $mpaaRating = 'PG';
-        $trailerPath = '';
+        $audienceRating = $request->audience_rating;
+        $mpaaRating = $request->mpaa_rating;
+        $trailerPath = $request->trailer_path;
+        $showTrailer = $request->boolean('show_trailer');
+        $showRuntime = $request->boolean('show_runtime');
+        $showInRotation = $request->boolean('show_in_rotation');
+        $runtime = $request->runtime;
 
         if ($imdbId) {
             $tmdb = $this->callTMDB($imdbId);
+            $orginalName = Str::slug($tmdb['title']);
             $fileName = $tmdb['file_name'];
             $imageLocation = $tmdb['image_location'];
             $audienceRating = $tmdb['audience_rating'];
             $mpaaRating = $tmdb['mpaa_rating'];
-            $trailerPath = $tmdb['tailer_path'];
+            $trailerPath = $tmdb['trailer_path'];
+            $runtime = $tmdb['runtime'];
         }
 
         if ($request->image || $imageLocation) {
@@ -58,6 +64,10 @@ class PosterService
         $poster->audience_rating = $audienceRating;
         $poster->mpaa_rating = $mpaaRating;
         $poster->trailer_path = $trailerPath;
+        $poster->show_trailer = $showTrailer;
+        $poster->show_runtime = $showRuntime;
+        $poster->show_in_rotation = $showInRotation;
+        $poster->runtime = $runtime;
         $poster->save();
 
         return $poster;
@@ -72,14 +82,20 @@ class PosterService
         $audienceRating = $request->audience_rating;
         $mpaaRating = $request->mpaa_rating;
         $trailerPath = $request->trailer_path;
+        $showTrailer = $request->boolean('show_trailer');
+        $showRuntime = $request->boolean('show_runtime');
+        $showInRotation = $request->boolean('show_in_rotation');
+        $runtime = $request->runtime;
 
         if ($imdbId) {
             $tmdb = $this->callTMDB($imdbId);
+            $orginalName = Str::slug($tmdb['title']);
             $fileName = $tmdb['file_name'];
             $imageLocation = $tmdb['image_location'];
             $audienceRating = $tmdb['audience_rating'];
             $mpaaRating = $tmdb['mpaa_rating'];
-            $trailerPath = $tmdb['tailer_path'];
+            $trailerPath = $tmdb['trailer_path'];
+            $runtime = $tmdb['runtime'];
         }
 
         if ($request->image || $imageLocation) {
@@ -93,6 +109,10 @@ class PosterService
         $poster->audience_rating = $audienceRating;
         $poster->mpaa_rating = $mpaaRating;
         $poster->trailer_path = $trailerPath;
+        $poster->show_trailer = $showTrailer;
+        $poster->show_runtime = $showRuntime;
+        $poster->show_in_rotation = $showInRotation;
+        $poster->runtime = $runtime;
         $poster->save();
 
         return $poster;
@@ -134,7 +154,11 @@ class PosterService
 
         $data = $response->json();
 
-        $orginalName = Str::slug($data['original_title']);
+        if (isset($data['success']) && !$data['success']) {
+            abort(404, 'Cannot find movie in TMDB.');
+        }
+
+        $orginalName = Str::slug($data['title']);
         $fileName = $orginalName.'.jpg';
 
         $imageLocation = 'https://image.tmdb.org/t/p/original'.$data['poster_path'];
@@ -155,11 +179,13 @@ class PosterService
         }
 
         return [
+            'title' => $data['title'],
             'image_location' => $imageLocation,
             'file_name' => $fileName,
             'mpaa_rating' => $mpaaRating,
             'audience_rating' => $audienceRating,
-            'trailer_path' => $trailerPath
+            'trailer_path' => $trailerPath,
+            'runtime' => $data['runtime']
         ];
     }
 

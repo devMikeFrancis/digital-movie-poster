@@ -19,6 +19,9 @@ class Poster extends Model
         'imdb_id',
         'mpaa_rating',
         'audience_rating',
-        'trailer_path'
+        'trailer_path',
+        'runtime',
+        'show_runtime',
+        'show_trailer',
     ];
 }

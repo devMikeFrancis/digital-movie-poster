@@ -31,32 +31,44 @@
                     />
                 </div>
                 <div class="dolby-logos" v-if="settings.show_processing_logos">
-                    <img class="imax" src="/images/imax.png" alt="IMAX" v-if="settings.show_imax" />
-                    <img
-                        src="/images/dolby-vision.svg"
-                        class="dolby-vision"
-                        alt="Dolby Vision"
-                        v-if="settings.show_dolby_vision_horizontal"
-                    />
-                    <img
-                        src="/images/dolby-atmos.svg"
-                        class="dolby-atmos"
-                        alt="Dolby Atmos"
-                        v-if="settings.show_dolby_atmos_horizontal"
-                    />
-                    <img
-                        src="/images/dolby-vision-stacked.svg"
-                        alt="Dolby Vision"
-                        class="dolby-vision-stacked"
-                        v-if="settings.show_dolby_vision_vertical"
-                    />
-                    <img
-                        src="/images/dolby-atmos-stacked.svg"
-                        alt="Dolby Atmos"
-                        class="dolby-atmos-stacked"
-                        v-if="settings.show_dolby_atmos_vertical"
-                    />
-                    <img class="dts" src="/images/dts-x.svg" alt="DTS" v-if="settings.show_dts" />
+                    <div v-if="settings.show_imax">
+                        <img class="imax" src="/images/imax.png" alt="IMAX" />
+                    </div>
+                    <div v-if="settings.show_auro_3d">
+                        <img
+                            class="auro3d"
+                            src="/images/auro3d.svg"
+                            alt="Auro 3D"
+                            v-if="settings.show_auro_3d"
+                        />
+                    </div>
+                    <div v-if="settings.show_dolby_vision_horizontal">
+                        <img
+                            src="/images/dolby-vision.svg"
+                            class="dolby-vision"
+                            alt="Dolby Vision"
+                        />
+                    </div>
+                    <div v-if="settings.show_dolby_atmos_horizontal">
+                        <img src="/images/dolby-atmos.svg" class="dolby-atmos" alt="Dolby Atmos" />
+                    </div>
+                    <div v-if="settings.show_dolby_vision_vertical">
+                        <img
+                            src="/images/dolby-vision-stacked.svg"
+                            alt="Dolby Vision"
+                            class="dolby-vision-stacked"
+                        />
+                    </div>
+                    <div v-if="settings.show_dolby_atmos_vertical">
+                        <img
+                            src="/images/dolby-atmos-stacked.svg"
+                            alt="Dolby Atmos"
+                            class="dolby-atmos-stacked"
+                        />
+                    </div>
+                    <div v-if="settings.show_dts">
+                        <img class="dts" src="/images/dts-x.svg" alt="DTS" />
+                    </div>
                 </div>
                 <div class="audience-rating" v-if="settings.show_audience_rating">
                     <star-rating
@@ -65,7 +77,7 @@
                         v-bind:max-rating="5"
                         inactive-color="#000"
                         active-color="#fff"
-                        v-bind:star-size="24"
+                        v-bind:star-size="28"
                         v-bind:rating="audienceRating"
                         border-color="#fff"
                         :border-width="borderWidth"
@@ -104,6 +116,12 @@
                             v-if="settings.show_imax"
                         />
                         <img
+                            class="auro3d"
+                            src="/images/auro3d.svg"
+                            alt="Auro 3D"
+                            v-if="settings.show_auro_3d"
+                        />
+                        <img
                             src="/images/dolby-vision.svg"
                             class="dolby-vision"
                             alt="Dolby Vision"
@@ -140,7 +158,7 @@
                             v-bind:max-rating="5"
                             inactive-color="#000"
                             active-color="#fff"
-                            v-bind:star-size="24"
+                            v-bind:star-size="28"
                             v-bind:rating="rating"
                             border-color="#fff"
                             :border-width="borderWidth"
@@ -188,10 +206,9 @@ export default {
             settings: {
                 poster_display_speed: 15000,
             },
-            YTplayer: '',
-            showYTplayer: false,
             videoPlaying: false,
             iframeEl: '',
+            runtime: '',
         };
     },
     components: {
@@ -251,8 +268,14 @@ export default {
                             if (this.moviePosters[rand].audience_rating) {
                                 this.audienceRating = this.moviePosters[rand].audience_rating / 2;
                             }
-                            if (this.moviePosters[rand].trailer_path) {
+                            if (
+                                this.moviePosters[rand].trailer_path &&
+                                this.moviePosters[rand].show_trailer
+                            ) {
                                 this.playTrailer(this.moviePosters[rand].trailer_path);
+                            }
+                            if (this.moviePosters[rand].show_runtime) {
+                                this.runtime = this.moviePosters[rand].runtime;
                             }
                         } else {
                             this.moviePosters[0].show = true;
@@ -260,8 +283,14 @@ export default {
                             if (this.moviePosters[0].audience_rating) {
                                 this.audienceRating = this.moviePosters[0].audience_rating / 2;
                             }
-                            if (this.moviePosters[0].trailer_path) {
+                            if (
+                                this.moviePosters[0].trailer_path &&
+                                this.moviePosters[0].show_trailer
+                            ) {
                                 this.playTrailer(this.moviePosters[0].trailer_path);
+                            }
+                            if (this.moviePosters[0].show_runtime) {
+                                this.runtime = this.moviePosters[0].runtime;
                             }
                         }
 
@@ -344,8 +373,11 @@ export default {
                 if (poster.audience_rating) {
                     this.audienceRating = poster.audience_rating / 2;
                 }
-                if (poster.trailer_path) {
+                if (poster.trailer_path && poster.show_trailer) {
                     this.playTrailer(poster.trailer_path);
+                }
+                if (poster.show_runtime) {
+                    this.runtime = poster.runtime;
                 }
             }
         },
@@ -633,6 +665,8 @@ body {
     justify-content: flex-start;
     margin-right: auto;
     flex-grow: 1;
+    min-width: 230px;
+    max-width: 230px;
 
     img {
         width: 100%;
@@ -647,38 +681,48 @@ body {
     justify-content: flex-end;
     margin-left: auto;
     flex-grow: 1;
+    min-width: 200px;
+    max-width: 200px;
 }
 
 .dolby-logos {
+    flex-grow: 2;
+    padding: 0 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-grow: 2;
+
+    div {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
     img {
-        margin: 0 10px;
+        margin: 0 12px;
     }
 }
 
 .dolby-atmos {
     width: 100%;
-    max-width: 200px;
+    max-width: 180px;
     height: auto;
 }
 .dolby-vision {
     width: 100%;
-    max-width: 200px;
+    max-width: 180px;
     height: auto;
 }
 
 .dolby-atmos-stacked {
     width: 100%;
-    max-width: 140px;
+    max-width: 130px;
     height: auto;
 }
 .dolby-vision-stacked {
     width: 100%;
-    max-width: 140px;
+    max-width: 130px;
     height: auto;
 }
 
@@ -691,6 +735,11 @@ body {
 .imax {
     width: 100%;
     max-width: 130px;
+    height: auto;
+}
+.auro3d {
+    width: 100%;
+    max-width: 140px;
     height: auto;
 }
 

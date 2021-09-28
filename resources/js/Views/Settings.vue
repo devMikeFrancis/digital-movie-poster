@@ -3,9 +3,7 @@
         <div class="admin">
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
                 <div class="pt-4 pb-4">
-                    <router-link class="text-white" to="/"
-                        >&larr; Back to movie posters</router-link
-                    >
+                    <router-link class="text-white" to="/">&larr; Back to DMP</router-link>
                 </div>
             </div>
             <div class="md:container md:mx-auto lg:container lg:mx-auto">

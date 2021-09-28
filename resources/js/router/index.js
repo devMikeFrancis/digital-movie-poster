@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Dashboard from '../Views/Dashboard';
 import Settings from '../Views/Settings';
 import Posters from '../Views/Posters';
+import PostersEdit from '../Views/PostersEdit';
 
 Vue.use(Router);
 
@@ -24,6 +25,11 @@ const routes = [
         path: '/posters',
         name: 'Posters',
         component: Posters,
+    },
+    {
+        path: '/posters/:id',
+        name: 'PostersEdit',
+        component: PostersEdit,
     },
 ];
 

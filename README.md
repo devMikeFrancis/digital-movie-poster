@@ -11,6 +11,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Automatically fill in data using IMDB ID
 -   Control settings such as playing speed, transition speed, etc ...
 -   Control display power using HDMI-CEC control
+-   Show Runtime
 -   Movie trailers
 
 Open to new features/suggestions/requests. Please use Github issues.

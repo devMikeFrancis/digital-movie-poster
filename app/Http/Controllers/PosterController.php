@@ -23,6 +23,13 @@ class PosterController extends Controller
         return response()->json(['posters' => $posters]);
     }
 
+    public function show($id)
+    {
+        $poster = Poster::findOrFail($id);
+        $poster->image = null;
+        return response()->json(['poster' => $poster]);
+    }
+
     public function cache(PosterService $service)
     {
         $service->cache();
