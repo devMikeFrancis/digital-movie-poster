@@ -92,6 +92,10 @@ If you delete a poster that was cached from a service like Plex the poster will 
 
 ## Updating
 
+In the settings view there is a `Update DMP` link next to the `Save Settings` button. Clicking Update DMP will update the application.
+
+After the application updates you will need to refresh the browser, or if using the Pi in kiosk mode, restart the Pi.
+
 ## Screenshots
 
 Below are some screenshots taken from a local dev environment. IRL screenshots coming soon.
