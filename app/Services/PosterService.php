@@ -125,6 +125,20 @@ class PosterService
         $poster->save();
     }
 
+    public function updateShowTrailer($id, $showTrailer): void
+    {
+        $poster = Poster::findOrFail($id);
+        $poster->show_trailer = $showTrailer;
+        $poster->save();
+    }
+
+    public function updateSetting($id, $column, $value): void
+    {
+        $poster = Poster::findOrFail($id);
+        $poster->$column = $value;
+        $poster->save();
+    }
+
     public function delete($id): ?bool
     {
         $poster = Poster::findOrFail($id);

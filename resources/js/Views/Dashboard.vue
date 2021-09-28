@@ -12,7 +12,11 @@
                     <div
                         v-for="(poster, index) in moviePosters"
                         class="recent-poster"
-                        v-bind:class="{ show: poster.show, hide: !poster.show }"
+                        v-bind:class="{
+                            show: poster.show,
+                            hide: !poster.show,
+                            'has-trailer': poster.show_trailer && poster.trailer_path,
+                        }"
                         :style="'background-image: url(storage/posters/' + poster.file_name + ')'"
                         v-bind:key="`key-${index}`"
                     ></div>
@@ -597,6 +601,13 @@ body {
         //transition: opacity 1s ease-in-out;
         animation: FadeIn 2.5s ease-in forwards;
         z-index: 2;
+    }
+
+    &.has-trailer {
+        width: 700px;
+        height: 1050px;
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 

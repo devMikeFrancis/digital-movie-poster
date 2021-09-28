@@ -90,12 +90,29 @@
                                             "
                                         ></div>
                                     </div>
-                                    <div class="col-span-6 flex items-center">
+                                    <div class="col-span-5 flex items-center">
                                         <router-link
                                             class="text-white font-bold"
                                             :to="'/posters/' + poster.id"
                                         >
                                             {{ poster.name }}</router-link
+                                        >
+                                    </div>
+
+                                    <div class="col-span-2 flex items-center">
+                                        <label class="text-white"
+                                            ><input
+                                                type="checkbox"
+                                                v-model="poster.show_trailer"
+                                                @change="
+                                                    updateSetting(
+                                                        poster,
+                                                        'show_trailer',
+                                                        poster.show_trailer
+                                                    )
+                                                "
+                                            />
+                                            Show trailer</label
                                         >
                                     </div>
 
@@ -110,12 +127,13 @@
                                         >
                                     </div>
 
-                                    <div class="col-span-2 flex items-center justify-end pr-4">
+                                    <div class="col-span-1 flex items-center justify-end pr-4">
                                         <a
+                                            v-if="poster.can_delete"
                                             href="#"
                                             @click.prevent="deletePoster(poster)"
                                             class="text-gray-300 font-bold hover:text-gray-50"
-                                            >Delete <span v-if="!poster.can_delete">Cached</span></a
+                                            >[X]</a
                                         >
                                     </div>
                                 </div>
@@ -216,6 +234,16 @@ export default {
             };
             axios
                 .post('/api/posters/' + poster.id + '/update-rotation', params)
+                .then((response) => {})
+                .catch((e) => {});
+        },
+        updateSetting(poster, column, value) {
+            const params = {
+                _method: 'put',
+                value: value,
+            };
+            axios
+                .post('/api/posters/' + poster.id + '/' + column, params)
                 .then((response) => {})
                 .catch((e) => {});
         },

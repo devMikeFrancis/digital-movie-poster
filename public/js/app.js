@@ -2266,6 +2266,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -2725,6 +2729,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -2805,6 +2827,13 @@ __webpack_require__.r(__webpack_exports__);
         show_in_rotation: poster.show_in_rotation
       };
       axios.post('/api/posters/' + poster.id + '/update-rotation', params).then(function (response) {})["catch"](function (e) {});
+    },
+    updateSetting: function updateSetting(poster, column, value) {
+      var params = {
+        _method: 'put',
+        value: value
+      };
+      axios.post('/api/posters/' + poster.id + '/' + column, params).then(function (response) {})["catch"](function (e) {});
     }
   },
   created: function created() {},
@@ -4190,7 +4219,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 140px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "body {\n  background: #000;\n}\n.loading-overlay {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 40px;\n  color: #fff;\n  font-weight: 500;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  background-color: #000;\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 100;\n}\n#recent-added-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.recent-poster-container,\n.now-playing-container {\n  width: 1060px;\n  height: 1589px;\n  max-height: 1589px;\n  position: relative;\n  overflow: hidden;\n}\n.trailer-container {\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n#trailer {\n  height: 580px;\n  width: 100%;\n  position: absolute;\n  left: 0;\n  bottom: -44px;\n  z-index: 4;\n}\n#trailer #youtube-player {\n  width: 100%;\n  height: 100%;\n}\n#trailer #youtube-player iframe {\n  width: 100%;\n  height: 100%;\n}\n.recent-poster {\n  width: 1060px;\n  height: 1590px;\n  opacity: 0;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.recent-poster.hide {\n  -webkit-animation: FadeOut 2.5s ease-out forwards;\n          animation: FadeOut 2.5s ease-out forwards;\n  z-index: 3;\n}\n.recent-poster.show {\n  -webkit-animation: FadeIn 2.5s ease-in forwards;\n          animation: FadeIn 2.5s ease-in forwards;\n  z-index: 2;\n}\n.recent-poster.has-trailer {\n  width: 700px;\n  height: 1050px;\n  left: 50%;\n  transform: translateX(-50%);\n}\n#now-playing-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 3;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex-direction: column;\n}\n.now-playing-poster {\n  width: 1060px;\n  height: 1590px;\n  flex-grow: 2;\n  background-size: cover;\n  background-repeat: no-repeat;\n  background-position: center center;\n  position: absolute;\n  top: 0;\n}\n.now-playing-header,\n.coming-soon-header {\n  display: flex;\n  flex-grow: 1;\n  max-height: 190px;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n  text-align: center;\n}\n.now-playing-header h1,\n.coming-soon-header h1 {\n  text-transform: uppercase;\n  padding: 12px 24px 14px 24px;\n  border: 4px solid #fff;\n  font-size: 80px;\n  font-weight: 700;\n  color: #fff;\n  line-height: 1;\n  letter-spacing: 3px;\n  margin: 0;\n}\n.now-playing-footer,\n.coming-soon-footer {\n  width: 100%;\n  min-height: 140px;\n  display: flex;\n  flex-grow: 1;\n  flex-direction: row;\n  align-items: center;\n  justify-content: center;\n  padding: 24px;\n}\n.content-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-start;\n  margin-right: auto;\n  flex-grow: 1;\n  min-width: 230px;\n  max-width: 230px;\n}\n.content-rating img {\n  width: 100%;\n  max-width: 220px;\n  height: auto;\n}\n.audience-rating {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  margin-left: auto;\n  flex-grow: 1;\n  min-width: 200px;\n  max-width: 200px;\n}\n.dolby-logos {\n  flex-grow: 2;\n  padding: 0 18px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos div {\n  flex-grow: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.dolby-logos img {\n  margin: 0 12px;\n}\n.dolby-atmos {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-vision {\n  width: 100%;\n  max-width: 180px;\n  height: auto;\n}\n.dolby-atmos-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dolby-vision-stacked {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.dts {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.imax {\n  width: 100%;\n  max-width: 130px;\n  height: auto;\n}\n.auro3d {\n  width: 100%;\n  max-width: 140px;\n  height: auto;\n}\n.fade-enter-active,\n.fade-leave-active {\n  transition: opacity 2s;\n}\n.fade-enter,\n.fade-leave-to {\n  opacity: 0;\n}\n.fade2-enter-active,\n.fade2-leave-active {\n  transition: opacity 1s;\n}\n.fade2-enter,\n.fade2-leave-to {\n  opacity: 0;\n}\n.vue-star-rating {\n  margin-top: -4px;\n}\n.vue-star-rating-star {\n  margin-right: 4px !important;\n}\n@-webkit-keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@keyframes FadeIn {\n0% {\n    opacity: 0;\n}\n100% {\n    opacity: 1;\n}\n}\n@-webkit-keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}\n@keyframes FadeOut {\n0% {\n    opacity: 1;\n}\n100% {\n    opacity: 0;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -9036,7 +9065,12 @@ var render = function() {
                       return _c("div", {
                         key: "key-" + index,
                         staticClass: "recent-poster",
-                        class: { show: poster.show, hide: !poster.show },
+                        class: {
+                          show: poster.show,
+                          hide: !poster.show,
+                          "has-trailer":
+                            poster.show_trailer && poster.trailer_path
+                        },
                         style:
                           "background-image: url(storage/posters/" +
                           poster.file_name +
@@ -9532,7 +9566,7 @@ var render = function() {
                           _vm._v(" "),
                           _c(
                             "div",
-                            { staticClass: "col-span-6 flex items-center" },
+                            { staticClass: "col-span-5 flex items-center" },
                             [
                               _c(
                                 "router-link",
@@ -9549,6 +9583,73 @@ var render = function() {
                               )
                             ],
                             1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "col-span-2 flex items-center" },
+                            [
+                              _c("label", { staticClass: "text-white" }, [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: poster.show_trailer,
+                                      expression: "poster.show_trailer"
+                                    }
+                                  ],
+                                  attrs: { type: "checkbox" },
+                                  domProps: {
+                                    checked: Array.isArray(poster.show_trailer)
+                                      ? _vm._i(poster.show_trailer, null) > -1
+                                      : poster.show_trailer
+                                  },
+                                  on: {
+                                    change: [
+                                      function($event) {
+                                        var $$a = poster.show_trailer,
+                                          $$el = $event.target,
+                                          $$c = $$el.checked ? true : false
+                                        if (Array.isArray($$a)) {
+                                          var $$v = null,
+                                            $$i = _vm._i($$a, $$v)
+                                          if ($$el.checked) {
+                                            $$i < 0 &&
+                                              _vm.$set(
+                                                poster,
+                                                "show_trailer",
+                                                $$a.concat([$$v])
+                                              )
+                                          } else {
+                                            $$i > -1 &&
+                                              _vm.$set(
+                                                poster,
+                                                "show_trailer",
+                                                $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1))
+                                              )
+                                          }
+                                        } else {
+                                          _vm.$set(poster, "show_trailer", $$c)
+                                        }
+                                      },
+                                      function($event) {
+                                        return _vm.updateSetting(
+                                          poster,
+                                          "show_trailer",
+                                          poster.show_trailer
+                                        )
+                                      }
+                                    ]
+                                  }
+                                }),
+                                _vm._v(
+                                  "\n                                        Show trailer"
+                                )
+                              ])
+                            ]
                           ),
                           _vm._v(" "),
                           _c(
@@ -9625,29 +9726,26 @@ var render = function() {
                             "div",
                             {
                               staticClass:
-                                "col-span-2 flex items-center justify-end pr-4"
+                                "col-span-1 flex items-center justify-end pr-4"
                             },
                             [
-                              _c(
-                                "a",
-                                {
-                                  staticClass:
-                                    "text-gray-300 font-bold hover:text-gray-50",
-                                  attrs: { href: "#" },
-                                  on: {
-                                    click: function($event) {
-                                      $event.preventDefault()
-                                      return _vm.deletePoster(poster)
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v("Delete "),
-                                  !poster.can_delete
-                                    ? _c("span", [_vm._v("Cached")])
-                                    : _vm._e()
-                                ]
-                              )
+                              poster.can_delete
+                                ? _c(
+                                    "a",
+                                    {
+                                      staticClass:
+                                        "text-gray-300 font-bold hover:text-gray-50",
+                                      attrs: { href: "#" },
+                                      on: {
+                                        click: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.deletePoster(poster)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("[X]")]
+                                  )
+                                : _vm._e()
                             ]
                           )
                         ])

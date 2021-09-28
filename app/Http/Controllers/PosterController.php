@@ -56,6 +56,12 @@ class PosterController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function updateSetting(PosterRequest $request, PosterService $service, $id, $column)
+    {
+        $service->updateSetting($id, $column, $request->boolean('value'));
+        return response()->json(['success' => true]);
+    }
+
     public function sort(PosterRequest $request, PosterService $service)
     {
         $service->sort($request);
