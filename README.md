@@ -74,6 +74,14 @@ On a fresh install with no posters in the database you will see a message asking
 
 After you've added posters and are back on the DMP screen you can always return to the posters and settings configuration by clicking or tapping on the 'Coming Soon/Now Playing' header.
 
+### Poster Data Auto-population
+
+When using the IMDB ID to manage poster data the application will use [TMDB API](https://developers.themoviedb.org/3/getting-started/introduction) to populate the metadata and poster image.
+
+### Plex
+
+To use Plex, go to the settings configuration, check the checkbox to use the Plex service and enter your Plex IP address and Plex auth token. You can find your Plex auth token [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
+
 ### A Note on Deleting Posters
 
 If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every hour when the DMP screen is active`
