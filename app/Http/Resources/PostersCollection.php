@@ -29,8 +29,11 @@ class PostersCollection extends ResourceCollection
                 'show_runtime' => $poster->show_runtime,
                 'show_trailer' => $poster->show_trailer,
                 'runtime' => $poster->runtime,
+                'play_theme_music' => $poster->play_theme_music,
+                'theme_music_path' => $poster->theme_music_path,
                 'show' => false,
                 'image' => null,
+                'music' => null,
             ];
         });
     }

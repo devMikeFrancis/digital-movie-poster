@@ -26,6 +26,7 @@
                     <div id="trailer">
                         <div ref="videoPlayer" id="youtube-player"></div>
                     </div>
+                    <div id="music"></div>
                 </div>
             </div>
             <footer class="coming-soon-footer">
@@ -215,7 +216,9 @@ export default {
             },
             videoPlaying: false,
             iframeEl: '',
+            audio: null,
             runtime: '',
+            theme_music: null,
         };
     },
     components: {
@@ -284,6 +287,14 @@ export default {
                             if (this.moviePosters[rand].show_runtime) {
                                 this.runtime = this.moviePosters[rand].runtime;
                             }
+                            if (
+                                this.moviePosters[rand].play_theme_music &&
+                                this.moviePosters[rand].theme_music_path &&
+                                this.settings.play_theme_music
+                            ) {
+                                this.theme_music = this.moviePosters[rand].theme_music_path;
+                                this.playMusic();
+                            }
                         } else {
                             this.moviePosters[0].show = true;
                             this.mpaaRating = this.moviePosters[0].mpaa_rating;
@@ -298,6 +309,14 @@ export default {
                             }
                             if (this.moviePosters[0].show_runtime) {
                                 this.runtime = this.moviePosters[0].runtime;
+                            }
+                            if (
+                                this.moviePosters[0].play_theme_music &&
+                                this.moviePosters[0].theme_music_path &&
+                                this.settings.play_theme_music
+                            ) {
+                                this.theme_music = this.moviePosters[0].theme_music_path;
+                                this.playMusic();
                             }
                         }
 
@@ -329,6 +348,7 @@ export default {
         },
         getNowPlaying() {
             console.log('GET NOW PLAYING');
+            this.stopMusic();
             Api.apiCallPlex('/status/sessions/')
                 .then((response) => {
                     const size = response.data.MediaContainer.size;
@@ -360,7 +380,10 @@ export default {
         transitionImages() {
             let poster = '';
             let activeIndex = 0;
-            this.$refs.videoPlayer.innerHTML = '';
+            if (this.$refs.videoPlayer) {
+                this.$refs.videoPlayer.innerHTML = '';
+            }
+            this.stopMusic();
 
             if (this.moviePosters.length > 0) {
                 if (this.settings.random_order) {
@@ -391,6 +414,14 @@ export default {
                 }
                 if (poster.show_runtime) {
                     this.runtime = poster.runtime;
+                }
+                if (
+                    poster.play_theme_music &&
+                    poster.theme_music_path &&
+                    this.settings.play_theme_music
+                ) {
+                    this.theme_music = poster.theme_music_path;
+                    this.playMusic();
                 }
             }
         },
@@ -428,9 +459,36 @@ export default {
                     break;
             }
         },
+        playMusic() {
+            setTimeout(() => {
+                this.audio = new Audio('/storage/music/' + this.theme_music);
+                this.audio.play();
+            }, 1500);
+        },
+        stopMusic() {
+            /*if (this.audio) {
+                this.audio.pause();
+                this.audio = null;
+            }*/
+            if (this.audio) {
+                let vol = 1;
+                let interval = 40;
+                if (this.audio.volume == 1) {
+                    var intervalID = setInterval(() => {
+                        if (vol > 0) {
+                            vol -= 0.05;
+                            this.audio.volume = vol.toFixed(2);
+                        } else {
+                            clearInterval(intervalID);
+                            this.audio.pause();
+                            console.log('PAUSE AUDIO');
+                            this.audio = null;
+                        }
+                    }, interval);
+                }
+            }
+        },
         playTrailer(youTubeId) {
-            console.log('PLAY TRAILER');
-
             this.iframeEl = document.createElement('iframe');
             this.iframeEl.setAttribute(
                 'src',
@@ -443,8 +501,6 @@ export default {
             this.iframeEl.focus();
         },
         playVideo(e) {
-            console.log('PLAY VIDEO');
-            console.log(e);
             this.videoPlaying = true;
             this.iframeEl.contentWindow.postMessage(
                 '{"event":"command","func":"playVideo","args":""}',
@@ -667,7 +723,7 @@ body {
     .runtime {
         position: absolute;
         top: 60px;
-        left: 32px;
+        left: 40px;
         color: #fff;
         font-size: 32px;
         font-weight: 400;

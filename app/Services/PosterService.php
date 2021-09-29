@@ -40,6 +40,8 @@ class PosterService
         $showRuntime = $request->boolean('show_runtime');
         $showInRotation = $request->boolean('show_in_rotation');
         $runtime = $request->runtime;
+        $playThemeMusic = $request->boolean('play_theme_music');
+        $themeMusicPath = null;
 
         if ($imdbId) {
             $tmdb = $this->callTMDB($imdbId);
@@ -56,6 +58,15 @@ class PosterService
             $this->saveImage($imageLocation, $fileName);
         }
 
+        if ($request->music) {
+            $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
+            $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
+            $stored = $this->saveMusic($request->music, $themeMusicPath);
+            if (!$stored) {
+                abort('500', 'Theme music not saved');
+            }
+        }
+
         $poster = new Poster();
         $poster->file_name = $fileName;
         $poster->name = $orginalName;
@@ -68,6 +79,8 @@ class PosterService
         $poster->show_runtime = $showRuntime;
         $poster->show_in_rotation = $showInRotation;
         $poster->runtime = $runtime;
+        $poster->theme_music_path = $themeMusicPath;
+        $poster->play_theme_music = $playThemeMusic;
         $poster->save();
 
         return $poster;
@@ -86,6 +99,8 @@ class PosterService
         $showRuntime = $request->boolean('show_runtime');
         $showInRotation = $request->boolean('show_in_rotation');
         $runtime = $request->runtime;
+        $playThemeMusic = $request->boolean('play_theme_music');
+        $themeMusicPath = null;
 
         if ($imdbId) {
             $tmdb = $this->callTMDB($imdbId);
@@ -102,6 +117,15 @@ class PosterService
             $this->saveImage($imageLocation, $fileName);
         }
 
+        if ($request->music) {
+            $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
+            $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
+            $stored = $this->saveMusic($request->music, $themeMusicPath);
+            if (!$stored) {
+                abort('500', 'Theme music not saved');
+            }
+        }
+
         $poster = Poster::findOrFail($id);
         $poster->file_name = $fileName;
         $poster->name = $orginalName;
@@ -113,6 +137,8 @@ class PosterService
         $poster->show_runtime = $showRuntime;
         $poster->show_in_rotation = $showInRotation;
         $poster->runtime = $runtime;
+        $poster->theme_music_path = $themeMusicPath;
+        $poster->play_theme_music = $playThemeMusic;
         $poster->save();
 
         return $poster;
@@ -210,5 +236,11 @@ class PosterService
             $constraint->aspectRatio();
         });
         return $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+    }
+
+    private function saveMusic($file, $fileName)
+    {
+        $stored = $file->storeAs('music', $fileName);
+        return $stored;
     }
 }

@@ -13,6 +13,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Control display power using HDMI-CEC control
 -   Show Runtime
 -   Movie trailers
+-   Movie theme music
 -   Shows Now Playing from Plex
 
 Open to new features/suggestions/requests. Please use Github issues.
@@ -64,6 +65,10 @@ sudo chown -R -f www-data:www-data /var/www/html
 ### Kiosk Mode
 
 **You will need to lookup tutorials on how to boot your Pi in kiosk mode using chromium.**
+
+**NOTE: THEME MUSIC AUDIO - You have to set this chromium flag in order to get audio to autoplay**
+
+`--autoplay-policy=no-user-gesture-required`
 
 ## Usage
 

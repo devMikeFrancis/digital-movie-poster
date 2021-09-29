@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use App\Models\Setting;
 
 class SettingController extends Controller
@@ -42,6 +41,7 @@ class SettingController extends Controller
         $settings->show_auro_3d = $request->boolean('show_auro_3d');
         $settings->use_cec_power = $request->boolean('use_cec_power');
         $settings->show_runtime = $request->boolean('show_runtime');
+        $settings->play_theme_music = $request->boolean('play_theme_music');
         $settings->save();
 
         return response()->json(['success' => true]);

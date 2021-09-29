@@ -52,8 +52,8 @@
                                         required
                                     />
                                     <div id="movie-posterHelp" class="text-gray-400 text-sm">
-                                        If used, TMDB API will override all other data for this
-                                        poster.
+                                        If used, TMDB API will override movie data for this poster
+                                        except theme music and settings.
                                     </div>
                                 </div>
 
@@ -75,7 +75,7 @@
                                     />
                                 </div>
 
-                                <div class="mb-5">
+                                <div class="mb-5 bg-gray-700 p-3">
                                     <label
                                         for="movie-poster"
                                         class="text-gray-300 block mb-2 font-bold"
@@ -90,6 +90,26 @@
                                         @change="selectFile"
                                     />
                                     <div id="movie-posterHelp" class="text-gray-400 text-sm"></div>
+                                </div>
+
+                                <div class="mb-5 bg-gray-700 p-3">
+                                    <label for="music" class="text-gray-300 block mb-2 font-bold"
+                                        >Theme Music</label
+                                    >
+
+                                    <input
+                                        type="file"
+                                        class="text-black w-full"
+                                        id="music"
+                                        aria-describedby="musicHelp"
+                                        @change="selectMusicFile"
+                                    />
+                                    <div id="musicHelp" class="text-gray-400 text-sm">
+                                        MP3 Theme music.
+                                        <span v-if="poster.theme_music_path"
+                                            >Current File: {{ poster.theme_music_path }}</span
+                                        >
+                                    </div>
                                 </div>
 
                                 <div class="mb-5">
@@ -197,6 +217,17 @@
                                     >
                                 </div>
 
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.play_theme_music"
+                                        />
+                                        Play Theme Music</label
+                                    >
+                                </div>
+
                                 <div class="py-3 text-white">
                                     {{ formMessage }}
                                     <div v-for="error in errors">{{ error }}</div>
@@ -243,13 +274,15 @@ export default {
                 imdb_id: '',
                 name: '',
                 image: null,
+                music: null,
                 mpaa_rating: '',
                 audience_rating: '',
                 trailer_path: '',
-                show_trailer: true,
+                show_trailer: false,
                 show_runtime: true,
                 show_in_rotation: true,
                 runtime: '',
+                play_theme_music: false,
             },
             savePosterBtn: 'Save Poster',
         };
@@ -270,6 +303,9 @@ export default {
         selectFile() {
             this.poster.image = event.target.files[0];
         },
+        selectMusicFile() {
+            this.poster.music = event.target.files[0];
+        },
         savePoster() {
             this.errors = [];
             this.formMessage = '';
@@ -285,6 +321,9 @@ export default {
             const params = new FormData();
             if (this.poster.image) {
                 params.append('image', this.poster.image);
+            }
+            if (this.poster.music) {
+                params.append('music', this.poster.music);
             }
 
             if (this.poster.name) {
@@ -309,6 +348,7 @@ export default {
             params.append('show_trailer', this.poster.show_trailer);
             params.append('show_runtime', this.poster.show_runtime);
             params.append('show_in_rotation', this.poster.show_in_rotation);
+            params.append('play_theme_music', this.poster.play_theme_music);
 
             if (this.mode === 'edit') {
                 params.append('_method', 'put');
@@ -325,6 +365,8 @@ export default {
 
                     this.poster = response.data.poster;
                     this.mode = 'edit';
+                    this.poster.music = null;
+                    this.poster.image = null;
 
                     setTimeout(() => {
                         this.savePosterBtn = 'Save Poster';

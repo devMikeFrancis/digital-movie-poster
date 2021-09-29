@@ -23,5 +23,7 @@ class Poster extends Model
         'runtime',
         'show_runtime',
         'show_trailer',
+        'play_theme_music',
+        'theme_music_path',
     ];
 }

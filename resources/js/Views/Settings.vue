@@ -159,6 +159,8 @@
 
                             <hr class="mt-3 mb-7 border-gray-700" />
 
+                            <h3 class="text-xl font-bold text-white mb-5">Global Options</h3>
+
                             <div class="mb-5">
                                 <label
                                     for="show-runtime"
@@ -209,6 +211,22 @@
                                 >
                                 <div id="audience-ratingHelp" class="text-gray-400 text-sm">
                                     Shows the audience rating when a movie is playing.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="theme-music" class="text-gray-300 block mb-2 font-bold">
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="theme-music"
+                                        aria-describedby="theme-musicHelp"
+                                        v-model="settings.play_theme_music"
+                                    />
+                                    Play Theme Music</label
+                                >
+                                <div id="theme-musicHelp" class="text-gray-400 text-sm">
+                                    Play theme music for posters
                                 </div>
                             </div>
 
