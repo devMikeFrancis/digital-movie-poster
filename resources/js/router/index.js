@@ -37,4 +37,15 @@ let router = new Router({
     routes,
 });
 
+router.beforeEach((to, from, next) => {
+    if (from.path === '/' && from.name !== null) {
+        clearInterval(window.transitionImagesInterval);
+        if (window.audio) {
+            window.audio.pause();
+            window.audio = null;
+        }
+    }
+    next();
+});
+
 export default router;

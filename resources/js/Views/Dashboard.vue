@@ -228,6 +228,7 @@ export default {
         nowPlaying: {
             handler: function (val, oldVal) {
                 if (val) {
+                    this.stopMusic();
                     this.getNowPlaying();
                     this.stopTransitionImages();
                     this.controlTV('on');
@@ -347,8 +348,6 @@ export default {
                 });
         },
         getNowPlaying() {
-            console.log('GET NOW PLAYING');
-            this.stopMusic();
             Api.apiCallPlex('/status/sessions/')
                 .then((response) => {
                     const size = response.data.MediaContainer.size;
@@ -426,12 +425,12 @@ export default {
             }
         },
         startTransitionImages() {
-            this.transitionImagesInterval = setInterval(() => {
+            window.transitionImagesInterval = setInterval(() => {
                 this.transitionImages();
             }, this.settings.poster_display_speed);
         },
         stopTransitionImages() {
-            clearInterval(this.transitionImagesInterval);
+            clearInterval(window.transitionImagesInterval);
         },
         controlTV(command) {
             if (this.settings.user_cec_power) {
@@ -461,8 +460,8 @@ export default {
         },
         playMusic() {
             setTimeout(() => {
-                this.audio = new Audio('/storage/music/' + this.theme_music);
-                this.audio.play();
+                window.audio = new Audio('/storage/music/' + this.theme_music);
+                window.audio.play();
             }, 1500);
         },
         stopMusic() {
@@ -470,19 +469,18 @@ export default {
                 this.audio.pause();
                 this.audio = null;
             }*/
-            if (this.audio) {
+            if (window.audio) {
                 let vol = 1;
                 let interval = 40;
-                if (this.audio.volume == 1) {
+                if (window.audio.volume == 1) {
                     var intervalID = setInterval(() => {
                         if (vol > 0) {
                             vol -= 0.05;
-                            this.audio.volume = vol.toFixed(2);
+                            window.audio.volume = vol.toFixed(2);
                         } else {
                             clearInterval(intervalID);
-                            this.audio.pause();
-                            console.log('PAUSE AUDIO');
-                            this.audio = null;
+                            window.audio.pause();
+                            window.audio = null;
                         }
                     }, interval);
                 }
@@ -556,7 +554,6 @@ export default {
                 const action = data.NotificationContainer.type;
                 if (action === 'playing') {
                     const state = data.NotificationContainer.PlaySessionStateNotification[0].state;
-                    console.log(state); // playing || stopped
                     this.controlPlayerState(state);
                 }
             });
