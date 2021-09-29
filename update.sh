@@ -5,7 +5,7 @@ echo "Deploy script started"
 cd `dirname $0` && pwd
 php artisan down
 git pull origin main
-composer install --no-dev --prefer-dist
+composer update
 php artisan cache:clear
 php artisan config:cache
 php artisan route:cache
