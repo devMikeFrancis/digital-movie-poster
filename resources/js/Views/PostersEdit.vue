@@ -248,6 +248,14 @@
                                 >
                                     {{ savePosterBtn }}
                                 </button>
+
+                                <a
+                                    href="#"
+                                    v-if="mode === 'edit'"
+                                    @click.prevent="clearPoster()"
+                                    class="inline ml-5 text-white"
+                                    >Reset to create new poster</a
+                                >
                             </div>
                         </div>
                     </div>
@@ -369,16 +377,26 @@ export default {
                     this.poster.image = null;
 
                     setTimeout(() => {
-                        this.savePosterBtn = 'Save Poster';
-                    }, 3000);
+                        this.setSavePosterBtn();
+                    }, 2000);
                 })
                 .catch((e) => {
                     console.log(e.message);
                     this.saving = false;
-                    this.savePosterBtn = 'Save Poster';
+                    setSavePosterBtn();
                     this.errors = e.response.data.errors;
                     this.formMessage = e.response.data.message;
                 });
+        },
+        clearPoster() {
+            for (const prop of Object.getOwnPropertyNames(this.poster)) {
+                this.poster[prop] = '';
+            }
+            this.poster.id = 0;
+            this.poster.show_runtime = 1;
+            this.poster.show_in_rotation = 1;
+            this.mode = 'new';
+            this.setSavePosterBtn();
         },
         validated() {
             this.formMessage = '';
@@ -396,21 +414,26 @@ export default {
 
             if (error) {
                 this.saving = false;
-                this.savePosterBtn = 'Save Poster';
+                this.setSavePosterBtn();
             }
 
             return error;
+        },
+        setSavePosterBtn() {
+            this.savePosterBtn = this.mode === 'edit' ? 'Update Poster' : 'Create Poster';
         },
     },
     created() {},
     mounted() {
         const id = parseInt(this.$route.params.id);
+        this.poster.id = id;
         if (id === 0) {
             this.mode = 'new';
         } else {
             this.mode = 'edit';
             this.getPoster(id);
         }
+        this.setSavePosterBtn();
     },
 };
 </script>
