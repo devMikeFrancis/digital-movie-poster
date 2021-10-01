@@ -43,7 +43,7 @@ A pre-installed image on a SD card will already be configured. Just plug-in-play
 7. Increase PHP ini `max_execution_time` to at least 600.
 8. Add your database credentials to the `.env` file.
 9. Add your TMDB API key to the `.env` file using this existing key: `TMDB_API_V3=`
-10. Change in the `.env` change the `FILESYSTEM_DRIVER=` to public
+10. In the `.env` file change `FILESYSTEM_DRIVER=` to public
 
 NOTE: If you alter any of the application files other than the `.env` file the update process will not work as it uses `git pull` to update the application.
 
