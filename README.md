@@ -39,7 +39,7 @@ A pre-installed image on a SD card will already be configured. Just plug-in-play
 1. Clone this repo to your web server.
 2. In the root of the application run `composer install`.
 3. In the root of the application duplicate the `.env.example` file and rename to `.env`. Do not delete the `.env.example` file.
-4. In the root of the application run `php artisan key:generate`.
+4. In the root of the application run `php artisan key:generate` and `php artisan storage:link`.
 5. Run `php artisan migrate` to create the database tables.
 6. Point your web root to the `public` folder of the application.
 7. Increase PHP ini `max_execution_time` to at least 600.
