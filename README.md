@@ -29,10 +29,9 @@ A pre-installed image on a SD card will already be configured. Just plug-in-play
 ## Self Install Requirements
 
 1. Pi 4 or computer with at least 2GB of RAM. 4GB recommended.
-2. HDMI output
-3. Apache/NGINX w/mod_rewrite enabled
-4. PHP 7.3+ with extensions: GD, Curl, Dom, MySql/Postgres
-5. Composer and Git
+2. Apache/NGINX w/mod_rewrite enabled
+3. PHP 7.3+ with extensions: GD, Curl, Dom, MySql/Postgres
+4. Composer and Git
 
 ## Self Installation
 
