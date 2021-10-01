@@ -14,7 +14,6 @@ The web application creates a digital movie poster display for use on LED screen
 -   Show Runtime
 -   Movie trailers
 -   Movie theme music
--   Shows Now Playing from Plex
 
 Open to new features/suggestions/requests. Please use Github issues.
 
