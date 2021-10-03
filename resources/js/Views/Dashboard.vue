@@ -39,42 +39,34 @@
                     />
                 </div>
                 <div class="dolby-logos" v-if="settings.show_processing_logos">
-                    <div v-if="settings.show_imax">
+                    <div v-if="show_imax">
                         <img class="imax" src="/images/imax.png" alt="IMAX" />
                     </div>
-                    <div v-if="settings.show_auro_3d">
-                        <img
-                            class="auro3d"
-                            src="/images/auro3d.svg"
-                            alt="Auro 3D"
-                            v-if="settings.show_auro_3d"
-                        />
+                    <div v-if="show_auro_3d">
+                        <img class="auro3d" src="/images/auro3d.svg" alt="Auro 3D" />
                     </div>
-                    <div v-if="settings.show_dolby_vision_horizontal">
-                        <img
-                            src="/images/dolby-vision.svg"
-                            class="dolby-vision"
-                            alt="Dolby Vision"
-                        />
-                    </div>
-                    <div v-if="settings.show_dolby_atmos_horizontal">
-                        <img src="/images/dolby-atmos.svg" class="dolby-atmos" alt="Dolby Atmos" />
-                    </div>
-                    <div v-if="settings.show_dolby_vision_vertical">
+                    <div v-if="show_dolby_vision_vertical">
                         <img
                             src="/images/dolby-vision-stacked.svg"
                             alt="Dolby Vision"
                             class="dolby-vision-stacked"
                         />
                     </div>
-                    <div v-if="settings.show_dolby_atmos_vertical">
+                    <div v-if="show_dolby_atmos_vertical">
                         <img
                             src="/images/dolby-atmos-stacked.svg"
                             alt="Dolby Atmos"
                             class="dolby-atmos-stacked"
                         />
                     </div>
-                    <div v-if="settings.show_dts">
+                    <div v-if="show_dolby_51">
+                        <img
+                            src="/images/dolby-51.svg"
+                            alt="Dolby Digital 5.1"
+                            class="dolby-atmos-stacked"
+                        />
+                    </div>
+                    <div v-if="show_dts">
                         <img class="dts" src="/images/dts-x.svg" alt="DTS" />
                     </div>
                 </div>
@@ -128,18 +120,6 @@
                             src="/images/auro3d.svg"
                             alt="Auro 3D"
                             v-if="settings.show_auro_3d"
-                        />
-                        <img
-                            src="/images/dolby-vision.svg"
-                            class="dolby-vision"
-                            alt="Dolby Vision"
-                            v-if="settings.show_dolby_vision_horizontal"
-                        />
-                        <img
-                            src="/images/dolby-atmos.svg"
-                            class="dolby-atmos"
-                            alt="Dolby Atmos"
-                            v-if="settings.show_dolby_atmos_horizontal"
                         />
                         <img
                             src="/images/dolby-vision-stacked.svg"
@@ -219,6 +199,12 @@ export default {
             audio: null,
             runtime: '',
             theme_music: null,
+            show_dolby_atmos_vertical: false,
+            show_dolby_vision_vertical: false,
+            show_dts: false,
+            show_auro_3d: false,
+            show_imax: false,
+            show_dolby_51: false,
         };
     },
     components: {
@@ -267,59 +253,21 @@ export default {
                 .get('/api/posters?show_in_rotation=true')
                 .then((response) => {
                     this.moviePosters = response.data.posters;
-
+                    let poster = '';
                     if (this.moviePosters.length === 0) {
                         this.loadingMessage =
                             'You do not have any posters loaded yet. Open this application in a browser and click here to manage your poster library.';
                     } else {
                         if (this.settings.random_order) {
                             const rand = Math.floor(Math.random() * this.moviePosters.length);
-                            this.moviePosters[rand].show = true;
-                            this.mpaaRating = this.moviePosters[rand].mpaa_rating;
-                            if (this.moviePosters[rand].audience_rating) {
-                                this.audienceRating = this.moviePosters[rand].audience_rating / 2;
-                            }
-                            if (
-                                this.moviePosters[rand].trailer_path &&
-                                this.moviePosters[rand].show_trailer
-                            ) {
-                                this.playTrailer(this.moviePosters[rand].trailer_path);
-                            }
-                            if (this.moviePosters[rand].show_runtime) {
-                                this.runtime = this.moviePosters[rand].runtime;
-                            }
-                            if (
-                                this.moviePosters[rand].play_theme_music &&
-                                this.moviePosters[rand].theme_music_path &&
-                                this.settings.play_theme_music
-                            ) {
-                                this.theme_music = this.moviePosters[rand].theme_music_path;
-                                this.playMusic();
-                            }
+                            poster = this.moviePosters[rand];
                         } else {
-                            this.moviePosters[0].show = true;
-                            this.mpaaRating = this.moviePosters[0].mpaa_rating;
-                            if (this.moviePosters[0].audience_rating) {
-                                this.audienceRating = this.moviePosters[0].audience_rating / 2;
-                            }
-                            if (
-                                this.moviePosters[0].trailer_path &&
-                                this.moviePosters[0].show_trailer
-                            ) {
-                                this.playTrailer(this.moviePosters[0].trailer_path);
-                            }
-                            if (this.moviePosters[0].show_runtime) {
-                                this.runtime = this.moviePosters[0].runtime;
-                            }
-                            if (
-                                this.moviePosters[0].play_theme_music &&
-                                this.moviePosters[0].theme_music_path &&
-                                this.settings.play_theme_music
-                            ) {
-                                this.theme_music = this.moviePosters[0].theme_music_path;
-                                this.playMusic();
-                            }
+                            poster = this.moviePosters[0];
                         }
+
+                        poster.show = true;
+
+                        this.handlePosterView(poster);
 
                         setTimeout(() => {
                             this.loading = false;
@@ -346,6 +294,63 @@ export default {
                 .catch((e) => {
                     console.log(e.message);
                 });
+        },
+        handlePosterView(poster) {
+            this.mpaaRating = poster.mpaa_rating;
+            if (poster.audience_rating) {
+                this.audienceRating = poster.audience_rating / 2;
+            }
+            if (poster.trailer_path && poster.show_trailer) {
+                this.playTrailer(poster.trailer_path);
+            }
+            if (poster.show_runtime) {
+                this.runtime = poster.runtime;
+            }
+            if (
+                poster.play_theme_music &&
+                poster.theme_music_path &&
+                this.settings.play_theme_music
+            ) {
+                this.theme_music = poster.theme_music_path;
+                this.playMusic();
+            }
+
+            if (!this.settings.use_global_prologos) {
+                if (this.settings.use_global_prologos_if_no_poster_prologos) {
+                    if (
+                        !poster.show_dolby_atmos &&
+                        !poster.show_dolby_vision &&
+                        !poster.show_dtsx &&
+                        !poster.show_auro_3d &&
+                        !poster.show_imax &&
+                        !poster.show_dolby_51
+                    ) {
+                        this.useSettingsProLogos();
+                    } else {
+                        this.usePosterProLogos(poster);
+                    }
+                } else {
+                    this.usePosterProLogos(poster);
+                }
+            } else {
+                this.useSettingsProLogos();
+            }
+        },
+        usePosterProLogos(poster) {
+            this.show_dolby_atmos_vertical = poster.show_dolby_atmos;
+            this.show_dolby_vision_vertical = poster.show_dolby_vision;
+            this.show_dts = poster.show_dtsx;
+            this.show_auro_3d = poster.show_auro_3d;
+            this.show_imax = poster.show_imax;
+            this.show_dolby_51 = poster.show_dolby_51;
+        },
+        useSettingsProLogos() {
+            this.show_dolby_atmos_vertical = this.settings.show_dolby_atmos_vertical;
+            this.show_dolby_vision_vertical = this.settings.show_dolby_vision_vertical;
+            this.show_dts = this.settings.show_dts;
+            this.show_auro_3d = this.settings.show_auro_3d;
+            this.show_imax = this.settings.show_imax;
+            this.show_dolby_51 = this.settings.show_dolby_51;
         },
         getNowPlaying() {
             Api.apiCallPlex('/status/sessions/')
@@ -404,24 +409,7 @@ export default {
                     poster = this.moviePosters[activeIndex];
                 }
                 poster.show = true;
-                this.mpaaRating = poster.mpaa_rating;
-                if (poster.audience_rating) {
-                    this.audienceRating = poster.audience_rating / 2;
-                }
-                if (poster.trailer_path && poster.show_trailer) {
-                    this.playTrailer(poster.trailer_path);
-                }
-                if (poster.show_runtime) {
-                    this.runtime = poster.runtime;
-                }
-                if (
-                    poster.play_theme_music &&
-                    poster.theme_music_path &&
-                    this.settings.play_theme_music
-                ) {
-                    this.theme_music = poster.theme_music_path;
-                    this.playMusic();
-                }
+                this.handlePosterView(poster);
             }
         },
         startTransitionImages() {

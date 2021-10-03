@@ -228,6 +228,72 @@
                                     >
                                 </div>
 
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_dolby_atmos"
+                                        />
+                                        Show Dolby Atmos Logo</label
+                                    >
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_dolby_51"
+                                        />
+                                        Show Dolby 5.1 Logo</label
+                                    >
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_dolby_vision"
+                                        />
+                                        Show Dolby Vision Logo</label
+                                    >
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_dtsx"
+                                        />
+                                        Show DTS:X Logo</label
+                                    >
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_auro_3d"
+                                        />
+                                        Show Auro 3D Logo</label
+                                    >
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            type="checkbox"
+                                            class="text-black"
+                                            v-model="poster.show_imax"
+                                        />
+                                        Show IMAX Enhanced Logo</label
+                                    >
+                                </div>
+
                                 <div class="py-3 text-white">
                                     {{ formMessage }}
                                     <div v-for="error in errors">{{ error }}</div>
@@ -357,6 +423,12 @@ export default {
             params.append('show_runtime', this.poster.show_runtime);
             params.append('show_in_rotation', this.poster.show_in_rotation);
             params.append('play_theme_music', this.poster.play_theme_music);
+            params.append('show_dolby_atmos', this.poster.show_dolby_atmos);
+            params.append('show_dolby_51', this.poster.show_dolby_51);
+            params.append('show_dolby_vision', this.poster.show_dolby_vision);
+            params.append('show_dtsx', this.poster.show_dtsx);
+            params.append('show_auro_3d', this.poster.show_auro_3d);
+            params.append('show_imax', this.poster.show_imax);
 
             if (this.mode === 'edit') {
                 params.append('_method', 'put');

@@ -29,117 +29,58 @@ class PosterService
 
     public function store($request): Poster
     {
-        $imdbId = $request->imdb_id;
-        $orginalName = Str::slug($request->title);
-        $fileName = $orginalName.'.jpg';
-        $imageLocation = $request->image;
-        $audienceRating = $request->audience_rating;
-        $mpaaRating = $request->mpaa_rating;
-        $trailerPath = $request->trailer_path;
-        $showTrailer = $request->boolean('show_trailer');
-        $showRuntime = $request->boolean('show_runtime');
-        $showInRotation = $request->boolean('show_in_rotation');
-        $runtime = $request->runtime;
-        $playThemeMusic = $request->boolean('play_theme_music');
-        $themeMusicPath = null;
+        $image = $request->image;
 
-        if ($imdbId) {
-            $tmdb = $this->callTMDB($imdbId);
-            $orginalName = Str::slug($tmdb['title']);
-            $fileName = $tmdb['file_name'];
-            $imageLocation = $tmdb['image_location'];
-            $audienceRating = $tmdb['audience_rating'];
-            $mpaaRating = $tmdb['mpaa_rating'];
-            $trailerPath = $tmdb['trailer_path'];
-            $runtime = $tmdb['runtime'];
+        $data = $request->formatted();
+
+        if ($request->imdb_id) {
+            $tmdb = $this->callTMDB($request->imdb_id);
+            $data['name'] = $tmdb['title'];
+            $data['file_name'] = $tmdb['file_name'];
+            $data['audience_rating'] = $tmdb['audience_rating'];
+            $data['mpaa_rating'] = $tmdb['mpaa_rating'];
+            $data['trailer_path'] = $tmdb['trailer_path'];
+            $data['runtime'] = $tmdb['runtime'];
+            $image = $tmdb['image_location'];
         }
 
-        if ($request->image || $imageLocation) {
-            $this->saveImage($imageLocation, $fileName);
+        if ($image) {
+            $this->saveImage($image, $data['file_name']);
         }
 
         if ($request->music) {
-            $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
-            $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
-            $stored = $this->saveMusic($request->music, $themeMusicPath);
-            if (!$stored) {
-                abort('500', 'Theme music not saved');
-            }
+            $data['theme_music_path'] = $this->saveMusic($request, $data['file_name']);
         }
 
-        $poster = new Poster();
-        $poster->file_name = $fileName;
-        $poster->name = $orginalName;
-        $poster->can_delete = true;
-        $poster->imdb_id = $imdbId;
-        $poster->audience_rating = $audienceRating;
-        $poster->mpaa_rating = $mpaaRating;
-        $poster->trailer_path = $trailerPath;
-        $poster->show_trailer = $showTrailer;
-        $poster->show_runtime = $showRuntime;
-        $poster->show_in_rotation = $showInRotation;
-        $poster->runtime = $runtime;
-        $poster->theme_music_path = $themeMusicPath;
-        $poster->play_theme_music = $playThemeMusic;
-        $poster->save();
-
-        return $poster;
+        return Poster::create($data);
     }
 
-    public function update($request, $id): Poster
+    public function update($request, Poster $poster): Poster
     {
-        $imdbId = $request->imdb_id;
-        $orginalName = Str::slug($request->title);
-        $fileName = $orginalName.'.jpg';
-        $imageLocation = $request->image;
-        $audienceRating = $request->audience_rating;
-        $mpaaRating = $request->mpaa_rating;
-        $trailerPath = $request->trailer_path;
-        $showTrailer = $request->boolean('show_trailer');
-        $showRuntime = $request->boolean('show_runtime');
-        $showInRotation = $request->boolean('show_in_rotation');
-        $runtime = $request->runtime;
-        $playThemeMusic = $request->boolean('play_theme_music');
-        $themeMusicPath = null;
+        $image = $request->image;
 
-        if ($imdbId) {
-            $tmdb = $this->callTMDB($imdbId);
-            $orginalName = Str::slug($tmdb['title']);
-            $fileName = $tmdb['file_name'];
-            $imageLocation = $tmdb['image_location'];
-            $audienceRating = $tmdb['audience_rating'];
-            $mpaaRating = $tmdb['mpaa_rating'];
-            $trailerPath = $tmdb['trailer_path'];
-            $runtime = $tmdb['runtime'];
+        $data = $request->formatted();
+
+        if ($request->imdb_id) {
+            $tmdb = $this->callTMDB($request->imdb_id);
+            $data['name'] = $tmdb['title'];
+            $data['file_name'] = $tmdb['file_name'];
+            $data['audience_rating'] = $tmdb['audience_rating'];
+            $data['mpaa_rating'] = $tmdb['mpaa_rating'];
+            $data['trailer_path'] = $tmdb['trailer_path'];
+            $data['runtime'] = $tmdb['runtime'];
+            $image = $tmdb['image_location'];
         }
 
-        if ($request->image || $imageLocation) {
-            $this->saveImage($imageLocation, $fileName);
+        if ($image) {
+            $this->saveImage($image, $data['file_name']);
         }
 
         if ($request->music) {
-            $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
-            $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
-            $stored = $this->saveMusic($request->music, $themeMusicPath);
-            if (!$stored) {
-                abort('500', 'Theme music not saved');
-            }
+            $data['theme_music_path'] = $this->saveMusic($request, $data['file_name']);
         }
 
-        $poster = Poster::findOrFail($id);
-        $poster->file_name = $fileName;
-        $poster->name = $orginalName;
-        $poster->imdb_id = $imdbId;
-        $poster->audience_rating = $audienceRating;
-        $poster->mpaa_rating = $mpaaRating;
-        $poster->trailer_path = $trailerPath;
-        $poster->show_trailer = $showTrailer;
-        $poster->show_runtime = $showRuntime;
-        $poster->show_in_rotation = $showInRotation;
-        $poster->runtime = $runtime;
-        $poster->theme_music_path = $themeMusicPath;
-        $poster->play_theme_music = $playThemeMusic;
-        $poster->save();
+        $poster->update($data);
 
         return $poster;
     }
@@ -192,27 +133,27 @@ class PosterService
             'Accept' => 'application/json',
         ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.env('TMDB_API_V3').'&append_to_response=videos,images,release_dates');
 
-        $data = $response->json();
+        $res = $response->json();
 
-        if (isset($data['success']) && !$data['success']) {
+        if (isset($res['success']) && !$res['success']) {
             abort(404, 'Cannot find movie in TMDB.');
         }
 
-        $orginalName = Str::slug($data['title']);
+        $orginalName = Str::slug($res['title']);
         $fileName = $orginalName.'.jpg';
         $trailerPath = '';
 
-        $imageLocation = 'https://image.tmdb.org/t/p/original'.$data['poster_path'];
+        $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
 
-        $audienceRating = $data['vote_average'];
+        $audienceRating = $res['vote_average'];
 
-        foreach ($data['release_dates']['results'] as $country) {
+        foreach ($res['release_dates']['results'] as $country) {
             if ($country['iso_3166_1'] === 'US') {
                 $mpaaRating = $country['release_dates'][0]['certification'];
             }
         }
 
-        foreach ($data['videos']['results'] as $video) {
+        foreach ($res['videos']['results'] as $video) {
             if ($video['type'] === 'Trailer' && $video['official'] === true && $video['site'] === 'YouTube') {
                 $trailerPath = $video['key'];
                 break;
@@ -220,13 +161,13 @@ class PosterService
         }
 
         return [
-            'title' => $data['title'],
+            'title' => Str::slug($res['title']),
             'image_location' => $imageLocation,
             'file_name' => $fileName,
             'mpaa_rating' => $mpaaRating,
             'audience_rating' => $audienceRating,
             'trailer_path' => $trailerPath,
-            'runtime' => $data['runtime']
+            'runtime' => $res['runtime']
         ];
     }
 
@@ -236,12 +177,26 @@ class PosterService
         $image->resize(1400, null, function ($constraint) {
             $constraint->aspectRatio();
         });
-        return $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+
+        try {
+            $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+        } catch (\Exception $e) {
+            // Muting this exception because for some reason some images do not save correctly when using Plex. Rare case.
+            // This will allow the cache to continue and the user can fix any rarely missing images.
+        }
     }
 
-    private function saveMusic($file, $fileName)
+    private function saveMusic($request, $fileName)
     {
-        $stored = $file->storeAs('music', $fileName);
-        return $stored;
+        $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
+        $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
+
+        try {
+            $request->music->storeAs('music', $fileName);
+        } catch (\Exception $e) {
+            abort(500, $e->getMessage());
+        }
+
+        return $themeMusicPath;
     }
 }

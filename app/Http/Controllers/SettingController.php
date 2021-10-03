@@ -37,11 +37,14 @@ class SettingController extends Controller
         $settings->show_dolby_vision_horizontal = $request->boolean('show_dolby_vision_horizontal');
         $settings->show_dolby_vision_vertical = $request->boolean('show_dolby_vision_vertical');
         $settings->show_dts = $request->boolean('show_dts');
+        $settings->show_dolby_51 = $request->boolean('show_dolby_51');
         $settings->show_imax = $request->boolean('show_imax');
         $settings->show_auro_3d = $request->boolean('show_auro_3d');
         $settings->use_cec_power = $request->boolean('use_cec_power');
         $settings->show_runtime = $request->boolean('show_runtime');
         $settings->play_theme_music = $request->boolean('play_theme_music');
+        $settings->use_global_prologos = $request->boolean('use_global_prologos');
+        $settings->use_global_prologos_if_no_poster_prologos = $request->boolean('use_global_prologos_if_no_poster_prologos');
         $settings->save();
 
         return response()->json(['success' => true]);

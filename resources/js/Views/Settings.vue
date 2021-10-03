@@ -256,25 +256,17 @@
                                     ><input
                                         class="text-black"
                                         type="checkbox"
-                                        v-model="settings.show_dolby_atmos_horizontal"
+                                        v-model="settings.show_dolby_51"
                                     />
-                                    Show Dolby Atmos Horizontal Logo</label
+                                    Show Dolby Digital 5.1 Logo</label
                                 >
                                 <label class="text-gray-300 block mb-2 font-bold"
                                     ><input
                                         class="text-black"
                                         type="checkbox"
-                                        v-model="settings.show_dolby_atmos_vartical"
+                                        v-model="settings.show_dolby_atmos_vertical"
                                     />
-                                    Show Dolby Atmos Vertical Logo</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_dolby_vision_horizontal"
-                                    />
-                                    Show Dolby Vision Horizontal Logo</label
+                                    Show Dolby Atmos Logo</label
                                 >
                                 <label class="text-gray-300 block mb-2 font-bold"
                                     ><input
@@ -282,7 +274,7 @@
                                         type="checkbox"
                                         v-model="settings.show_dolby_vision_vertical"
                                     />
-                                    Show Dolby Vision Vertical Logo</label
+                                    Show Dolby Vision Logo</label
                                 >
                                 <label class="text-gray-300 block mb-2 font-bold"
                                     ><input
@@ -308,6 +300,28 @@
                                     />
                                     Show Auro 3D Logo</label
                                 >
+                            </div>
+
+                            <hr class="mt-3 mb-7 border-gray-700" />
+
+                            <div class="mb-5">
+                                <label class="text-gray-300 block mb-2 font-bold"
+                                    ><input
+                                        class="text-black"
+                                        type="checkbox"
+                                        v-model="settings.use_global_prologos"
+                                    />
+                                    Always use enabled processing logos from settings.
+                                </label>
+                                <label class="text-gray-300 block mb-2 font-bold"
+                                    ><input
+                                        class="text-black"
+                                        type="checkbox"
+                                        v-model="settings.use_global_prologos_if_no_poster_prologos"
+                                    />
+                                    Use settings processing logos only if poster does not have any
+                                    enabled.
+                                </label>
                             </div>
 
                             <hr class="mt-3 mb-7 border-gray-700" />

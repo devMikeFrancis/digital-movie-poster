@@ -79,7 +79,7 @@
                                 class="mb-5"
                                 style="background-color: #222"
                             >
-                                <div class="grid lg:grid-cols-12 gap-4 p-4 lg:p-0 relative">
+                                <div class="grid lg:grid-cols-12 gap-4 relative">
                                     <div class="sm:col-span-2 lg:col-span-1 w-12">
                                         <div
                                             class="poster-image-block handle"
@@ -90,7 +90,15 @@
                                             "
                                         ></div>
                                     </div>
-                                    <div class="sm:col-span-2 lg:col-span-5 flex items-center">
+                                    <div
+                                        class="
+                                            sm:col-span-2
+                                            md:col-span-8
+                                            lg:col-span-8
+                                            flex
+                                            items-center
+                                        "
+                                    >
                                         <router-link
                                             class="text-white font-bold"
                                             :to="'/posters/' + poster.id"
@@ -99,32 +107,247 @@
                                         >
                                     </div>
 
-                                    <div class="sm:col-span-2 lg:col-span-2 flex items-center">
-                                        <label class="text-white"
-                                            ><input
-                                                type="checkbox"
-                                                v-model="poster.show_trailer"
-                                                @change="
-                                                    updateSetting(
-                                                        poster,
-                                                        'show_trailer',
-                                                        poster.show_trailer
-                                                    )
-                                                "
-                                            />
-                                            Show trailer</label
-                                        >
-                                    </div>
-
-                                    <div class="sm:col-span-2 lg:col-span-3 flex items-center">
-                                        <label class="text-white"
+                                    <div
+                                        class="
+                                            sm:col-span-2
+                                            md:col-span-1
+                                            lg:col-span-1
+                                            flex
+                                            items-center
+                                        "
+                                    >
+                                        <label class="text-white cursor-pointer"
                                             ><input
                                                 type="checkbox"
                                                 v-model="poster.show_in_rotation"
-                                                @change="updateShowInRotation(poster)"
+                                                class="hidden"
+                                                @change="
+                                                    updateSetting(
+                                                        poster,
+                                                        'show_in_rotation',
+                                                        poster.show_in_rotation
+                                                    )
+                                                "
                                             />
-                                            Show in rotation</label
-                                        >
+                                            <span
+                                                v-if="!poster.show_in_rotation"
+                                                class="block opacity-60"
+                                                ><img
+                                                    src="/images/eye-slash-regular.svg"
+                                                    alt="Not in rotation"
+                                                    style="width: 24px; height: auto"
+                                            /></span>
+                                            <span v-if="poster.show_in_rotation"
+                                                ><img
+                                                    src="/images/eye-regular.svg"
+                                                    alt="In rotation"
+                                                    style="width: 24px; height: auto"
+                                            /></span>
+                                        </label>
+                                    </div>
+
+                                    <div
+                                        class="
+                                            sm:col-span-2
+                                            md:col-span-1
+                                            lg:col-span-1
+                                            flex
+                                            items-center
+                                        "
+                                    >
+                                        <div class="relative">
+                                            <!-- Dropdown toggle button -->
+                                            <button
+                                                @click.prevent="
+                                                    poster.openOptions = !poster.openOptions
+                                                "
+                                                class="py-2 px-3 hover:bg-gray-500"
+                                            >
+                                                <span
+                                                    ><img
+                                                        src="/images/ellipsis-v-regular.svg"
+                                                        alt="Options"
+                                                        style="width: 8px; height: auto"
+                                                /></span>
+                                            </button>
+                                            <!-- Dropdown list -->
+                                            <div
+                                                class="
+                                                    absolute
+                                                    right-0
+                                                    py-2
+                                                    mt-2
+                                                    bg-white bg-gray-100
+                                                    rounded-md
+                                                    shadow-xl
+                                                    w-44
+                                                    z-20
+                                                "
+                                                v-bind:class="{ hidden: !poster.openOptions }"
+                                                style="width: 240px"
+                                            >
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_trailer"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_trailer',
+                                                                poster.show_trailer
+                                                            )
+                                                        "
+                                                    />
+                                                    Show trailer
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_dolby_atmos"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_dolby_atmos',
+                                                                poster.show_dolby_atmos
+                                                            )
+                                                        "
+                                                    />
+                                                    Show Dolby Atmos Logo
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_dolby_51"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_dolby_51',
+                                                                poster.show_dolby_51
+                                                            )
+                                                        "
+                                                    />
+                                                    Show Dolby 5.1 Logo
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_dolby_vision"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_dolby_vision',
+                                                                poster.show_dolby_vision
+                                                            )
+                                                        "
+                                                    />
+                                                    Show Dolby Vision Logo
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_dtsx"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_dtsx',
+                                                                poster.show_dtsx
+                                                            )
+                                                        "
+                                                    />
+                                                    Show DTS:X Logo
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_auro_3d"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_auro_3d',
+                                                                poster.show_auro_3d
+                                                            )
+                                                        "
+                                                    />
+                                                    Show Auro 3D Logo
+                                                </label>
+
+                                                <label
+                                                    class="
+                                                        block
+                                                        px-4
+                                                        py-2
+                                                        text-sm text-gray-700
+                                                        hover:bg-gray-500
+                                                        hover:text-white
+                                                    "
+                                                    ><input
+                                                        type="checkbox"
+                                                        v-model="poster.show_imax"
+                                                        @change="
+                                                            updateSetting(
+                                                                poster,
+                                                                'show_imax',
+                                                                poster.show_imax
+                                                            )
+                                                        "
+                                                    />
+                                                    Show IMAX Enhanced Logo
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div
@@ -245,16 +468,6 @@ export default {
                 }.bind(this, params),
                 1000
             );
-        },
-        updateShowInRotation(poster) {
-            const params = {
-                _method: 'put',
-                show_in_rotation: poster.show_in_rotation,
-            };
-            axios
-                .post('/api/posters/' + poster.id + '/update-rotation', params)
-                .then((response) => {})
-                .catch((e) => {});
         },
         updateSetting(poster, column, value) {
             const params = {

@@ -44,9 +44,9 @@ class PosterController extends Controller
         return response()->json(['poster' => $poster]);
     }
 
-    public function update(PosterRequest $request, PosterService $service, $id)
+    public function update(PosterRequest $request, PosterService $service, Poster $poster)
     {
-        $poster = $service->update($request, $id);
+        $poster = $service->update($request, $poster);
         return response()->json(['poster' => $poster]);
     }
 

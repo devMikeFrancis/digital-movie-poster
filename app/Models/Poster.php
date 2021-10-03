@@ -25,5 +25,11 @@ class Poster extends Model
         'show_trailer',
         'play_theme_music',
         'theme_music_path',
+        'show_dolby_atmos',
+        'show_dolby_51',
+        'show_dolby_vision',
+        'show_dtsx',
+        'show_auro_3d',
+        'show_imax',
     ];
 }
