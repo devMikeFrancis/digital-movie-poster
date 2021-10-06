@@ -18,6 +18,11 @@
                                     >Posters</router-link
                                 >
                             </li>
+                            <li class="mb-3">
+                                <router-link class="hover:text-gray-500 active" to="/voting"
+                                    >Voting</router-link
+                                >
+                            </li>
                             <li>
                                 <router-link class="hover:text-gray-500" to="/settings"
                                     >Settings</router-link
@@ -487,7 +492,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .cache-overlay {
     position: absolute;
     top: 60px;
@@ -508,6 +513,12 @@ export default {
         color: #fff;
         text-transform: uppercase;
     }
+}
+
+input[type='text'],
+input[type='number'] {
+    height: 32px;
+    border-radius: 4px;
 }
 
 .handle {
