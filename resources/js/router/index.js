@@ -4,6 +4,7 @@ import Dashboard from '../Views/Dashboard';
 import Settings from '../Views/Settings';
 import Posters from '../Views/Posters';
 import PostersEdit from '../Views/PostersEdit';
+import Voting from '../Views/Voting';
 
 Vue.use(Router);
 
@@ -31,9 +32,15 @@ const routes = [
         name: 'PostersEdit',
         component: PostersEdit,
     },
+    {
+        path: '/voting',
+        name: 'Voting',
+        component: Voting,
+    },
 ];
 
 let router = new Router({
+    mode: 'history',
     routes,
 });
 
