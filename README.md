@@ -14,6 +14,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Show Runtime
 -   Movie trailers
 -   Movie theme music
+-   Movie Voting! See WIKI for more info
 
 Open to new features/suggestions/requests. Please use Github issues.
 
@@ -50,6 +51,23 @@ NOTE: If you alter any of the application files other than the `.env` file the u
 Make sure your web server supports/turned on mod_rewrite.
 
 If using NGINX your configuration may need to be updated to support Laravel mod rewrites.
+
+### Movie Voting Service
+
+The movie voting service runs on a socket.io server locally.
+
+If you want to use the movie voting feature you will need to go into the `socketserver` folder and run:
+`npm install`
+
+Next you will need to install PM2:
+
+`npm install -g pm2`
+
+Start the voting socket.io server run:
+
+`pm2 start server.js`
+
+Now the voting service will listen for connections when navigating to the `/voting` path in your browser.
 
 ### Permissions
 
