@@ -198,7 +198,9 @@
                 </div>
 
                 <div class="sm:col-span-12 md:col-span-10 text-center" v-if="showResults">
-                    <h3 class="text-white font-bold text-3xl">We Have a {{ resultMessage }}!</h3>
+                    <h3 class="text-white font-bold text-3xl mb-4">
+                        We Have a {{ resultMessage }}!
+                    </h3>
                     <div class="winner-container flex flex-wrap justify-center">
                         <div class="winner-item" v-for="winner in winners">
                             <span class="votes"
@@ -451,8 +453,11 @@ export default {
 };
 </script>
 
-<style lang="scss">
-body {
+<style scoped lang="scss">
+.vote-container,
+.posters-container,
+.winner-container {
+    padding: 12px;
     background: #222;
 }
 .loading-overlay {
