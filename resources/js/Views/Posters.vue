@@ -89,7 +89,7 @@
                                         <div
                                             class="poster-image-block handle"
                                             :style="
-                                                'background-image: url(storage/posters/' +
+                                                'background-image: url(storage/posters/_tn_' +
                                                 poster.file_name +
                                                 ')'
                                             "

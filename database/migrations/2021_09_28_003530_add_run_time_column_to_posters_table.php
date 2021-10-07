@@ -16,7 +16,7 @@ class AddRunTimeColumnToPostersTable extends Migration
         Schema::table('posters', function (Blueprint $table) {
             $table->integer('runtime')->nullable();
             $table->boolean('show_runtime')->default(true);
-            $table->boolean('show_trailer')->default(true);
+            $table->boolean('show_trailer')->default(false);
         });
     }
 
