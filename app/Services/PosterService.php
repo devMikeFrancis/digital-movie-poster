@@ -114,6 +114,10 @@ class PosterService
             unlink(storage_path('app/public/posters/').$poster->file_name);
         }
 
+        if (file_exists(storage_path('app/public/posters/_tn_').$poster->file_name)) {
+            unlink(storage_path('app/public/posters/_tn_').$poster->file_name);
+        }
+
         return $poster->delete();
     }
 
@@ -180,6 +184,10 @@ class PosterService
 
         try {
             $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+            $image->resize(200, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
         } catch (\Exception $e) {
             // Muting this exception because for some reason some images do not save correctly when using Plex. Rare case.
             // This will allow the cache to continue and the user can fix any rarely missing images.

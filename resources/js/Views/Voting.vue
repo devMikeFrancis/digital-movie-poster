@@ -164,7 +164,7 @@
                                 />
                                 <div>
                                     <img
-                                        :src="'/storage/posters/' + poster.file_name"
+                                        :src="'/storage/posters/_tn_' + poster.file_name"
                                         class="rounded-lg shadow-lg hover:shadow-none"
                                         :alt="poster.name"
                                     />

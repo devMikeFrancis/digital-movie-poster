@@ -59,6 +59,10 @@ class PlexService
                     $constraint->aspectRatio();
                 });
                 $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+                $image->resize(200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
 
                 Poster::updateOrCreate(
                     ['object_id' => $movie['key'] ],
