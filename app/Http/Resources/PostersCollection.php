@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PostersCollection extends ResourceCollection
 {
+    public static $wrap = 'posters';
+
     /**
      * Transform the resource collection into an array.
      *
@@ -14,34 +16,12 @@ class PostersCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->collection->transform(function ($poster) {
-            return [
-                'id' => $poster->id,
-                'name' => $poster->name,
-                'file_name' => $poster->file_name,
-                'show_in_rotation' => $poster->show_in_rotation,
-                'ordinal' => $poster->ordinal,
-                'can_delete' => $poster->can_delete,
-                'imdb_id' => $poster->imdb_id,
-                'mpaa_rating' => $poster->mpaa_rating,
-                'audience_rating' => $poster->audience_rating,
-                'trailer_path' => $poster->trailer_path,
-                'show_runtime' => $poster->show_runtime,
-                'show_trailer' => $poster->show_trailer,
-                'runtime' => $poster->runtime,
-                'play_theme_music' => $poster->play_theme_music,
-                'theme_music_path' => $poster->theme_music_path,
-                'show_dolby_atmos' => $poster->show_dolby_atmos,
-                'show_dolby_51' => $poster->show_dolby_51,
-                'show_dolby_vision' => $poster->show_dolby_vision,
-                'show_dtsx' => $poster->show_dtsx,
-                'show_auro_3d' => $poster->show_auro_3d,
-                'show_imax' => $poster->show_imax,
-                'show' => false,
-                'openOptions' => false,
-                'image' => null,
-                'music' => null,
-            ];
+        return $this->collection->map(function ($item) {
+            $item['show'] = false;
+            $item['openOptions'] = false;
+            $item['image'] = null;
+            $item['music'] = null;
+            return $item;
         });
     }
 }

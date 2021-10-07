@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
 use App\Services\PosterService;
 use App\Http\Resources\PostersCollection;
+use App\Http\Resources\PosterResource;
 use App\Models\Poster;
 
 class PosterController extends Controller
@@ -14,60 +15,117 @@ class PosterController extends Controller
     {
     }
 
+    /**
+     * Get posters
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
     public function index(Request $request)
     {
         $posters = $request->show_in_rotation ?
-        new PostersCollection(Poster::where('show_in_rotation', true)->orderBy('ordinal')->orderBy('name')->get()) :
-        new PostersCollection(Poster::orderBy('ordinal')->orderBy('name')->get());
+        Poster::where('show_in_rotation', true) :
+        Poster::orderBy('ordinal');
 
-        return response()->json(['posters' => $posters]);
+        return new PostersCollection(
+            $posters->orderBy('ordinal')->orderBy('name')->get()
+        );
     }
 
-    public function show($id)
+    /**
+     * Get poster
+     *
+     * @param Poster $poster
+     *
+     * @return array
+     */
+    public function show(Poster $poster)
     {
-        $poster = Poster::findOrFail($id);
-        $poster->image = null;
-        return response()->json(['poster' => $poster]);
+        return new PosterResource($poster);
     }
 
+    /**
+     * Re download posters from external service
+     *
+     * @param PosterService $service
+     *
+     * @return array
+     */
     public function cache(PosterService $service)
     {
         $service->cache();
-        $posters = new PostersCollection(Poster::where('show_in_rotation', true)->orderBy('ordinal')->orderBy('name')->get());
-        return response()->json(['posters' => $posters]);
+
+        return new PostersCollection(
+            Poster::where('show_in_rotation', true)->orderBy('ordinal')->orderBy('name')->get()
+        );
     }
 
+    /**
+     * Saves poster
+     *
+     * @param PosterRequest $request
+     * @param PosterService $service
+     *
+     * @return array
+     */
     public function store(PosterRequest $request, PosterService $service)
     {
-        $poster = $service->store($request);
-
-        return response()->json(['poster' => $poster]);
+        return new PosterResource($service->store($request));
     }
 
+    /**
+     * Updates poster
+     *
+     * @param PosterRequest $request
+     * @param PosterService $service
+     * @param Poster $poster
+     *
+     * @return array
+     */
     public function update(PosterRequest $request, PosterService $service, Poster $poster)
     {
-        $poster = $service->update($request, $poster);
-        return response()->json(['poster' => $poster]);
+        return new PosterResource($service->update($request, $poster));
     }
 
-    public function updateShowInRotation(PosterRequest $request, PosterService $service, $id)
-    {
-        $service->updateShowInRotation($id, $request->boolean('show_in_rotation'));
-        return response()->json(['success' => true]);
-    }
-
+    /**
+     * Updates specific boolean on poster
+     *
+     * @param PosterRequest $request
+     * @param PosterService $service
+     * @param int $id poster id
+     * @param string $column column to update
+     *
+     * @return array
+     */
     public function updateSetting(PosterRequest $request, PosterService $service, $id, $column)
     {
         $service->updateSetting($id, $column, $request->boolean('value'));
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Sorts posters via drag and drop
+     *
+     * @param PosterRequest $request
+     * @param PosterService $service
+     *
+     * @return array
+     */
     public function sort(PosterRequest $request, PosterService $service)
     {
         $service->sort($request);
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Delete poster
+     *
+     * @param PosterService $service
+     * @param int $id
+     *
+     * @return array
+     */
     public function delete(PosterService $service, $id)
     {
         $service->delete($id);

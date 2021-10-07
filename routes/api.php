@@ -16,7 +16,6 @@ Route::post('/posters', [PosterController::class, 'store']);
 Route::post('/posters-sort', [PosterController::class, 'sort']);
 Route::get('/posters/{poster}', [PosterController::class, 'show']);
 Route::put('/posters/{poster}', [PosterController::class, 'update']);
-Route::put('/posters/{id}/update-rotation', [PosterController::class, 'updateShowInRotation']);
 Route::put('/posters/{id}/{column}', [PosterController::class, 'updateSetting']);
 Route::delete('/posters/{id}', [PosterController::class, 'delete']);
 Route::get('/update-application', [SettingController::class, 'updateApplication']);

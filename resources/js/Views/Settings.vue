@@ -19,7 +19,7 @@
                                 >
                             </li>
                             <li class="mb-3">
-                                <router-link class="hover:text-gray-500 active" to="/voting"
+                                <router-link class="hover:text-gray-500" to="/voting"
                                     >Voting</router-link
                                 >
                             </li>
