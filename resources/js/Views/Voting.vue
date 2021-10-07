@@ -369,6 +369,11 @@ export default {
                 posters = this.getRandomPosters();
             }
 
+            posters.forEach((v, i) => {
+                posters[i].votes = 0;
+                posters[i].checked = false;
+            });
+
             const data = {
                 posters: posters,
                 timeLimit: this.timeLimit,
@@ -388,11 +393,6 @@ export default {
                 result[limit] = this.posters[x in taken ? taken[x] : x];
                 taken[x] = --len in taken ? taken[len] : len;
             }
-
-            result.forEach((v, i) => {
-                result[i].votes = 0;
-                result[i].checked = false;
-            });
 
             return result;
         },
