@@ -1,162 +1,166 @@
 <template>
     <div>
-        <div class="loading-overlay" v-if="loading">
-            <div class="p-12" @click="gotoPosters()">{{ loadingMessage }}</div>
-        </div>
-        <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
-            <header class="coming-soon-header">
-                <span class="runtime" v-if="settings.show_runtime && runtime"
-                    >{{ runtime }} min</span
-                >
-                <h1>{{ settings.coming_soon_text }}</h1>
-            </header>
-            <div class="recent-poster-container">
-                <div class="trailer-container has-trailer">
-                    <div
-                        v-for="(poster, index) in moviePosters"
-                        class="recent-poster"
-                        v-bind:class="{
-                            show: poster.show,
-                            hide: !poster.show,
-                            'has-trailer': poster.show_trailer && poster.trailer_path,
-                        }"
-                        :style="'background-image: url(storage/posters/' + poster.file_name + ')'"
-                        v-bind:key="`key-${index}`"
-                    ></div>
-                    <div id="trailer">
-                        <div ref="videoPlayer" id="youtube-player"></div>
-                    </div>
-                    <div id="music"></div>
-                </div>
+        <div class="movie-posters">
+            <div class="loading-overlay" v-if="loading">
+                <div class="p-12" @click="gotoPosters()">{{ loadingMessage }}</div>
             </div>
-            <footer class="coming-soon-footer">
-                <div class="content-rating" v-if="settings.show_mpaa_rating">
-                    <img
-                        v-if="mpaaRating"
-                        :src="'/images/' + mpaaRating + '.svg'"
-                        alt="Content Rating"
-                        v-cloak
-                    />
-                </div>
-                <div class="dolby-logos" v-if="settings.show_processing_logos">
-                    <div v-if="show_imax">
-                        <img class="imax" src="/images/imax.png" alt="IMAX" />
-                    </div>
-                    <div v-if="show_auro_3d">
-                        <img class="auro3d" src="/images/auro3d.svg" alt="Auro 3D" />
-                    </div>
-                    <div v-if="show_dolby_vision_vertical">
-                        <img
-                            src="/images/dolby-vision-stacked.svg"
-                            alt="Dolby Vision"
-                            class="dolby-vision-stacked"
-                        />
-                    </div>
-                    <div v-if="show_dolby_atmos_vertical">
-                        <img
-                            src="/images/dolby-atmos-stacked.svg"
-                            alt="Dolby Atmos"
-                            class="dolby-atmos-stacked"
-                        />
-                    </div>
-                    <div v-if="show_dolby_51">
-                        <img
-                            src="/images/dolby-51.svg"
-                            alt="Dolby Digital 5.1"
-                            class="dolby-atmos-stacked"
-                        />
-                    </div>
-                    <div v-if="show_dts">
-                        <img class="dts" src="/images/dts-x.svg" alt="DTS" />
-                    </div>
-                </div>
-                <div class="audience-rating" v-if="settings.show_audience_rating">
-                    <star-rating
-                        v-if="audienceRating"
-                        v-bind:increment="0.1"
-                        v-bind:max-rating="5"
-                        inactive-color="#000"
-                        active-color="#fff"
-                        v-bind:star-size="28"
-                        v-bind:rating="audienceRating"
-                        border-color="#fff"
-                        :border-width="borderWidth"
-                        v-bind:show-rating="false"
-                        v-bind:read-only="true"
-                    />
-                </div>
-            </footer>
-        </div>
-        <transition name="fade" mode="out-in">
-            <div id="now-playing-container" v-if="nowPlaying" @click.prevent="gotoPosters()">
-                <header class="now-playing-header">
-                    <h1>{{ settings.now_playing_text }}</h1>
+            <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
+                <header class="coming-soon-header">
+                    <span class="runtime" v-if="settings.show_runtime && runtime"
+                        >{{ runtime }} min</span
+                    >
+                    <h1>{{ settings.coming_soon_text }}</h1>
                 </header>
-                <div class="now-playing-container">
-                    <div
-                        class="now-playing-poster"
-                        :style="'background-image: url(' + nowPlayingPoster + ')'"
-                    ></div>
+                <div class="recent-poster-container">
+                    <div class="trailer-container has-trailer">
+                        <div
+                            v-for="(poster, index) in moviePosters"
+                            class="recent-poster"
+                            v-bind:class="{
+                                show: poster.show,
+                                hide: !poster.show,
+                                'has-trailer': poster.show_trailer && poster.trailer_path,
+                            }"
+                            :style="
+                                'background-image: url(storage/posters/' + poster.file_name + ')'
+                            "
+                            v-bind:key="`key-${index}`"
+                        ></div>
+                        <div id="trailer">
+                            <div ref="videoPlayer" id="youtube-player"></div>
+                        </div>
+                        <div id="music"></div>
+                    </div>
                 </div>
-                <div class="now-playing-footer">
+                <footer class="coming-soon-footer">
                     <div class="content-rating" v-if="settings.show_mpaa_rating">
                         <img
-                            v-if="contentRating"
-                            :src="'/images/' + contentRating + '.svg'"
+                            v-if="mpaaRating"
+                            :src="'/images/' + mpaaRating + '.svg'"
                             alt="Content Rating"
                             v-cloak
                         />
                     </div>
-
                     <div class="dolby-logos" v-if="settings.show_processing_logos">
-                        <img
-                            class="imax"
-                            src="/images/imax.png"
-                            alt="IMAX"
-                            v-if="settings.show_imax"
-                        />
-                        <img
-                            class="auro3d"
-                            src="/images/auro3d.svg"
-                            alt="Auro 3D"
-                            v-if="settings.show_auro_3d"
-                        />
-                        <img
-                            src="/images/dolby-vision-stacked.svg"
-                            alt="Dolby Vision"
-                            class="dolby-vision-stacked"
-                            v-if="settings.show_dolby_vision_vertical"
-                        />
-                        <img
-                            src="/images/dolby-atmos-stacked.svg"
-                            alt="Dolby Atmos"
-                            class="dolby-atmos-stacked"
-                            v-if="settings.show_dolby_atmos_vertical"
-                        />
-                        <img
-                            class="dts"
-                            src="/images/dts-x.svg"
-                            alt="DTS"
-                            v-if="settings.show_dts"
-                        />
+                        <div v-if="show_imax">
+                            <img class="imax" src="/images/imax.png" alt="IMAX" />
+                        </div>
+                        <div v-if="show_auro_3d">
+                            <img class="auro3d" src="/images/auro3d.svg" alt="Auro 3D" />
+                        </div>
+                        <div v-if="show_dolby_vision_vertical">
+                            <img
+                                src="/images/dolby-vision-stacked.svg"
+                                alt="Dolby Vision"
+                                class="dolby-vision-stacked"
+                            />
+                        </div>
+                        <div v-if="show_dolby_atmos_vertical">
+                            <img
+                                src="/images/dolby-atmos-stacked.svg"
+                                alt="Dolby Atmos"
+                                class="dolby-atmos-stacked"
+                            />
+                        </div>
+                        <div v-if="show_dolby_51">
+                            <img
+                                src="/images/dolby-51.svg"
+                                alt="Dolby Digital 5.1"
+                                class="dolby-atmos-stacked"
+                            />
+                        </div>
+                        <div v-if="show_dts">
+                            <img class="dts" src="/images/dts-x.svg" alt="DTS" />
+                        </div>
                     </div>
                     <div class="audience-rating" v-if="settings.show_audience_rating">
                         <star-rating
+                            v-if="audienceRating"
                             v-bind:increment="0.1"
                             v-bind:max-rating="5"
                             inactive-color="#000"
                             active-color="#fff"
                             v-bind:star-size="28"
-                            v-bind:rating="rating"
+                            v-bind:rating="audienceRating"
                             border-color="#fff"
                             :border-width="borderWidth"
                             v-bind:show-rating="false"
                             v-bind:read-only="true"
                         />
                     </div>
-                </div>
+                </footer>
             </div>
-        </transition>
+            <transition name="fade" mode="out-in">
+                <div id="now-playing-container" v-if="nowPlaying" @click.prevent="gotoPosters()">
+                    <header class="now-playing-header">
+                        <h1>{{ settings.now_playing_text }}</h1>
+                    </header>
+                    <div class="now-playing-container">
+                        <div
+                            class="now-playing-poster"
+                            :style="'background-image: url(' + nowPlayingPoster + ')'"
+                        ></div>
+                    </div>
+                    <div class="now-playing-footer">
+                        <div class="content-rating" v-if="settings.show_mpaa_rating">
+                            <img
+                                v-if="contentRating"
+                                :src="'/images/' + contentRating + '.svg'"
+                                alt="Content Rating"
+                                v-cloak
+                            />
+                        </div>
+
+                        <div class="dolby-logos" v-if="settings.show_processing_logos">
+                            <img
+                                class="imax"
+                                src="/images/imax.png"
+                                alt="IMAX"
+                                v-if="settings.show_imax"
+                            />
+                            <img
+                                class="auro3d"
+                                src="/images/auro3d.svg"
+                                alt="Auro 3D"
+                                v-if="settings.show_auro_3d"
+                            />
+                            <img
+                                src="/images/dolby-vision-stacked.svg"
+                                alt="Dolby Vision"
+                                class="dolby-vision-stacked"
+                                v-if="settings.show_dolby_vision_vertical"
+                            />
+                            <img
+                                src="/images/dolby-atmos-stacked.svg"
+                                alt="Dolby Atmos"
+                                class="dolby-atmos-stacked"
+                                v-if="settings.show_dolby_atmos_vertical"
+                            />
+                            <img
+                                class="dts"
+                                src="/images/dts-x.svg"
+                                alt="DTS"
+                                v-if="settings.show_dts"
+                            />
+                        </div>
+                        <div class="audience-rating" v-if="settings.show_audience_rating">
+                            <star-rating
+                                v-bind:increment="0.1"
+                                v-bind:max-rating="5"
+                                inactive-color="#000"
+                                active-color="#fff"
+                                v-bind:star-size="28"
+                                v-bind:rating="rating"
+                                border-color="#fff"
+                                :border-width="borderWidth"
+                                v-bind:show-rating="false"
+                                v-bind:read-only="true"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -205,6 +209,7 @@ export default {
             show_auro_3d: false,
             show_imax: false,
             show_dolby_51: false,
+            socket: '',
         };
     },
     components: {
@@ -453,10 +458,6 @@ export default {
             }, 1500);
         },
         stopMusic() {
-            /*if (this.audio) {
-                this.audio.pause();
-                this.audio = null;
-            }*/
             if (window.audio) {
                 let vol = 1;
                 let interval = 40;
@@ -552,20 +553,54 @@ export default {
         gotoPosters() {
             this.$router.push('posters');
         },
+        reload() {
+            this.stopTransitionImages();
+            clearInterval(this.recentlyAddedInterval);
+            this.stopMusic();
+            this.videoPlaying = false;
+            this.boot();
+        },
     },
     created() {
         this.boot();
     },
     mounted() {
         this.loading = true;
+        this.socket = io('http://movieposter.local:3000');
+
+        this.socket.on('receive:command', (data) => {
+            switch (data.command) {
+                case 'reload':
+                    this.reload();
+                    break;
+            }
+        });
     },
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 body {
-    background: #000;
+    overflow: hidden;
+
+    .movie-posters {
+        transform: rotate(90deg);
+        transform-origin: bottom left;
+
+        position: absolute;
+        top: -100vw;
+        left: 0;
+
+        height: 100vw;
+        width: 100vh;
+
+        background-color: #000;
+        color: #fff;
+
+        overflow: auto;
+    }
 }
+
 .loading-overlay {
     display: flex;
     align-items: center;
@@ -707,7 +742,7 @@ body {
 
     .runtime {
         position: absolute;
-        top: 60px;
+        top: 50px;
         left: 40px;
         color: #fff;
         font-size: 32px;
@@ -718,7 +753,7 @@ body {
         text-transform: uppercase;
         padding: 12px 24px 14px 24px;
         border: 4px solid #fff;
-        font-size: 80px;
+        font-size: 56px;
         font-weight: 700;
         color: #fff;
         line-height: 1;

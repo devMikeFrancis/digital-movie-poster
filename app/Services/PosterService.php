@@ -77,7 +77,7 @@ class PosterService
         }
 
         if ($request->music) {
-            $data['theme_music_path'] = $this->saveMusic($request, $data['file_name']);
+            $data['theme_music_path'] = $this->saveMusic($request);
         }
 
         $poster->update($data);
@@ -194,10 +194,10 @@ class PosterService
         }
     }
 
-    private function saveMusic($request, $fileName)
+    private function saveMusic($request)
     {
         $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
-        $themeMusicPath = $basename.'.'.$request->music->getClientOriginalExtension();
+        $fileName = $basename.'.'.$request->music->getClientOriginalExtension();
 
         try {
             $request->music->storeAs('music', $fileName);
@@ -205,6 +205,6 @@ class PosterService
             abort(500, $e->getMessage());
         }
 
-        return $themeMusicPath;
+        return $fileName;
     }
 }

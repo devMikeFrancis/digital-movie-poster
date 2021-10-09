@@ -124,6 +124,10 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('dispatch:command', (data) => {
+        socket.broadcast.emit('receive:command', data);
+    });
+
     socket.on('disconnect', () => {
         users = users.filter(function (value, index, arr) {
             return value.id !== socket.id;

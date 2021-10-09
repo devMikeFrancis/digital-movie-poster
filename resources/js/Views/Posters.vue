@@ -5,7 +5,7 @@
                 <div class="grid lg:grid-cols-12 gap-4">
                     <div class="lg:col-span-2">
                         <ul
-                            class="block text-gray-300 p-4 sticky top-0"
+                            class="block text-gray-300 p-4 sticky top-0 mb-5"
                             style="background-color: #121212"
                         >
                             <li class="mb-3">
@@ -29,6 +29,21 @@
                                 >
                             </li>
                         </ul>
+                        <button
+                            class="
+                                w-full
+                                text-white text-center
+                                py-2
+                                px-1
+                                rounded-md
+                                bg-gray-700
+                                hover:bg-gray-500
+                            "
+                            type="button"
+                            @click.prevent="reloadPosters()"
+                        >
+                            Refresh Movie Posters
+                        </button>
                     </div>
                     <div class="lg:col-span-10 p-4 relative" style="background-color: #121212">
                         <div class="grid grid-cols-12 gap-4">
@@ -408,6 +423,7 @@ export default {
             showPosterModal: false,
             formMessage: '',
             settings: {},
+            sockets: '',
         };
     },
     components: { draggable },
@@ -484,10 +500,14 @@ export default {
                 .then((response) => {})
                 .catch((e) => {});
         },
+        reloadPosters() {
+            this.socket.emit('dispatch:command', { command: 'reload' });
+        },
     },
     created() {},
     mounted() {
         this.getPosters();
+        this.socket = io('http://movieposter.local:3000');
     },
 };
 </script>
@@ -513,6 +533,14 @@ export default {
         color: #fff;
         text-transform: uppercase;
     }
+}
+
+.poster-image-block {
+    width: 100%;
+    height: 60px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 input[type='text'],

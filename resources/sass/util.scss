@@ -2,6 +2,10 @@ a {
     transition: color 0.2s ease;
 }
 
+.active {
+    color: #888;
+}
+
 button {
     border-radius: 4px;
     transition: background-color 0.2s ease;
