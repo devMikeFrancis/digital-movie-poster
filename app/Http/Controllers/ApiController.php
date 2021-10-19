@@ -19,7 +19,7 @@ class ApiController extends Controller
         $output = 'Invalid command.';
 
         if ($command === 'on' || $command === 'standby') {
-            $output = shell_exec("echo '".$command." 0' | cec-client -s -d 1");
+            $output = shell_exec("echo ".$command." 0 | cec-client -s -d 1");
         }
 
         return response()->json(['message' => $output]);
