@@ -487,7 +487,7 @@ export default {
             return poster;
         },
         controlTV(command) {
-            if (this.settings.user_cec_power) {
+            if (this.settings.use_cec_power) {
                 if (!this.isOnTime()) {
                     if (command === 'on') {
                         command = 'standby';
@@ -495,7 +495,9 @@ export default {
                 }
                 axios
                     .get('/api/control-display/' + command)
-                    .then(() => {})
+                    .then((response) => {
+                        console.log(response.data);
+                    })
                     .catch((e) => {
                         console.log(e.message);
                     });
