@@ -123,6 +123,25 @@
                             </div>
 
                             <div class="mb-5">
+                                <label for="type" class="text-gray-300 block mb-2 font-bold">
+                                    Transition Type
+                                </label>
+                                <select
+                                    class="text-black"
+                                    id="type"
+                                    aria-describedby="typeHelp"
+                                    v-model="settings.transition_type"
+                                >
+                                    <option value="fade">Fade</option>
+                                    <option value="vertical">Vertical</option>
+                                </select>
+
+                                <div id="typeHelp" class="text-gray-400 text-sm">
+                                    Fade in/out or Vertical slide transition.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
                                 <label
                                     for="display-speed"
                                     class="text-gray-300 block mb-2 font-bold"
@@ -473,6 +492,7 @@ export default {
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
+                transition_type: 'fade',
             },
             updateBtn: 'Update DMP',
             updateOutput: '',
@@ -526,7 +546,9 @@ export default {
     created() {},
     mounted() {
         this.getSettings();
-        this.socket = io('http://movieposter.local:3000');
+        if (typeof io !== 'undefined') {
+            this.socket = io('http://movieposter.local:3000');
+        }
     },
 };
 </script>

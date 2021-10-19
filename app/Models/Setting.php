@@ -36,5 +36,6 @@ class Setting extends Model
         'play_theme_music',
         'use_global_prologos',
         'use_global_prologos_if_no_poster_prologos',
+        'transition_type',
     ];
 }

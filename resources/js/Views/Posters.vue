@@ -507,7 +507,9 @@ export default {
     created() {},
     mounted() {
         this.getPosters();
-        this.socket = io('http://movieposter.local:3000');
+        if (typeof io !== 'undefined') {
+            this.socket = io('http://movieposter.local:3000');
+        }
     },
 };
 </script>

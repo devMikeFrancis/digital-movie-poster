@@ -7,6 +7,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Create/Edit movie posters
 -   Show content ratings, processing logos, audience ratings
 -   Random order or drag-and-drop ordering
+-   Fade in/out or vertical slide transitions
 -   Pull posters from Plex and show currently playing
 -   Automatically fill in data using IMDB ID
 -   Control settings such as playing speed, transition speed, etc ...

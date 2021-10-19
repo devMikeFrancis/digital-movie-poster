@@ -18,6 +18,9 @@ class PostersCollection extends ResourceCollection
     {
         return $this->collection->map(function ($item) {
             $item['show'] = false;
+            $item['nextItem'] = true;
+            $item['activeItem'] = false;
+            $item['pastItem'] = false;
             $item['openOptions'] = false;
             $item['image'] = null;
             $item['music'] = null;

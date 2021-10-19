@@ -14,18 +14,33 @@
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
                         <div
-                            v-for="(poster, index) in moviePosters"
-                            class="recent-poster"
-                            v-bind:class="{
-                                show: poster.show,
-                                hide: !poster.show,
-                                'has-trailer': poster.show_trailer && poster.trailer_path,
+                            class="poster-items"
+                            :class="{
+                                'vertical-items': settings.transition_type === 'vertical',
+                                'fade-items': settings.transition_type === 'fade',
                             }"
-                            :style="
-                                'background-image: url(storage/posters/' + poster.file_name + ')'
-                            "
-                            v-bind:key="`key-${index}`"
-                        ></div>
+                        >
+                            <div
+                                v-for="(poster, index) in moviePosters"
+                                :class="{
+                                    show: poster.show,
+                                    hide: !poster.show,
+                                    item: settings.transition_type === 'vertical',
+                                    'recent-poster': settings.transition_type === 'fade',
+                                    'next-item': poster.nextItem,
+                                    'active-item': poster.activeItem,
+                                    'past-item': poster.pastItem,
+                                    'has-trailer': poster.show_trailer && poster.trailer_path,
+                                }"
+                                :style="
+                                    'background-image: url(storage/posters/' +
+                                    poster.file_name +
+                                    ')'
+                                "
+                                v-bind:key="`key-${index}`"
+                            ></div>
+                        </div>
+
                         <div id="trailer">
                             <div ref="videoPlayer" id="youtube-player"></div>
                         </div>
@@ -197,6 +212,7 @@ export default {
             controller: '',
             settings: {
                 poster_display_speed: 15000,
+                transition_type: 'fade',
             },
             videoPlaying: false,
             iframeEl: '',
@@ -264,10 +280,10 @@ export default {
                             'You do not have any posters loaded yet. Open this application in a browser and click here to manage your poster library.';
                     } else {
                         if (this.settings.random_order) {
-                            const rand = Math.floor(Math.random() * this.moviePosters.length);
-                            poster = this.moviePosters[rand];
+                            poster = this.getRandomPoster();
                         } else {
                             poster = this.moviePosters[0];
+                            poster.activeItem = true;
                         }
 
                         poster.show = true;
@@ -388,7 +404,6 @@ export default {
         },
         transitionImages() {
             let poster = '';
-            let activeIndex = 0;
             if (this.$refs.videoPlayer) {
                 this.$refs.videoPlayer.innerHTML = '';
             }
@@ -396,22 +411,9 @@ export default {
 
             if (this.moviePosters.length > 0) {
                 if (this.settings.random_order) {
-                    this.moviePosters.forEach((item) => {
-                        if (item.show) {
-                            item.show = false;
-                        }
-                    });
-                    poster =
-                        this.moviePosters[Math.floor(Math.random() * this.moviePosters.length)];
+                    poster = this.getRandomPoster();
                 } else {
-                    const len = this.moviePosters.length;
-                    const currItem = this.moviePosters.filter(function (e, i) {
-                        return e.show === true;
-                    });
-                    const currIndex = this.moviePosters.indexOf(currItem[0]);
-                    this.moviePosters[currIndex].show = false;
-                    activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
-                    poster = this.moviePosters[activeIndex];
+                    poster = this.getInSequencePoster();
                 }
                 poster.show = true;
                 this.handlePosterView(poster);
@@ -424,6 +426,65 @@ export default {
         },
         stopTransitionImages() {
             clearInterval(window.transitionImagesInterval);
+        },
+        getRandomPoster() {
+            const currItem = this.moviePosters.filter(function (e, i) {
+                return e.show === true;
+            });
+
+            const currIndex = this.moviePosters.indexOf(currItem[0]);
+
+            this.moviePosters.forEach((item) => {
+                if (item.show) {
+                    item.show = false;
+                }
+            });
+
+            const randIndex = Math.floor(Math.random() * this.moviePosters.length);
+
+            let poster = this.moviePosters[randIndex];
+            let pastPoster = this.moviePosters[currIndex];
+
+            poster.activeItem = true;
+            pastPoster.pastItem = true;
+            pastPoster.activeItem = false;
+
+            setTimeOut(() => {
+                pastPoster.pastItem = false;
+            }, 3000);
+
+            return poster;
+        },
+        getInSequencePoster() {
+            const len = this.moviePosters.length;
+
+            // Current/Past Item
+            const currItem = this.moviePosters.filter(function (e, i) {
+                return e.show === true;
+            });
+            const currIndex = this.moviePosters.indexOf(currItem[0]);
+            this.moviePosters[currIndex].show = false;
+
+            // Next/Active Item
+            const activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
+
+            // For vertical transition
+            let nextIndex = currIndex === 0 ? len - 1 : currIndex - 1;
+
+            //let nextPoster = this.moviePoster[nextIndex];
+            let poster = this.moviePosters[activeIndex];
+            let pastPoster = this.moviePosters[currIndex];
+
+            poster.activeItem = true;
+            pastPoster.pastItem = true;
+            pastPoster.activeItem = false;
+
+            setTimeout(() => {
+                pastPoster.pastItem = false;
+            }, 3000);
+            // END FOR VERTICAL TRANSITION
+
+            return poster;
         },
         controlTV(command) {
             if (this.settings.user_cec_power) {
@@ -566,15 +627,17 @@ export default {
     },
     mounted() {
         this.loading = true;
-        this.socket = io('http://movieposter.local:3000');
+        if (typeof io !== 'undefined') {
+            this.socket = io('http://movieposter.local:3000');
 
-        this.socket.on('receive:command', (data) => {
-            switch (data.command) {
-                case 'reload':
-                    this.reload();
-                    break;
-            }
-        });
+            this.socket.on('receive:command', (data) => {
+                switch (data.command) {
+                    case 'reload':
+                        this.reload();
+                        break;
+                }
+            });
+        }
     },
 };
 </script>
@@ -701,6 +764,42 @@ body {
         height: 1052px;
         left: 50%;
         transform: translateX(-50%);
+    }
+}
+
+.poster-items {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.vertical-items {
+    .item {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        transform: translateY(100%);
+
+        transition: transform 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+
+        &.next-item {
+            z-index: -1;
+        }
+
+        &.active-item {
+            transform: translateY(0);
+            z-index: 10;
+        }
+
+        &.past-item {
+            transform: translateY(-100%);
+            z-index: 10;
+        }
     }
 }
 
