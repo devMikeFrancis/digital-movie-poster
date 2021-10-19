@@ -48,6 +48,11 @@ function calcWinner() {
         winningStatus = 'nowinner';
     }
 
+    /*
+    users.forEach((v, i) => {
+        users[i].voted = false;
+    });*/
+
     io.emit('end:voting', {
         votingStarted: false,
         timer: 0,
@@ -76,7 +81,7 @@ io.on('connection', (socket) => {
     socket.emit('users', { users: users });
 
     socket.on('new:user', (data) => {
-        users.push({ id: socket.id, name: data.name });
+        users.push({ id: socket.id, name: data.name, voted: false });
         io.emit('users', { users: users });
         socket.emit('status', {
             votingStarted: votingStarted,
@@ -121,6 +126,26 @@ io.on('connection', (socket) => {
             if (v.id === data.new) {
                 posters[i].votes++;
             }
+        });
+
+        users.forEach((v, i) => {
+            if (users[i].id === socket.id) {
+                users[i].voted = true;
+            }
+        });
+
+        io.emit('user:voted', {
+            user_id: socket.id,
+        });
+    });
+
+    socket.on('reset:voting', (data) => {
+        users.forEach((v, i) => {
+            users[i].voted = false;
+        });
+
+        io.emit('voting:reset', {
+            users: users,
         });
     });
 

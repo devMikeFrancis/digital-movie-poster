@@ -56,12 +56,24 @@
                     <div v-if="users.length && loggedin">
                         <h3 class="text-white font-bold text-2xl mb-3">Voters</h3>
                         <ul class="block mb-8">
-                            <li v-for="user in users" class="text-xl text-white">
+                            <li v-for="user in users" class="text-xl text-white mb-2">
                                 <span
                                     v-bind:class="{ 'text-yellow-200': myId === user.id }"
                                     style="text-transform: capitalize"
                                     >{{ user.name }}</span
                                 >
+                                <span class="inline-block ml-2 user-voted" v-if="user.voted"
+                                    ><svg
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+                                        ></path></svg
+                                ></span>
                             </li>
                         </ul>
 
@@ -128,7 +140,7 @@
                             </label>
                         </div>
 
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-2 text-right">
                             <div class="start-messages">
                                 <div
                                     v-for="startMessage in startMessages"
@@ -269,7 +281,7 @@ export default {
             this.getPosters();
         },
         signIn() {
-            if (this.name.length > 2) {
+            if (this.name.length > 1) {
                 this.socket.emit('new:user', { name: this.name });
                 this.loggedin = true;
             }
@@ -329,6 +341,18 @@ export default {
                 this.ready = 5;
                 this.status = data.status;
                 this.showResults = true;
+            });
+
+            this.socket.on('user:voted', (data) => {
+                this.users.forEach((v) => {
+                    if (v.id === data.user_id) {
+                        v.voted = true;
+                    }
+                });
+            });
+
+            this.socket.on('voting:reset', (data) => {
+                this.users = data.users;
             });
         },
         getPosters() {
@@ -432,6 +456,7 @@ export default {
             }
         },
         resetVoting() {
+            this.socket.emit('reset:voting', {});
             this.votingStarted = false;
             this.votingOnPosters = [];
             this.votes = [];
@@ -524,6 +549,13 @@ export default {
     }
 }
 
+.user-voted {
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
 .choose-poster-item {
     input {
         display: none;
@@ -565,7 +597,7 @@ export default {
         pointer-events: none;
     }
     img {
-        max-width: 100px;
+        max-width: 112px;
         height: auto;
     }
 }
