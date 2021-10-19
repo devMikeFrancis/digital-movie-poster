@@ -15,6 +15,13 @@ class ApiController extends Controller
 
     public function controlDisplay($command)
     {
-        shell_exec("echo '".$command." 0' | cec-client -s -d 1");
+        $command = strtolower($command);
+        $output = 'Invalid command.';
+
+        if ($command === 'on' || $command === 'standby') {
+            $output = shell_exec("echo '".$command." 0' | cec-client -s -d 1");
+        }
+
+        return response()->json(['message' => $output]);
     }
 }
