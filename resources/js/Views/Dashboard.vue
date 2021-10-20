@@ -292,6 +292,7 @@ export default {
 
                         setTimeout(() => {
                             this.loading = false;
+                            this.loadingMessage = 'Loading Posters ...';
                             this.startTransitionImages();
                         }, 12000);
                     }
@@ -617,6 +618,8 @@ export default {
             this.$router.push('posters');
         },
         reload() {
+            this.loadingMessage = 'Re-loading Posters ...';
+            this.loading = true;
             this.stopTransitionImages();
             clearInterval(this.recentlyAddedInterval);
             this.stopMusic();

@@ -4,46 +4,7 @@
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
                 <div class="grid lg:grid-cols-12 gap-4">
                     <div class="lg:col-span-2">
-                        <ul
-                            class="block text-gray-300 p-4 sticky top-0 mb-5"
-                            style="background-color: #121212"
-                        >
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500" to="/"
-                                    >&larr; Back to DMP</router-link
-                                >
-                            </li>
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500 active" to="/posters"
-                                    >Posters</router-link
-                                >
-                            </li>
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500" to="/voting"
-                                    >Voting</router-link
-                                >
-                            </li>
-                            <li>
-                                <router-link class="hover:text-gray-500" to="/settings"
-                                    >Settings</router-link
-                                >
-                            </li>
-                        </ul>
-                        <button
-                            class="
-                                w-full
-                                text-white text-center
-                                py-2
-                                px-1
-                                rounded-md
-                                bg-gray-700
-                                hover:bg-gray-500
-                            "
-                            type="button"
-                            @click.prevent="reloadPosters()"
-                        >
-                            Refresh Movie Posters
-                        </button>
+                        <main-nav />
                     </div>
                     <div class="lg:col-span-10 p-4 relative" style="background-color: #121212">
                         <div class="grid grid-cols-12 gap-4">
@@ -89,6 +50,7 @@
                         </div>
                         <draggable
                             v-model="posters"
+                            handle=".handle"
                             group="posters"
                             @start="onDragStart"
                             @end="onDragEnd"
@@ -99,8 +61,16 @@
                                 class="mb-5"
                                 style="background-color: #222"
                             >
-                                <div class="grid lg:grid-cols-12 gap-4 relative">
-                                    <div class="sm:col-span-2 lg:col-span-1 w-12">
+                                <div
+                                    class="
+                                        grid grid-cols-4
+                                        md:grid-cols-12
+                                        lg:grid-cols-12
+                                        gap-4
+                                        relative
+                                    "
+                                >
+                                    <div class="sm:col-span-1 lg:col-span-1 w-12">
                                         <div
                                             class="poster-image-block handle"
                                             :style="
@@ -112,7 +82,7 @@
                                     </div>
                                     <div
                                         class="
-                                            sm:col-span-2
+                                            col-span-1
                                             md:col-span-8
                                             lg:col-span-8
                                             flex
@@ -129,11 +99,12 @@
 
                                     <div
                                         class="
-                                            sm:col-span-2
+                                            col-span-1
                                             md:col-span-1
                                             lg:col-span-1
                                             flex
                                             items-center
+                                            justify-center
                                         "
                                     >
                                         <label class="text-white cursor-pointer"
@@ -168,7 +139,7 @@
 
                                     <div
                                         class="
-                                            sm:col-span-2
+                                            col-span-1
                                             md:col-span-1
                                             lg:col-span-1
                                             flex
@@ -388,11 +359,13 @@
                                                 font-bold
                                                 hover:text-gray-50
                                                 absolute
-                                                top-6
-                                                right-6
                                                 lg:relative
                                                 lg:top-auto
                                                 lg:right-auto
+                                                top-1
+                                                right-2
+                                                lg:top-auto
+                                                lg:right-2
                                             "
                                             ><span v-if="poster.can_delete">[X]</span>
                                             <span v-if="!poster.can_delete">[X]</span></a
@@ -409,6 +382,7 @@
 </template>
 
 <script>
+import MainNav from '../partials/MainNav';
 import draggable from 'vuedraggable';
 
 export default {
@@ -426,7 +400,7 @@ export default {
             sockets: '',
         };
     },
-    components: { draggable },
+    components: { MainNav, draggable },
     watch: {},
     methods: {
         getPosters() {

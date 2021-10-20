@@ -2,7 +2,8 @@ a {
     transition: color 0.2s ease;
 }
 
-.active {
+.active,
+.router-link-active {
     color: #888;
 }
 

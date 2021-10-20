@@ -4,46 +4,7 @@
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
                 <div class="grid lg:grid-cols-12 gap-4">
                     <div class="lg:col-span-2">
-                        <ul
-                            class="block text-gray-300 p-4 sticky top-0 mb-5"
-                            style="background-color: #121212"
-                        >
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500" to="/"
-                                    >&larr; Back to DMP</router-link
-                                >
-                            </li>
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500" to="/posters"
-                                    >Posters</router-link
-                                >
-                            </li>
-                            <li class="mb-3">
-                                <router-link class="hover:text-gray-500" to="/voting"
-                                    >Voting</router-link
-                                >
-                            </li>
-                            <li>
-                                <router-link class="hover:text-gray-500" to="/settings"
-                                    >Settings</router-link
-                                >
-                            </li>
-                        </ul>
-                        <button
-                            class="
-                                w-full
-                                text-white text-center
-                                py-2
-                                px-1
-                                rounded-md
-                                bg-gray-700
-                                hover:bg-gray-500
-                            "
-                            type="button"
-                            @click.prevent="reloadPosters()"
-                        >
-                            Refresh Movie Posters
-                        </button>
+                        <main-nav />
                     </div>
                     <div class="lg:col-span-10 p-4 relative" style="background-color: #121212">
                         <div class="grid lg:grid-cols-12 gap-4">
@@ -352,6 +313,8 @@
 </template>
 
 <script>
+import MainNav from '../partials/MainNav';
+
 export default {
     data: function () {
         return {
@@ -382,7 +345,7 @@ export default {
             socket: '',
         };
     },
-    components: {},
+    components: { MainNav },
     watch: {},
     methods: {
         getPoster(id) {
@@ -530,7 +493,9 @@ export default {
             this.getPoster(id);
         }
         this.setSavePosterBtn();
-        this.socket = io('http://movieposter.local:3000');
+        if (typeof io !== 'undefined') {
+            this.socket = io('http://movieposter.local:3000');
+        }
     },
 };
 </script>

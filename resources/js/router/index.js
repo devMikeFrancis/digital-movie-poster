@@ -41,6 +41,7 @@ const routes = [
 
 let router = new Router({
     mode: 'history',
+    linkExactActiveClass: 'active',
     routes,
 });
 
