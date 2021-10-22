@@ -7,7 +7,7 @@
             <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
                 <header class="coming-soon-header">
                     <span class="runtime" v-if="settings.show_runtime && runtime"
-                        >{{ runtime }} min</span
+                        >{{ runtime.toFixed(0) }} min</span
                     >
                     <h1>{{ settings.coming_soon_text }}</h1>
                 </header>
@@ -108,6 +108,9 @@
             <transition name="fade" mode="out-in">
                 <div id="now-playing-container" v-if="nowPlaying" @click.prevent="gotoPosters()">
                     <header class="now-playing-header">
+                        <span class="runtime" v-if="settings.show_runtime && nowPlayingRuntime"
+                            >{{ nowPlayingRuntime.toFixed(0) }} min</span
+                        >
                         <h1>{{ settings.now_playing_text }}</h1>
                     </header>
                     <div class="now-playing-container">
@@ -217,7 +220,8 @@ export default {
             videoPlaying: false,
             iframeEl: '',
             audio: null,
-            runtime: '',
+            runtime: 0,
+            nowPlayingRuntime: 0,
             theme_music: null,
             show_dolby_atmos_vertical: false,
             show_dolby_vision_vertical: false,
@@ -395,7 +399,7 @@ export default {
                         }
 
                         if (data.duration && this.settings.show_runtime) {
-                            this.runtime = data.duration / 1000 / 60;
+                            this.nowPlayingRuntime = data.duration / 1000 / 60;
                         }
                     }
                 })
@@ -750,7 +754,10 @@ body {
     background-position: center center;
     position: absolute;
     top: 0;
-    //transition: opacity 2.5s ease-in-out;
+    backface-visibility: hidden;
+    will-change: opacity;
+    perspective: 1000;
+    transform: translateZ(0);
 
     &.hide {
         animation: FadeOut 2.5s ease-out forwards;
@@ -758,8 +765,6 @@ body {
     }
 
     &.show {
-        //opacity: 1;
-        //transition: opacity 1s ease-in-out;
         animation: FadeIn 2.5s ease-in forwards;
         z-index: 2;
     }
@@ -768,7 +773,7 @@ body {
         width: 702px;
         height: 1052px;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate3d(-50%, 0, 0);
     }
 }
 
@@ -788,21 +793,24 @@ body {
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
-        transform: translateY(100%);
+        backface-visibility: hidden;
+        will-change: transform;
+        perspective: 1000;
+        transform: translate3d(0, 100%, 0);
 
-        transition: transform 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+        transition: transform 1.5s ease-in-out;
 
         &.next-item {
             z-index: -1;
         }
 
         &.active-item {
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
             z-index: 10;
         }
 
         &.past-item {
-            transform: translateY(-100%);
+            transform: translate3d(0, -100%, 0);
             z-index: 10;
         }
     }
@@ -846,7 +854,7 @@ body {
 
     .runtime {
         position: absolute;
-        top: 50px;
+        top: 60px;
         left: 40px;
         color: #fff;
         font-size: 32px;
