@@ -14,33 +14,16 @@
                 <router-link class="hover:text-gray-500" to="/settings">Settings</router-link>
             </li>
         </ul>
-        <button
-            class="w-full text-white text-center py-2 px-1 rounded-md bg-gray-700 hover:bg-gray-500"
-            type="button"
-            @click.prevent="reloadPosters()"
-        >
-            Refresh Movie Posters
-        </button>
+        <refresh-button></refresh-button>
     </div>
 </template>
 
 <script>
+import RefreshButton from '../components/refresh-button';
 export default {
     name: 'MainNav',
-    data: function () {
-        return {
-            socket: '',
-        };
-    },
-    methods: {
-        reloadPosters() {
-            this.socket.emit('dispatch:command', { command: 'reload' });
-        },
-    },
-    mounted() {
-        if (typeof io !== 'undefined') {
-            this.socket = io('http://movieposter.local:3000');
-        }
+    components: {
+        RefreshButton,
     },
 };
 </script>
