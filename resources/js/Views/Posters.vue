@@ -262,7 +262,7 @@ export default {
                 function (params) {
                     this.debounce = false;
                     axios
-                        .post('/api/posters-sort/', { items: params })
+                        .post('/api/posters-sort', { items: params })
                         .then((response) => {
                             //this.posters response.data.posters;
                         })
