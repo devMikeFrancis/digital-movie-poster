@@ -1,9 +1,7 @@
 const plugin = require('tailwindcss/plugin');
 
 module.exports = {
-    mode: 'jit',
-    darkMode: 'class',
-    purge: [
+    content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
@@ -57,16 +55,6 @@ module.exports = {
             zIndex: {
                 60: '60',
             },
-        },
-    },
-
-    variants: {
-        extend: {
-            opacity: ['disabled'],
-            backgroundColor: ['checked'],
-            borderColor: ['checked'],
-            inset: ['checked'],
-            zIndex: ['hover', 'active'],
         },
     },
 
