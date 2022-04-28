@@ -40,10 +40,10 @@ A pre-installed image on a SD card will already be configured. Just plug-in-play
 2. In the root of the application run `composer install`.
 3. In the root of the application duplicate the `.env.example` file and rename to `.env`. Do not delete the `.env.example` file.
 4. In the root of the application run `php artisan key:generate` and `php artisan storage:link`.
-5. Run `php artisan migrate` to create the database tables.
-6. Point your web root to the `public` folder of the application.
-7. Increase PHP ini `max_execution_time` to at least 600.
-8. Add your database credentials to the `.env` file.
+5. Add your database credentials to the `.env` file.
+6. Run `php artisan migrate` to create the database tables.
+7. Point your web root to the `public` folder of the application.
+8. Increase PHP ini `max_execution_time` to at least 600.
 9. Add your TMDB API key to the `.env` file using this existing key: `TMDB_API_V3=`
 10. In the `.env` file change `FILESYSTEM_DRIVER=` to public
 
