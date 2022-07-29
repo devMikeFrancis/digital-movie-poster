@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import RefreshButton from '../components/refresh-button';
+import RefreshButton from '../components/refresh-button.vue';
 export default {
     name: 'MainNav',
     components: {

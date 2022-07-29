@@ -313,7 +313,7 @@
 </template>
 
 <script>
-import MainNav from '../partials/MainNav';
+import MainNav from '../partials/MainNav.vue';
 
 export default {
     data: function () {

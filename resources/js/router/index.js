@@ -1,12 +1,9 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import Dashboard from '../Views/Dashboard';
-import Settings from '../Views/Settings';
-import Posters from '../Views/Posters';
-import PostersEdit from '../Views/PostersEdit';
-import Voting from '../Views/Voting';
-
-Vue.use(Router);
+import { createRouter, createWebHistory } from 'vue-router';
+import Dashboard from '../Views/Dashboard.vue';
+import Settings from '../Views/Settings.vue';
+import Posters from '../Views/Posters.vue';
+import PostersEdit from '../Views/PostersEdit.vue';
+import Voting from '../Views/Voting.vue';
 
 const routes = [
     {
@@ -39,8 +36,8 @@ const routes = [
     },
 ];
 
-let router = new Router({
-    mode: 'history',
+let router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
     linkExactActiveClass: 'active',
     routes,
 });

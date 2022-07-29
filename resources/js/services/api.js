@@ -1,8 +1,4 @@
 import { Service } from './service';
-window.axios = require('axios');
-
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['Accept'] = 'application/json';
 
 class Api extends Service {
     constructor() {

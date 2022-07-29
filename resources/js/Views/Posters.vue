@@ -49,138 +49,136 @@
                             <span>Caching Posters ...</span>
                         </div>
                         <draggable
-                            v-model="posters"
+                            :list="posters"
                             handle=".handle"
                             group="posters"
                             @start="onDragStart"
                             @end="onDragEnd"
+                            item-key="id"
                         >
-                            <div
-                                v-for="poster in posters"
-                                :key="poster.id"
-                                class="mb-5"
-                                style="background-color: #222"
-                            >
-                                <div
-                                    class="
-                                        grid grid-cols-4
-                                        md:grid-cols-12
-                                        lg:grid-cols-12
-                                        gap-4
-                                        relative
-                                    "
-                                >
-                                    <div class="sm:col-span-1 lg:col-span-1 w-12">
-                                        <div
-                                            class="poster-image-block handle"
-                                            :style="
-                                                'background-image: url(storage/posters/_tn_' +
-                                                poster.file_name +
-                                                ')'
-                                            "
-                                        ></div>
-                                    </div>
+                            <template #item="{ element }">
+                                <div class="mb-5" style="background-color: #222">
                                     <div
                                         class="
-                                            col-span-1
-                                            md:col-span-8
-                                            lg:col-span-8
-                                            flex
-                                            items-center
+                                            grid grid-cols-4
+                                            md:grid-cols-12
+                                            lg:grid-cols-12
+                                            gap-4
+                                            relative
                                         "
                                     >
-                                        <router-link
-                                            class="text-white font-bold"
-                                            :to="'/posters/' + poster.id"
-                                        >
-                                            {{ poster.name }}</router-link
-                                        >
-                                    </div>
-
-                                    <div
-                                        class="
-                                            col-span-1
-                                            md:col-span-1
-                                            lg:col-span-1
-                                            flex
-                                            items-center
-                                            justify-center
-                                        "
-                                    >
-                                        <label class="text-white cursor-pointer"
-                                            ><input
-                                                type="checkbox"
-                                                v-model="poster.show_in_rotation"
-                                                class="hidden"
-                                                @change="
-                                                    updateSetting(
-                                                        poster,
-                                                        'show_in_rotation',
-                                                        poster.show_in_rotation
-                                                    )
+                                        <div class="sm:col-span-1 lg:col-span-1 w-12">
+                                            <div
+                                                class="poster-image-block handle"
+                                                :style="
+                                                    'background-image: url(storage/posters/_tn_' +
+                                                    element.file_name +
+                                                    ')'
                                                 "
-                                            />
-                                            <span
-                                                v-if="!poster.show_in_rotation"
-                                                class="block opacity-60"
-                                                ><img
-                                                    src="/images/eye-slash-regular.svg"
-                                                    alt="Not in rotation"
-                                                    style="width: 24px; height: auto"
-                                            /></span>
-                                            <span v-if="poster.show_in_rotation"
-                                                ><img
-                                                    src="/images/eye-regular.svg"
-                                                    alt="In rotation"
-                                                    style="width: 24px; height: auto"
-                                            /></span>
-                                        </label>
-                                    </div>
-
-                                    <div
-                                        class="
-                                            col-span-1
-                                            md:col-span-1
-                                            lg:col-span-1
-                                            flex
-                                            items-center
-                                        "
-                                    >
-                                        <PosterOptions :poster="poster" />
-                                    </div>
-
-                                    <div
-                                        class="
-                                            sm:col-span-4
-                                            lg:col-span-1
-                                            flex
-                                            items-center
-                                            justify-end
-                                            lg:pr-4
-                                        "
-                                    >
-                                        <a
-                                            href="#"
-                                            @click.prevent="deletePoster(poster)"
+                                            ></div>
+                                        </div>
+                                        <div
                                             class="
-                                                text-gray-300
-                                                font-bold
-                                                hover:text-gray-50
-                                                absolute
-                                                lg:relative
-                                                lg:top-auto
-                                                lg:right-auto
-                                                top-1
-                                                right-2
-                                                lg:top-auto
-                                                lg:right-2
+                                                col-span-1
+                                                md:col-span-8
+                                                lg:col-span-8
+                                                flex
+                                                items-center
                                             "
-                                            ><span v-if="poster.can_delete">[X]</span>
-                                            <span v-if="!poster.can_delete">[X]</span></a
                                         >
+                                            <router-link
+                                                class="text-white font-bold"
+                                                :to="'/posters/' + element.id"
+                                            >
+                                                {{ element.name }}</router-link
+                                            >
+                                        </div>
+
+                                        <div
+                                            class="
+                                                col-span-1
+                                                md:col-span-1
+                                                lg:col-span-1
+                                                flex
+                                                items-center
+                                                justify-center
+                                            "
+                                        >
+                                            <label class="text-white cursor-pointer"
+                                                ><input
+                                                    type="checkbox"
+                                                    v-model="element.show_in_rotation"
+                                                    class="hidden"
+                                                    @change="
+                                                        updateSetting(
+                                                            element,
+                                                            'show_in_rotation',
+                                                            element.show_in_rotation
+                                                        )
+                                                    "
+                                                />
+                                                <span
+                                                    v-if="!element.show_in_rotation"
+                                                    class="block opacity-60"
+                                                    ><img
+                                                        src="/images/eye-slash-regular.svg"
+                                                        alt="Not in rotation"
+                                                        style="width: 24px; height: auto"
+                                                /></span>
+                                                <span v-if="element.show_in_rotation"
+                                                    ><img
+                                                        src="/images/eye-regular.svg"
+                                                        alt="In rotation"
+                                                        style="width: 24px; height: auto"
+                                                /></span>
+                                            </label>
+                                        </div>
+
+                                        <div
+                                            class="
+                                                col-span-1
+                                                md:col-span-1
+                                                lg:col-span-1
+                                                flex
+                                                items-center
+                                            "
+                                        >
+                                            <PosterOptions :poster="element" />
+                                        </div>
+
+                                        <div
+                                            class="
+                                                sm:col-span-4
+                                                lg:col-span-1
+                                                flex
+                                                items-center
+                                                justify-end
+                                                lg:pr-4
+                                            "
+                                        >
+                                            <a
+                                                href="#"
+                                                @click.prevent="deletePoster(element)"
+                                                class="
+                                                    text-gray-300
+                                                    font-bold
+                                                    hover:text-gray-50
+                                                    absolute
+                                                    lg:relative
+                                                    lg:top-auto
+                                                    lg:right-auto
+                                                    top-1
+                                                    right-2
+                                                    lg:top-auto
+                                                    lg:right-2
+                                                "
+                                                ><span v-if="element.can_delete">[X]</span>
+                                                <span v-if="!element.can_delete">[X]</span></a
+                                            >
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </template>
                         </draggable>
                     </div>
                 </div>
@@ -190,8 +188,8 @@
 </template>
 
 <script>
-import MainNav from '../partials/MainNav';
-import PosterOptions from '../components/poster-options';
+import MainNav from '../partials/MainNav.vue';
+import PosterOptions from '../components/poster-options.vue';
 import draggable from 'vuedraggable';
 
 export default {

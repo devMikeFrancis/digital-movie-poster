@@ -9,6 +9,8 @@ const io = new Server(httpServer, {
             'http://localhost:*',
             'http://127.0.0.0:8000',
             'http://movieposter.local',
+            'http://digital-movie-poster.test',
+            'https://digital-movie-poster.test',
             'http://raspberrypi.local',
         ],
         methods: ['GET', 'POST'],
