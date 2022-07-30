@@ -287,7 +287,7 @@ export default {
             }
         },
         startSockets() {
-            this.socket = io('http://movieposter.local:3000');
+            this.socket = io('http://' + import.meta.env.BASE_URL + ':3000');
 
             this.socket.on('connect', () => {
                 this.myId = this.socket.id;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,5 +38,140 @@ class Setting extends Model
         'use_global_prologos',
         'use_global_prologos_if_no_poster_prologos',
         'transition_type',
+        'show_bottom_text',
+        'bottom_text',
     ];
+
+    protected function plexService(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function randomOrder(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showMpaaRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showAudienceRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showProcessingLogos(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyAtmosHorizontal(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyAtmosVertical(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyVisionHorizontal(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyVisionVertical(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDts(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolby51(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showImax(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showAuro3d(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function useCecPower(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showRuntime(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function playThemeMusic(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function useGlobalPrologos(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function useGlobalPrologosIfNoPosterPrologos(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showBottomText(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
 }

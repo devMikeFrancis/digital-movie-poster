@@ -15,6 +15,8 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::first();
+        $settings->show_dolby_51 = $settings->show_dolby_51 ? true : false;
+        $settings->show_auro_3d = $settings->show_auro_3d ? true : false;
         return response()->json($settings);
     }
 

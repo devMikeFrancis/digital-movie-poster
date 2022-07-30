@@ -24,6 +24,8 @@ class PostersCollection extends ResourceCollection
             $item['openOptions'] = false;
             $item['image'] = null;
             $item['music'] = null;
+            $item['show_dolby_51'] = $item['show_dolby_51'] ? true : false;
+            $item['show_auro_3d'] = $item['show_auro_3d'] ? true : false;
             return $item;
         });
     }

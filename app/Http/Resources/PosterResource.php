@@ -16,7 +16,10 @@ class PosterResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $data = parent::toArray($request);
+        $data['show_dolby_51'] = $data['show_dolby_51'] ? true : false;
+        $data['show_auro_3d'] = $data['show_auro_3d'] ? true : false;
+        return $data;
     }
 
     public function with($request)

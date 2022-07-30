@@ -494,7 +494,7 @@ export default {
         }
         this.setSavePosterBtn();
         if (typeof io !== 'undefined') {
-            this.socket = io('http://movieposter.local:3000');
+            this.socket = io('http://' + import.meta.env.BASE_URL + ':3000');
         }
     },
 };

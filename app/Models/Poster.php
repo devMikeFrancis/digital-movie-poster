@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,4 +33,67 @@ class Poster extends Model
         'show_auro_3d',
         'show_imax',
     ];
+
+    protected function showInRotation(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function canDelete(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyAtmos(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDolbyVision(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showDtsx(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showImax(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showTrailer(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showRuntime(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function playThemeMusic(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
 }

@@ -445,7 +445,10 @@
 </template>
 
 <script>
-import MainNav from '../partials/MainNav.vue';
+import { mapState } from 'pinia';
+import { usePostersStore } from '@/store/posters';
+import MainNav from '@/partials/MainNav.vue';
+
 export default {
     data: function () {
         return {
@@ -463,6 +466,7 @@ export default {
     },
     components: { MainNav },
     watch: {},
+    computed: {},
     methods: {
         getSettings() {
             axios
@@ -506,7 +510,7 @@ export default {
     mounted() {
         this.getSettings();
         if (typeof io !== 'undefined') {
-            this.socket = io('http://movieposter.local:3000');
+            this.socket = io('http://' + import.meta.env.BASE_URL + ':3000');
         }
     },
 };
