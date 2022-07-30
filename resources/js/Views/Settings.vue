@@ -510,7 +510,7 @@ export default {
     mounted() {
         this.getSettings();
         if (typeof io !== 'undefined') {
-            this.socket = io('http://' + import.meta.env.BASE_URL + ':3000');
+            this.socket = io('http://' + import.meta.env.VITE_BASE_URL + ':3000');
         }
     },
 };

@@ -37,7 +37,7 @@ const routes = [
 ];
 
 let router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory('/'),
     linkExactActiveClass: 'active',
     routes,
 });
