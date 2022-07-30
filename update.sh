@@ -9,10 +9,10 @@ composer install --no-interaction
 php artisan cache:clear
 php artisan config:cache
 php artisan route:cache
-php artisan optimize
 php artisan migrate --force
 npm install
 npm run build
+php artisan optimize
 php artisan up
 echo "Deploy finished"
 exit
