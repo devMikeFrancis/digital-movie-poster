@@ -389,6 +389,7 @@ export const usePostersStore = defineStore('posters', {
             this.loading = value;
         },
         setSocket() {
+            console.log('SOCKET URL', import.meta.env.BASE_URL);
             this.socket = io('http://' + import.meta.env.BASE_URL + ':3000');
 
             this.socket.on('receive:command', (data) => {
