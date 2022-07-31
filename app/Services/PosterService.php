@@ -182,6 +182,10 @@ class PosterService
             $constraint->aspectRatio();
         });
 
+        if (!is_dir(storage_path("app/public/posters"))) {
+            mkdir(storage_path("app/public/posters"), 0775, true);
+        }
+
         try {
             $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
             $image->resize(200, null, function ($constraint) {
