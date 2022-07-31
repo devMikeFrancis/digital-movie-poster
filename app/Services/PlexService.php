@@ -47,6 +47,9 @@ class PlexService
 
     public function processMovie($movies)
     {
+        if (!is_dir(storage_path("app/public/posters"))) {
+            mkdir(storage_path("app/public/posters"), 0775, true);
+        }
         foreach ($movies as $movie) {
             if ($movie['type'] === 'movie') {
                 $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$movie['thumb'].'?X-Plex-Token='.$this->plexToken;

@@ -196,6 +196,9 @@ class PosterService
 
     private function saveMusic($request)
     {
+        if (!is_dir(storage_path("app/public/music"))) {
+            mkdir(storage_path("app/public/music"), 0775, true);
+        }
         $basename = Str::slug(pathinfo($request->file('music')->getClientOriginalName(), PATHINFO_FILENAME));
         $fileName = $basename.'.'.$request->music->getClientOriginalExtension();
 
