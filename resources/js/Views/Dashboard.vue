@@ -499,7 +499,7 @@ body {
     top: 50%;
     left: 5%;
     color: #fff;
-    font-size: 2vw;
+    font-size: 1.8vw;
     font-weight: 400;
     transform: translateY(-50%);
 }
