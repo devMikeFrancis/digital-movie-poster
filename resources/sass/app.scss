@@ -4,7 +4,6 @@
 @tailwind variants;
 
 @import 'util';
-
-body {
-    background: #000;
-}
+@import 'globals';
+@import 'template';
+@import 'animations';

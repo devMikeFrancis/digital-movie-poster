@@ -1,3 +1,4 @@
+import Api from '@/services/api';
 import { defineStore } from 'pinia';
 
 export const usePostersStore = defineStore('posters', {
@@ -101,7 +102,9 @@ export const usePostersStore = defineStore('posters', {
                 this.audienceRating = poster.audience_rating / 2;
             }
             if (poster.trailer_path && poster.show_trailer) {
-                this.playTrailer(poster.trailer_path);
+                if (typeof this.videoPlayer !== 'undefined') {
+                    this.playTrailer(poster.trailer_path);
+                }
             }
             if (poster.show_runtime) {
                 this.runtime = poster.runtime;
@@ -163,6 +166,35 @@ export const usePostersStore = defineStore('posters', {
             }, 3000);
 
             return poster;
+        },
+        getNowPlaying() {
+            Api.apiCallPlex('/status/sessions/')
+                .then((response) => {
+                    const size = response.data.MediaContainer.size;
+                    if (size > 0) {
+                        this.nowPlayingPoster =
+                            'http://' +
+                            this.settings.plex_ip_address +
+                            ':32400' +
+                            response.data.MediaContainer.Metadata[0].thumb +
+                            '?X-Plex-Token=' +
+                            this.settings.plex_token;
+
+                        let data = response.data.MediaContainer.Metadata[0];
+                        this.contentRating = data.contentRating;
+
+                        if (data.audienceRating) {
+                            this.rating = data.audienceRating / 2;
+                        }
+
+                        if (data.duration && this.settings.show_runtime) {
+                            this.nowPlayingRuntime = data.duration / 1000 / 60;
+                        }
+                    }
+                })
+                .catch((e) => {
+                    console.log(e.message);
+                });
         },
         usePosterProLogos(poster) {
             this.show_dolby_atmos_vertical = poster.show_dolby_atmos;

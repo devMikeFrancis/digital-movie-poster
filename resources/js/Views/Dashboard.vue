@@ -4,7 +4,12 @@
             <div class="loading-overlay" v-if="loading">
                 <div class="p-12" @click="gotoPosters()">{{ loadingMessage }}</div>
             </div>
-            <div id="recent-added-container" @click.prevent="gotoPosters()" v-if="!nowPlaying">
+            <div
+                id="recent-added-container"
+                class="poster-container"
+                @click.prevent="gotoPosters()"
+                v-if="!nowPlaying"
+            >
                 <header class="coming-soon-header">
                     <span class="runtime" v-if="settings.show_runtime && runtime"
                         >{{ runtime.toFixed(0) }} min</span
@@ -89,23 +94,28 @@
                         </div>
                     </div>
                     <div class="audience-rating" v-if="settings.show_audience_rating">
-                        <!--<star-rating
+                        <star-rating
                             :increment="0.1"
                             :max-rating="5"
                             :inactive-color="'#000'"
                             :active-color="'#fff'"
-                            :star-size="28"
+                            :star-size="starSize"
                             :rating="audienceRating"
                             :border-color="'#fff'"
                             :border-width="borderWidth"
                             :show-rating="false"
                             :read-only="true"
-                        />-->
+                        />
                     </div>
                 </footer>
             </div>
             <transition name="fade" mode="out-in">
-                <div id="now-playing-container" v-if="nowPlaying" @click.prevent="gotoPosters()">
+                <div
+                    id="now-playing-container"
+                    class="poster-container"
+                    v-if="nowPlaying"
+                    @click.prevent="gotoPosters()"
+                >
                     <header class="now-playing-header">
                         <span class="runtime" v-if="settings.show_runtime && nowPlayingRuntime"
                             >{{ nowPlayingRuntime.toFixed(0) }} min</span
@@ -166,7 +176,7 @@
                                 :max-rating="5"
                                 inactive-color="#000"
                                 active-color="#fff"
-                                :star-size="28"
+                                :star-size="starSize"
                                 v-model:rating="rating"
                                 border-color="#fff"
                                 :border-width="borderWidth"
@@ -191,22 +201,25 @@ let $video = document.getElementById('youtube-player');
 
 export default {
     data: function () {
-        return {};
+        return {
+            borderWidth: 2,
+            starSize: 28,
+        };
     },
     components: {
         StarRating,
     },
     watch: {
         nowPlaying: {
-            handler: function (val, oldVal) {
+            handler: function (val) {
                 if (val) {
                     this.stopMusic();
                     this.getNowPlaying();
                     this.stopTransitionImages();
                     this.controlTV('on');
                 } else {
+                    this.setVideoPlayerRef(this.$refs.videoPlayer);
                     this.startTransitionImages();
-                    this.setNowPlayingPoster(null);
                 }
             },
             deep: true,
@@ -222,8 +235,10 @@ export default {
             'nowPlayingPoster',
             'rating',
             'audienceRating',
+            'contentRating',
             'theme_music',
             'runtime',
+            'nowPlayingRuntime',
             'mpaaRating',
             'show_imax',
             'show_auro_3d',
@@ -242,6 +257,7 @@ export default {
             'controlTV',
             'setLoading',
             'setSocket',
+            'getNowPlaying',
             'setNowPlayingPoster',
             'setVideoPlayerRef',
             'playMusic',
@@ -249,6 +265,19 @@ export default {
             'playTrailer',
             'playVideo',
         ]),
+        setStarSizes() {
+            const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+            if (vw > 2000) {
+                this.starSize = 34;
+            }
+            if (vw > 3000) {
+                this.starSize = 48;
+                this.borderWidth = 4;
+            }
+            if (vw <= 2000) {
+                this.starSize = 28;
+            }
+        },
         gotoSettings() {
             this.$router.push('settings');
         },
@@ -257,14 +286,17 @@ export default {
         },
     },
     created() {
+        this.setStarSizes();
         this.boot();
     },
     mounted() {
         this.setLoading(true);
+        // TODO FIXME This breaks if the app is booted with nowplaying is true
         this.setVideoPlayerRef(this.$refs.videoPlayer);
         if (typeof io !== 'undefined') {
             this.setSocket();
         }
+        window.addEventListener('resize', this.setStarSizes);
     },
 };
 </script>
@@ -291,41 +323,30 @@ body {
     }
 }
 
-.loading-overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: #fff;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background-color: #000;
+.poster-container {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 100;
-}
-#recent-added-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
 }
 
+#recent-added-container {
+    z-index: 2;
+}
+
+#now-playing-container {
+    z-index: 3;
+}
+
 .recent-poster-container,
 .now-playing-container {
-    width: 1060px;
-    height: 1589px;
-    max-height: 1589px;
+    width: 100%;
+    flex-grow: 2;
     position: relative;
     overflow: hidden;
 }
@@ -345,33 +366,25 @@ body {
 }
 
 #trailer {
-    height: 580px;
+    height: 28vw;
     width: 100%;
     position: absolute;
     left: 0;
-    bottom: -44px;
+    bottom: 0;
     z-index: 4;
-
-    #youtube-player {
-        width: 100%;
-        height: 100%;
-
-        iframe {
-            width: 100%;
-            height: 100%;
-        }
-    }
 }
 
 .recent-poster {
-    width: 1060px;
-    height: 1590px;
+    height: 100%;
+    flex-grow: 2;
     opacity: 0;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     position: absolute;
     top: 0;
+    left: 2vw;
+    right: 2vw;
     backface-visibility: hidden;
     will-change: opacity;
     perspective: 1000;
@@ -388,8 +401,8 @@ body {
     }
 
     &.has-trailer {
-        width: 702px;
-        height: 1052px;
+        width: 35vw;
+        height: 50vw;
         left: 50%;
         transform: translate3d(-50%, 0, 0);
     }
@@ -434,22 +447,10 @@ body {
     }
 }
 
-#now-playing-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
 .now-playing-poster {
-    width: 1060px;
-    height: 1590px;
+    height: 100%;
+    left: 2vw;
+    right: 2vw;
     flex-grow: 2;
     background-size: cover;
     background-repeat: no-repeat;
@@ -462,28 +463,18 @@ body {
 .coming-soon-header {
     width: 100%;
     display: flex;
-    flex-grow: 1;
-    max-height: 190px;
+    min-height: 18vh;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 2vw;
     text-align: center;
     position: relative;
-
-    .runtime {
-        position: absolute;
-        top: 60px;
-        left: 40px;
-        color: #fff;
-        font-size: 32px;
-        font-weight: 400;
-    }
 
     h1 {
         text-transform: uppercase;
         padding: 12px 24px 14px 24px;
         border: 4px solid #fff;
-        font-size: 56px;
+        font-size: 6.5vh;
         font-weight: 700;
         color: #fff;
         line-height: 1;
@@ -495,14 +486,22 @@ body {
 .now-playing-footer,
 .coming-soon-footer {
     width: 100%;
-    min-height: 150px;
-    max-height: 150px;
+    min-height: 18vh;
     display: flex;
-    flex-grow: 1;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 4vh;
+}
+
+.runtime {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    color: #fff;
+    font-size: 2vw;
+    font-weight: 400;
+    transform: translateY(-50%);
 }
 
 .content-rating {
@@ -510,15 +509,64 @@ body {
     align-items: center;
     justify-content: flex-start;
     margin-right: auto;
-    flex-grow: 1;
-    min-width: 230px;
-    max-width: 230px;
+    width: 13vw;
 
     img {
         width: 100%;
-        max-width: 220px;
         height: auto;
     }
+}
+
+.dolby-logos {
+    flex-grow: 2;
+    padding: 0 1.5vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    div {
+        flex-grow: 1;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.dolby-atmos {
+    width: 100%;
+    height: auto;
+}
+.dolby-vision {
+    width: 100%;
+    height: auto;
+}
+
+.dolby-atmos-stacked {
+    width: 100%;
+    max-width: 8vw;
+    height: auto;
+}
+.dolby-vision-stacked {
+    width: 100%;
+    max-width: 8vw;
+    height: auto;
+}
+
+.dts {
+    width: 100%;
+    max-width: 8vw;
+    height: auto;
+}
+
+.imax {
+    width: 100%;
+    max-width: 8vw;
+    height: auto;
+}
+.auro3d {
+    width: 100%;
+    height: auto;
 }
 
 .audience-rating {
@@ -526,85 +574,8 @@ body {
     align-items: center;
     justify-content: flex-end;
     margin-left: auto;
-    flex-grow: 1;
-    min-width: 200px;
-    max-width: 200px;
-}
-
-.dolby-logos {
-    flex-grow: 2;
-    padding: 0 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    div {
-        flex-grow: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    img {
-        margin: 0 12px;
-    }
-}
-
-.dolby-atmos {
-    width: 100%;
-    max-width: 180px;
-    height: auto;
-}
-.dolby-vision {
-    width: 100%;
-    max-width: 180px;
-    height: auto;
-}
-
-.dolby-atmos-stacked {
-    width: 100%;
-    max-width: 130px;
-    height: auto;
-}
-.dolby-vision-stacked {
-    width: 100%;
-    max-width: 130px;
-    height: auto;
-}
-
-.dts {
-    width: 100%;
-    max-width: 130px;
-    height: auto;
-}
-
-.imax {
-    width: 100%;
-    max-width: 130px;
-    height: auto;
-}
-.auro3d {
-    width: 100%;
-    max-width: 140px;
-    height: auto;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 2s;
-}
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
-.fade2-enter-active,
-.fade2-leave-active {
-    transition: opacity 1s;
-}
-.fade2-enter,
-.fade2-leave-to {
-    opacity: 0;
+    width: 14vh;
+    margin-left: auto;
 }
 
 .vue-star-rating {
@@ -613,23 +584,5 @@ body {
 
 .vue-star-rating-star {
     margin-right: 4px !important;
-}
-
-@keyframes FadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes FadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
 }
 </style>
