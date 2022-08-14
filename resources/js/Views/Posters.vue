@@ -188,6 +188,9 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia';
+import { usePostersStore } from '@/store/posters';
+
 import MainNav from '../partials/MainNav.vue';
 import PosterOptions from '../components/poster-options.vue';
 import draggable from 'vuedraggable';
@@ -195,7 +198,6 @@ import draggable from 'vuedraggable';
 export default {
     data: function () {
         return {
-            loading: false,
             saving: false,
             errors: [],
             posters: [],
@@ -203,13 +205,15 @@ export default {
             debounce: false,
             showPosterModal: false,
             formMessage: '',
-            settings: {},
-            sockets: '',
         };
     },
     components: { MainNav, draggable, PosterOptions },
     watch: {},
+    computed: {
+        ...mapState(usePostersStore, ['loading', 'loadingMessage', 'settings']),
+    },
     methods: {
+        ...mapActions(usePostersStore, ['boot', 'controlTV', 'setLoading', 'setSocket']),
         getPosters() {
             axios
                 .get('/api/posters')
@@ -247,7 +251,7 @@ export default {
                 });
         },
         onDragStart(e) {
-            // e
+            //
         },
         onDragEnd(e) {
             var params = this.posters.map(function (item, index) {
@@ -271,17 +275,10 @@ export default {
                 1000
             );
         },
-
-        reloadPosters() {
-            this.socket.emit('dispatch:command', { command: 'reload' });
-        },
     },
     created() {},
     mounted() {
         this.getPosters();
-        if (typeof io !== 'undefined') {
-            this.socket = io('http://' + import.meta.env.VITE_BASE_URL + ':3000');
-        }
     },
 };
 </script>

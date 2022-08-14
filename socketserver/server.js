@@ -7,9 +7,10 @@ const io = new Server(httpServer, {
     cors: {
         origins: [
             'http://localhost:*',
-            'http://127.0.0.0:8000',
+            'http://127.0.0.1:*',
             'http://movieposter.local',
             'http://digital-movie-poster.test',
+            'http://digital-movie-poster.test:3000',
             'https://digital-movie-poster.test',
             'http://raspberrypi.local',
         ],
@@ -152,7 +153,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('dispatch:command', (data) => {
-        socket.broadcast.emit('receive:command', data);
+        io.emit('receive:command', data);
     });
 
     socket.on('disconnect', () => {

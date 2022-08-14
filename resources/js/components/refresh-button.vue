@@ -20,21 +20,24 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia';
+import { usePostersStore } from '@/store/posters';
 export default {
     name: 'RefreshButton',
     data: function () {
         return {
-            socket: '',
             btnLabel: 'Refresh Movie Posters',
         };
     },
+    computed: {
+        ...mapState(usePostersStore, ['loading', 'socket']),
+    },
     methods: {
+        ...mapActions(usePostersStore, ['boot', 'setSocket']),
         reloadPosters(e) {
             e.target.disabled = true;
             this.btnLabel = 'Refresh sent ...';
-            if (this.socket.hasOwnProperty('emit')) {
-                this.socket.emit('dispatch:command', { command: 'reload' });
-            }
+            this.socket.emit('dispatch:command', { command: 'reload' });
             setTimeout(() => {
                 e.target.disabled = false;
                 this.btnLabel = 'Refresh Movie Posters';
@@ -42,9 +45,7 @@ export default {
         },
     },
     mounted() {
-        if (typeof io !== 'undefined') {
-            this.socket = io('http://' + import.meta.env.VITE_BASE_URL + ':3000');
-        }
+        this.setSocket();
     },
 };
 </script>
