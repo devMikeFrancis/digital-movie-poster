@@ -86,7 +86,9 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
+import { mapActions } from 'pinia';
+import { usePostersStore } from '@/store/posters';
+import vClickOutside from 'click-outside-vue3';
 
 export default {
     name: 'PosterOptions',
@@ -94,7 +96,7 @@ export default {
         poster: Object,
     },
     directives: {
-        ClickOutside,
+        clickOutside: vClickOutside.directive,
     },
     data: function () {
         return {
@@ -102,16 +104,7 @@ export default {
         };
     },
     methods: {
-        updateSetting(poster, column, value) {
-            const params = {
-                _method: 'put',
-                value: value,
-            };
-            axios
-                .post('/api/posters/' + poster.id + '/' + column, params)
-                .then((response) => {})
-                .catch((e) => {});
-        },
+        ...mapActions(usePostersStore, ['updateSetting']),
         close() {
             this.show = false;
         },

@@ -78,7 +78,6 @@ export const usePostersStore = defineStore('posters', {
                             poster = this.getRandomPoster();
                         } else {
                             poster = this.moviePosters[0];
-                            poster.activeItem = true;
                         }
 
                         poster.show = true;
@@ -139,34 +138,6 @@ export const usePostersStore = defineStore('posters', {
                 this.useSettingsProLogos();
             }
         },
-        getRandomPoster() {
-            const currItem = this.moviePosters.filter(function (e, i) {
-                return e.show === true;
-            });
-
-            const currIndex = this.moviePosters.indexOf(currItem[0]);
-
-            this.moviePosters.forEach((item) => {
-                if (item.show) {
-                    item.show = false;
-                }
-            });
-
-            const randIndex = Math.floor(Math.random() * this.moviePosters.length);
-
-            let poster = this.moviePosters[randIndex];
-            let pastPoster = this.moviePosters[currIndex];
-
-            poster.activeItem = true;
-            pastPoster.pastItem = true;
-            pastPoster.activeItem = false;
-
-            setTimeOut(() => {
-                pastPoster.pastItem = false;
-            }, 3000);
-
-            return poster;
-        },
         getNowPlaying() {
             Api.apiCallPlex('/status/sessions/')
                 .then((response) => {
@@ -214,34 +185,33 @@ export const usePostersStore = defineStore('posters', {
         },
         getInSequencePoster() {
             const len = this.moviePosters.length;
+            const currIndex = this.moviePosters.findIndex((poster) => poster.show === true);
+            let activeIndex = 0;
+            if (this.settings.random_order) {
+                activeIndex = Math.floor(Math.random() * len);
+            } else {
+                activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
+            }
 
-            // Current/Past Item
-            const currItem = this.moviePosters.filter(function (e, i) {
-                return e.show === true;
-            });
-            const currIndex = this.moviePosters.indexOf(currItem[0]);
-            this.moviePosters[currIndex].show = false;
-
-            // Next/Active Item
-            const activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
-
-            // For vertical transition
-            let nextIndex = currIndex === 0 ? len - 1 : currIndex - 1;
-
-            //let nextPoster = this.moviePoster[nextIndex];
             let poster = this.moviePosters[activeIndex];
             let pastPoster = this.moviePosters[currIndex];
 
-            poster.activeItem = true;
-            pastPoster.pastItem = true;
-            pastPoster.activeItem = false;
-
-            setTimeout(() => {
-                pastPoster.pastItem = false;
-            }, 3000);
-            // END FOR VERTICAL TRANSITION
+            poster.show = true;
+            pastPoster.show = false;
 
             return poster;
+        },
+        transitionImages() {
+            let poster = '';
+            if (this.videoPlayer) {
+                this.videoPlayer.innerHTML = '';
+            }
+            this.stopMusic();
+
+            if (this.moviePosters.length > 0) {
+                poster = this.getInSequencePoster();
+                this.handlePosterView(poster);
+            }
         },
         cachePosters() {
             axios
@@ -301,6 +271,16 @@ export const usePostersStore = defineStore('posters', {
                 '{"event":"command","func":"playVideo","args":""}',
                 '*'
             );
+        },
+        updateSetting(poster, column, value) {
+            const params = {
+                _method: 'put',
+                value: value,
+            };
+            axios
+                .post('/api/posters/' + poster.id + '/' + column, params)
+                .then((response) => {})
+                .catch((e) => {});
         },
         startSockets() {
             const socket = new WebSocket(
@@ -383,23 +363,7 @@ export const usePostersStore = defineStore('posters', {
             var diff = date.getTime() - invdate.getTime();
             return new Date(date.getTime() - diff);
         },
-        transitionImages() {
-            let poster = '';
-            if (this.videoPlayer) {
-                this.videoPlayer.innerHTML = '';
-            }
-            this.stopMusic();
 
-            if (this.moviePosters.length > 0) {
-                if (this.settings.random_order) {
-                    poster = this.getRandomPoster();
-                } else {
-                    poster = this.getInSequencePoster();
-                }
-                poster.show = true;
-                this.handlePosterView(poster);
-            }
-        },
         startTransitionImages() {
             window.transitionImagesInterval = setInterval(() => {
                 this.transitionImages();
@@ -422,7 +386,6 @@ export const usePostersStore = defineStore('posters', {
         },
         setSocket() {
             this.socket = io('http://' + import.meta.env.VITE_BASE_URL + ':3000');
-
             this.socket.on('receive:command', (data) => {
                 switch (data.command) {
                     case 'reload':

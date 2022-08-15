@@ -18,32 +18,32 @@
                 </header>
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
-                        <div
-                            class="poster-items"
-                            :class="{
-                                'vertical-items': settings.transition_type === 'vertical',
-                                'fade-items': settings.transition_type === 'fade',
-                            }"
-                        >
+                        <div class="poster-items">
                             <div
                                 v-for="(poster, index) in moviePosters"
+                                v-bind:key="`key-${index}`"
+                                class="poster"
                                 :class="{
-                                    show: poster.show,
-                                    hide: !poster.show,
-                                    item: settings.transition_type === 'vertical',
-                                    'recent-poster': settings.transition_type === 'fade',
-                                    'next-item': poster.nextItem,
-                                    'active-item': poster.activeItem,
-                                    'past-item': poster.pastItem,
                                     'has-trailer': poster.show_trailer && poster.trailer_path,
                                 }"
-                                :style="
-                                    'background-image: url(storage/posters/' +
-                                    poster.file_name +
-                                    ')'
-                                "
-                                v-bind:key="`key-${index}`"
-                            ></div>
+                            >
+                                <Transition
+                                    :name="
+                                        settings.transition_type === 'fade'
+                                            ? 'fade-poster'
+                                            : 'slide-poster'
+                                    "
+                                >
+                                    <div
+                                        v-if="poster.show"
+                                        :style="
+                                            'background-image: url(storage/posters/' +
+                                            poster.file_name +
+                                            ')'
+                                        "
+                                    ></div>
+                                </Transition>
+                            </div>
                         </div>
 
                         <div id="trailer">
@@ -374,30 +374,24 @@ body {
     z-index: 4;
 }
 
-.recent-poster {
+.poster {
     height: 100%;
     flex-grow: 2;
-    opacity: 0;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
     position: absolute;
     top: 0;
     left: 2vw;
     right: 2vw;
     backface-visibility: hidden;
     will-change: opacity;
-    perspective: 1000;
-    transform: translateZ(0);
 
-    &.hide {
-        animation: FadeOut 2.5s ease-out forwards;
-        z-index: 3;
-    }
-
-    &.show {
-        animation: FadeIn 2.5s ease-in forwards;
-        z-index: 2;
+    > div {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        backface-visibility: hidden;
+        will-change: opacity;
     }
 
     &.has-trailer {
@@ -413,38 +407,6 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden;
-}
-
-.vertical-items {
-    .item {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-        backface-visibility: hidden;
-        will-change: transform;
-        perspective: 1000;
-        transform: translate3d(0, 100%, 0);
-
-        transition: transform 1.5s ease-in-out;
-
-        &.next-item {
-            z-index: -1;
-        }
-
-        &.active-item {
-            transform: translate3d(0, 0, 0);
-            z-index: 10;
-        }
-
-        &.past-item {
-            transform: translate3d(0, -100%, 0);
-            z-index: 10;
-        }
-    }
 }
 
 .now-playing-poster {
@@ -584,5 +546,28 @@ body {
 
 .vue-star-rating-star {
     margin-right: 4px !important;
+}
+
+.fade-poster-enter-active,
+.fade-poster-leave-active {
+    transition: opacity 2.2s ease;
+}
+
+.fade-poster-enter-from,
+.fade-poster-leave-to {
+    opacity: 0;
+}
+
+.slide-poster-enter-active,
+.slide-poster-leave-active {
+    transition: transform 1.2s ease-in-out;
+    transform: translate3d(0, 0, 0);
+}
+
+.slide-poster-leave-to {
+    transform: translate3d(0, -100%, 0);
+}
+.slide-poster-enter-from {
+    transform: translate3d(0, 100%, 0);
 }
 </style>

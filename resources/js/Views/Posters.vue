@@ -213,7 +213,13 @@ export default {
         ...mapState(usePostersStore, ['loading', 'loadingMessage', 'settings']),
     },
     methods: {
-        ...mapActions(usePostersStore, ['boot', 'controlTV', 'setLoading', 'setSocket']),
+        ...mapActions(usePostersStore, [
+            'boot',
+            'controlTV',
+            'setLoading',
+            'updateSetting',
+            'setSocket',
+        ]),
         getPosters() {
             axios
                 .get('/api/posters')
