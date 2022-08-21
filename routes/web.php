@@ -13,7 +13,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/{any}', function () {
+Route::get('/', function () {
+    return view('app');
+})->where('any', '.*');
+
+Route::get('/dashboard', function () {
+    return view('app');
+})->where('any', '.*');
+
+Route::get('/posters', function () {
+    return view('app');
+})->where('any', '.*');
+
+Route::get('/posters/{any}', function () {
+    return view('app');
+})->where('any', '.*');
+
+Route::get('/settings', function () {
+    return view('app');
+})->where('any', '.*');
+
+Route::get('/voting', function () {
     return view('app');
 })->where('any', '.*');
 

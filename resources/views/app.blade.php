@@ -11,6 +11,6 @@
     <body class="font-sans antialiased">
         <div id="app">
         </div>
-        <script src="{{ env('APP_URL') }}:3000/socket.io/socket.io.js"></script>
+        <script src="http://raspberrypi.local:3000/socket.io/socket.io.js"></script>
     </body>
 </html>
