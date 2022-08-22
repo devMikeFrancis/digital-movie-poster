@@ -68,7 +68,7 @@
                                         class="text-black w-full"
                                         id="movie-poster"
                                         aria-describedby="movie-posterHelp"
-                                        @change="selectFile"
+                                        @change="selectFile($event)"
                                     />
                                     <div id="movie-posterHelp" class="text-gray-400 text-sm"></div>
                                 </div>
@@ -83,7 +83,7 @@
                                         class="text-black w-full"
                                         id="music"
                                         aria-describedby="musicHelp"
-                                        @change="selectMusicFile"
+                                        @change="selectMusicFile($event)"
                                     />
                                     <div id="musicHelp" class="text-gray-400 text-sm">
                                         MP3 Theme music.
@@ -358,10 +358,10 @@ export default {
                     console.log(e.message);
                 });
         },
-        selectFile() {
+        selectFile(event) {
             this.poster.image = event.target.files[0];
         },
-        selectMusicFile() {
+        selectMusicFile(event) {
             this.poster.music = event.target.files[0];
         },
         savePoster() {
@@ -420,9 +420,9 @@ export default {
             } else {
                 url = '/api/posters';
             }
-
+            const headers = { 'Content-Type': 'multipart/form-data' };
             axios
-                .post(url, params)
+                .post(url, params, { headers })
                 .then((response) => {
                     this.saving = false;
                     this.savePosterBtn = 'Saved Poster!';
