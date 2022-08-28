@@ -68,6 +68,61 @@
                             <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
+                                <label
+                                    for="jellyfin-service"
+                                    class="text-gray-300 block mb-2 font-bold"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="jellyfin-service"
+                                        aria-describedby="jellyfin-serviceHelp"
+                                        v-model="settings.jellyfin_service"
+                                    />
+                                    Enable Jellyfin Service</label
+                                >
+                                <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
+                                    Use Jellyfin media server for posters.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label
+                                    for="jellyfin-ip-address"
+                                    class="text-gray-300 block mb-2 font-bold"
+                                    >Jellyfin Server IP Address</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="jellyfin-ip-address"
+                                    aria-describedby="jellyfinIpAddressHelp"
+                                    v-model="settings.jellyfin_ip_address"
+                                />
+                                <div id="jellyfinIpAddressHelp" class="text-gray-400 text-sm">
+                                    The IP address of your Jellyfin server.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label
+                                    for="jellyfin-token"
+                                    class="text-gray-300 block mb-2 font-bold"
+                                    >Jellyfin API Token</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="jellyfin-token"
+                                    aria-describedby="jellyfintokenHelp"
+                                    v-model="settings.jellyfin_token"
+                                />
+                                <div id="jellyfintokenHelp" class="text-gray-400 text-sm"></div>
+                            </div>
+
+                            <hr class="mt-3 mb-7 border-gray-700" />
+
+                            <div class="mb-5">
                                 <label for="random" class="text-gray-300 block mb-2 font-bold">
                                     <input
                                         type="checkbox"
@@ -457,6 +512,8 @@ export default {
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
+                jellyfin_token: '',
+                jellyfin_ip_address: '',
                 transition_type: 'fade',
             },
             updateBtn: 'Update DMP',

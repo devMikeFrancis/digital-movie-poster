@@ -17,6 +17,7 @@ export const usePostersStore = defineStore('posters', {
         nowPlayingPoster: '',
         recentlyAddedInterval: null,
         nowPlayingInterval: null,
+        jellyfinDevicePlaying: null,
         transitionImagesInterval: null,
         contentRating: '',
         mpaaRating: '',
@@ -139,11 +140,27 @@ export const usePostersStore = defineStore('posters', {
             }
         },
         getNowPlaying() {
+            if (this.settings.plex_service) {
+                this.plexNowPlaying();
+            }
+            if (this.settings.jellyfin_service) {
+                this.jellyfinNowPlaying();
+            }
+        },
+        plexNowPlaying() {
             Api.apiCallPlex('/status/sessions/')
                 .then((response) => {
                     const size = response.data.MediaContainer.size;
                     if (size > 0) {
-                        this.nowPlayingPoster =
+                        let data = response.data.MediaContainer.Metadata[0];
+                        let playing = {
+                            contentRating: 0,
+                            rating: 0,
+                            duration: null,
+                            poster: '',
+                        };
+
+                        playing.poster =
                             'http://' +
                             this.settings.plex_ip_address +
                             ':32400' +
@@ -151,21 +168,50 @@ export const usePostersStore = defineStore('posters', {
                             '?X-Plex-Token=' +
                             this.settings.plex_token;
 
-                        let data = response.data.MediaContainer.Metadata[0];
-                        this.contentRating = data.contentRating;
+                        playing.contentRating = data.contentRating;
 
                         if (data.audienceRating) {
-                            this.rating = data.audienceRating / 2;
+                            playing.audienceRating = data.audienceRating;
                         }
 
-                        if (data.duration && this.settings.show_runtime) {
-                            this.nowPlayingRuntime = data.duration / 1000 / 60;
+                        if (dara.duration) {
+                            playing.duration = data.duration / 1000 / 60;
                         }
+
+                        this.setNowPlaying(playing);
                     }
                 })
                 .catch((e) => {
                     console.log(e.message);
                 });
+        },
+        jellyfinNowPlaying() {
+            let playing = {
+                contentRating: this.jellyfinDevicePlaying.NowPlayingItem.OfficialRating,
+                audienceRating: this.jellyfinDevicePlaying.NowPlayingItem.CommunityRating,
+                duration:
+                    this.jellyfinDevicePlaying.NowPlayingItem.RunTimeTicks / 10000 / 1000 / 60,
+                poster:
+                    'http://' +
+                    this.settings.jellyfin_ip_address +
+                    ':8096/Items/' +
+                    this.jellyfinDevicePlaying.NowPlayingItem.Id +
+                    '/Images/Primary',
+            };
+
+            this.setNowPlaying(playing);
+        },
+        setNowPlaying(data) {
+            this.nowPlayingPoster = data.poster;
+            this.contentRating = data.contentRating;
+
+            if (data.audienceRating) {
+                this.rating = data.audienceRating / 2;
+            }
+
+            if (data.duration && this.settings.show_runtime) {
+                this.nowPlayingRuntime = data.duration;
+            }
         },
         usePosterProLogos(poster) {
             this.show_dolby_atmos_vertical = poster.show_dolby_atmos;
@@ -283,6 +329,14 @@ export const usePostersStore = defineStore('posters', {
                 .catch((e) => {});
         },
         startSockets() {
+            if (this.settings.plex_service) {
+                this.plexSocket();
+            }
+            if (this.settings.jellyfin_service) {
+                this.jellyfinSocket();
+            }
+        },
+        plexSocket() {
             const socket = new WebSocket(
                 'ws://' +
                     this.settings.plex_ip_address +
@@ -301,6 +355,39 @@ export const usePostersStore = defineStore('posters', {
                     this.controlPlayerState(state);
                 }
             });
+        },
+        jellyfinSocket() {
+            // Jellyfin we have to poll. Does not have socket for now playing
+            setInterval(() => {
+                axios
+                    .get(
+                        'http://' +
+                            this.settings.jellyfin_ip_address +
+                            ':8096/Sessions?api_key=' +
+                            this.settings.jellyfin_token
+                    )
+                    .then((response) => {
+                        let devices = response.data;
+                        this.jellyfinDevicePlaying = devices.find((device) => {
+                            if (
+                                device.hasOwnProperty('NowPlayingItem') &&
+                                device.NowPlayingItem.Type === 'Movie'
+                            ) {
+                                return device;
+                            }
+                        });
+
+                        if (this.jellyfinDevicePlaying) {
+                            this.controlPlayerState('playing');
+                        } else {
+                            this.controlPlayerState('stopped');
+                        }
+                    })
+                    .catch(() => {
+                        this.jellyfinDevicePlaying = null;
+                        this.controlPlayerState('stopped');
+                    });
+            }, 7000);
         },
         controlPlayerState(state) {
             switch (state) {

@@ -8,21 +8,21 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 
-class PlexService
+class JellyfinService
 {
-    private $plexIpAddress = '';
-    private $plexToken = '';
+    private $jellyfinIpAddress = '';
+    private $jellyfinToken = '';
 
     public function __construct()
     {
         $settings = Setting::first();
 
-        $this->plexIpAddress = $settings->plex_ip_address;
-        $this->plexToken = $settings->plex_token;
+        $this->jellyfinIpAddress = $settings->jellyfin_ip_address;
+        $this->jellyfinToken = $settings->jellyfin_token;
     }
 
     /**
-     * Make Plex API calls to media server
+     * Make Jellyfin API calls to media server
      *
      * @param string $path /path/resource
      * @param string $method get|post
@@ -34,27 +34,38 @@ class PlexService
     {
         $response = Http::withHeaders([
             'Accept' => 'application/json',
-        ])->get('http://'.$this->plexIpAddress.':32400'.$path.'?X-Plex-Token='.$this->plexToken);
+        ])->get('http://'.$this->jellyfinIpAddress.':8096'.$path.'?api_key='.$this->jellyfinToken);
 
         return $response->json();
     }
 
     public function saveMovies($data)
     {
-        $movies = $data['MediaContainer']['Metadata'];
-        $this->processMovies($movies);
+        //$movies = $data;
+        //$this->processMovies($movies);
     }
 
     public function processMovies($movies)
     {
+        /*
+        NowPlayingItem
+        ->Id
+        ->Name
+        ->CriticRating
+        ->CommunityRating
+        ->RunTimeTicks
+        ->Type = “Movie”
+        ->OfficialRating
+        */
+
         if (!is_dir(storage_path("app/public/posters"))) {
             mkdir(storage_path("app/public/posters"), 0775, true);
         }
         foreach ($movies as $movie) {
-            if ($movie['type'] === 'movie') {
-                $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$movie['thumb'].'?X-Plex-Token='.$this->plexToken;
+            if ($movie['Type'] === 'Movie') {
+                $imageUrl = 'http://'.$this->jellyfinIpAddress.':8096/Items/'.$movie['Id'].'/Images/Primary';
 
-                $orginalName = Str::slug($movie['title']);
+                $orginalName = Str::slug($movie['Name']);
                 $fileName = $orginalName.'.jpg';
 
                 $image = Image::make($imageUrl);
@@ -68,17 +79,17 @@ class PlexService
                 $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
 
                 Poster::updateOrCreate(
-                    ['object_id' => $movie['key'] ],
+                    ['object_id' => $movie['Id'] ],
                     [
-                        'object_id' => $movie['key'],
+                        'object_id' => $movie['Id'],
                         'name' => $orginalName,
                         'file_name' => $fileName,
                         'can_delete' => false,
                         'created_at' => now(),
                         'updated_at' => now(),
-                        'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
-                        'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
-                        'runtime' => is_numeric($movie['duration']) ? $movie['duration']/1000/60 : null
+                        'mpaa_rating' => isset($movie['OfficialRating']) ? $movie['OfficialRating'] : null,
+                        'audience_rating' => isset($movie['CommunityRating']) ? $movie['CommunityRating'] : 0,
+                        'runtime' => is_numeric($movie['RunTimeTicks']) ? $movie['RunTimeTicks']/1000/60 : null
                     ]
                 );
             }

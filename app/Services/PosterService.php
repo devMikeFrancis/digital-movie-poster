@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Http;
 use App\Services\PlexService;
+use App\Services\JellyfinService;
 use App\Models\Poster;
 use App\Models\Setting;
 
@@ -23,7 +24,13 @@ class PosterService
         if ($this->settings->plex_service) {
             $plexService = new PlexService();
             $json = $plexService->apiCall('/library/sections/1/all');
-            $plexService->save($json);
+            $plexService->saveMovies($json);
+        }
+
+        if ($this->settings->jellyfin_service) {
+            $jellyfinService = new JellyfinService();
+            $json = $jellyfinService->apiCall('/Movies');
+            $jellyfinService->saveMovies($json);
         }
     }
 

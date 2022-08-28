@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\SettingsRequest;
 use Symfony\Component\Process\Process;
 use App\Models\Setting;
 
@@ -20,7 +20,7 @@ class SettingController extends Controller
         return response()->json($settings);
     }
 
-    public function update(Request $request)
+    public function update(SettingsRequest $request)
     {
         $updated = Setting::where('id', 1)->update($request->except('_method', '_token'));
 

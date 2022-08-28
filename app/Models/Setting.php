@@ -40,9 +40,19 @@ class Setting extends Model
         'transition_type',
         'show_bottom_text',
         'bottom_text',
+        'jellyfin_service',
+        'jellyfin_ip_address',
+        'jellyfin_token',
     ];
 
     protected function plexService(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function jellyfinService(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,
