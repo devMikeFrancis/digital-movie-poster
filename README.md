@@ -15,7 +15,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Show Runtime
 -   Movie trailers
 -   Movie theme music
--   Movie Voting! See WIKI for more info
+-   Movie Voting! See Wiki for more info
 
 Open to new features/suggestions/requests. Please use Github issues.
 
@@ -30,24 +30,7 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 
 ## Self Installation
 
-See the WIKI
-
-### Movie Voting Service
-
-The movie voting service runs on a socket.io server locally.
-
-If you want to use the movie voting feature you will need to go into the `socketserver` folder and run:
-`npm install`
-
-Next you will need to install PM2:
-
-`npm install -g pm2`
-
-Start the voting socket.io server run:
-
-`pm2 start server.js`
-
-Now the voting service will listen for connections when navigating to the `/voting` path in your browser.
+See the WiKi
 
 **Recommended poster size is 1400x2000 or higher, but retain the same ratio.**
 
@@ -62,10 +45,6 @@ When using the IMDB ID to manage poster data the application will use [TMDB API]
 To use Plex, go to the settings configuration, check the checkbox to use the Plex service and enter your Plex IP address and Plex auth token. You can find your Plex auth token [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 
 Anytime a movie is played on Plex it will show the Now Playing poster.
-
-### Sorting Posters
-
-On the poster list screen you can drag-and-drop each poster by the thumbnail to sort. If you have chosen to use a random order in the settings this list order is ignored.
 
 ### A Note on Deleting Posters
 
