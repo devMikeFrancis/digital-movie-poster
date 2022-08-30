@@ -8,7 +8,7 @@ The web application creates a digital movie poster display for use on LED screen
 -   Show content ratings, processing logos, audience ratings
 -   Random order or drag-and-drop ordering
 -   Fade in/out or vertical slide transitions
--   Pull posters from Plex and Jellyfin and show currently playing
+-   Sync posters from Plex, Kodi and Jellyfin and show currently playing
 -   Automatically fill in data using IMDB ID
 -   Control settings such as playing speed, transition speed, etc ...
 -   Control display power using HDMI-CEC control
@@ -43,8 +43,6 @@ When using the IMDB ID to manage poster data the application will use [TMDB API]
 ### Plex
 
 To use Plex, go to the settings configuration, check the checkbox to use the Plex service and enter your Plex IP address and Plex auth token. You can find your Plex auth token [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
-
-Anytime a movie is played on Plex it will show the Now Playing poster.
 
 ### A Note on Deleting Posters
 

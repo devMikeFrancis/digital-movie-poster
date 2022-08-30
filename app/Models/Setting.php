@@ -43,6 +43,13 @@ class Setting extends Model
         'jellyfin_service',
         'jellyfin_ip_address',
         'jellyfin_token',
+        'kodi_service',
+        'kodi_url',
+        'kodi_port',
+        'kodi_username',
+        'kodi_password',
+        'tmdb_api_key_v3',
+        'tmdb_api_key_v4',
     ];
 
     protected function plexService(): Attribute
@@ -53,6 +60,13 @@ class Setting extends Model
     }
 
     protected function jellyfinService(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function kodiService(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,

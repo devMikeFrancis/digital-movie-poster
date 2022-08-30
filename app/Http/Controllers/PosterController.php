@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
 use App\Services\PosterService;
+use App\Services\KodiService;
 use App\Http\Resources\PostersCollection;
 use App\Http\Resources\PosterResource;
 use App\Models\Poster;
@@ -130,5 +131,18 @@ class PosterController extends Controller
     {
         $service->delete($id);
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Get now playing from Kodi service
+     *
+     * @param App\Services\KodiService $service
+     *
+     * @return array
+     */
+    public function kodiNowPlaying(KodiService $service)
+    {
+        $nowPlaying = $service->nowPlaying();
+        return $nowPlaying;
     }
 }

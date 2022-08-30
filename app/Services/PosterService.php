@@ -7,6 +7,7 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Http;
 use App\Services\PlexService;
 use App\Services\JellyfinService;
+use App\Services\KodiService;
 use App\Models\Poster;
 use App\Models\Setting;
 
@@ -32,6 +33,13 @@ class PosterService
             $json = $jellyfinService->apiCall('/Movies');
             $jellyfinService->saveMovies($json);
         }
+
+        if ($this->settings->kodi_service) {
+            $kodiService = new KodiService();
+            $kodiService->syncMovies();
+        }
+
+        return ['success' => true];
     }
 
     public function store($request): Poster
@@ -142,7 +150,7 @@ class PosterService
     {
         $response = Http::withHeaders([
             'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.env('TMDB_API_V3').'&append_to_response=videos,images,release_dates');
+        ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
 
         $res = $response->json();
 

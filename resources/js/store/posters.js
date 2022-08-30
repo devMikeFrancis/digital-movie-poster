@@ -18,6 +18,7 @@ export const usePostersStore = defineStore('posters', {
         recentlyAddedInterval: null,
         nowPlayingInterval: null,
         jellyfinDevicePlaying: null,
+        servicePlaying: null,
         transitionImagesInterval: null,
         contentRating: '',
         mpaaRating: '',
@@ -140,11 +141,14 @@ export const usePostersStore = defineStore('posters', {
             }
         },
         getNowPlaying() {
-            if (this.settings.plex_service) {
+            if (this.settings.plex_service && this.servicePlaying === 'plex') {
                 this.plexNowPlaying();
             }
-            if (this.settings.jellyfin_service) {
+            if (this.settings.jellyfin_service && this.servicePlaying === 'jellyfin') {
                 this.jellyfinNowPlaying();
+            }
+            if (this.settings.kodi_service && this.servicePlaying === 'kodi') {
+                this.kodiNowPlaying();
             }
         },
         plexNowPlaying() {
@@ -174,7 +178,7 @@ export const usePostersStore = defineStore('posters', {
                             playing.audienceRating = data.audienceRating;
                         }
 
-                        if (dara.duration) {
+                        if (data.duration) {
                             playing.duration = data.duration / 1000 / 60;
                         }
 
@@ -186,20 +190,40 @@ export const usePostersStore = defineStore('posters', {
                 });
         },
         jellyfinNowPlaying() {
-            let playing = {
-                contentRating: this.jellyfinDevicePlaying.NowPlayingItem.OfficialRating,
-                audienceRating: this.jellyfinDevicePlaying.NowPlayingItem.CommunityRating,
-                duration:
-                    this.jellyfinDevicePlaying.NowPlayingItem.RunTimeTicks / 10000 / 1000 / 60,
-                poster:
-                    'http://' +
-                    this.settings.jellyfin_ip_address +
-                    ':8096/Items/' +
-                    this.jellyfinDevicePlaying.NowPlayingItem.Id +
-                    '/Images/Primary',
-            };
+            if (this.jellyfinDevicePlaying) {
+                let playing = {
+                    contentRating: this.jellyfinDevicePlaying.NowPlayingItem.OfficialRating,
+                    audienceRating: this.jellyfinDevicePlaying.NowPlayingItem.CommunityRating,
+                    duration:
+                        this.jellyfinDevicePlaying.NowPlayingItem.RunTimeTicks / 10000 / 1000 / 60,
+                    poster:
+                        'http://' +
+                        this.settings.jellyfin_ip_address +
+                        ':8096/Items/' +
+                        this.jellyfinDevicePlaying.NowPlayingItem.Id +
+                        '/Images/Primary',
+                };
 
-            this.setNowPlaying(playing);
+                this.setNowPlaying(playing);
+            }
+        },
+        kodiNowPlaying() {
+            axios
+                .get('/api/kodi-now-playing')
+                .then((response) => {
+                    let playing = {
+                        poster: decodeURIComponent(
+                            response.data[1].result.item.art.poster
+                                .replace('image://', '')
+                                .slice(0, -1)
+                        ),
+                        contentRating: response.data[0].result.item.mpaa.replace('Rated ', ''),
+                        audienceRating: response.data[0].result.item.rating,
+                        duration: response.data[0].result.item.runtime / 60,
+                    };
+                    this.setNowPlaying(playing);
+                })
+                .catch(() => {});
         },
         setNowPlaying(data) {
             this.nowPlayingPoster = data.poster;
@@ -335,6 +359,9 @@ export const usePostersStore = defineStore('posters', {
             if (this.settings.jellyfin_service) {
                 this.jellyfinSocket();
             }
+            if (this.settings.kodi_service) {
+                this.kodiSocket();
+            }
         },
         plexSocket() {
             const socket = new WebSocket(
@@ -352,12 +379,31 @@ export const usePostersStore = defineStore('posters', {
                 const action = data.NotificationContainer.type;
                 if (action === 'playing') {
                     const state = data.NotificationContainer.PlaySessionStateNotification[0].state;
+                    this.servicePlaying = 'plex';
                     this.controlPlayerState(state);
                 }
             });
         },
+        kodiSocket() {
+            const socket = new WebSocket('ws://' + this.settings.kodi_url + ':9090');
+
+            socket.addEventListener('open', () => {});
+
+            socket.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                if (data.method === 'Player.OnPlay' && data.params.data.item.type === 'movie') {
+                    this.servicePlaying = 'kodi';
+                    this.controlPlayerState('playing');
+                }
+
+                if (data.method === 'Player.OnStop' && data.params.data.item.type === 'movie') {
+                    this.servicePlaying = null;
+                    this.controlPlayerState('stopped');
+                }
+            });
+        },
         jellyfinSocket() {
-            // Jellyfin we have to poll. Does not have socket for now playing
+            // Jellyfin - we have to poll. Does not have socket for now playing
             setInterval(() => {
                 axios
                     .get(
@@ -378,13 +424,16 @@ export const usePostersStore = defineStore('posters', {
                         });
 
                         if (this.jellyfinDevicePlaying) {
+                            this.servicePlaying = 'jellyfin';
                             this.controlPlayerState('playing');
                         } else {
+                            this.servicePlaying = null;
                             this.controlPlayerState('stopped');
                         }
                     })
                     .catch(() => {
                         this.jellyfinDevicePlaying = null;
+                        this.servicePlaying = null;
                         this.controlPlayerState('stopped');
                     });
             }, 7000);

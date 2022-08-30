@@ -123,6 +123,103 @@
                             <hr class="mt-3 mb-7 border-gray-700" />
 
                             <div class="mb-5">
+                                <label
+                                    for="jellyfin-service"
+                                    class="text-gray-300 block mb-2 font-bold"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="text-black"
+                                        id="kodi-service"
+                                        aria-describedby="kodi-serviceHelp"
+                                        v-model="settings.kodi_service"
+                                    />
+                                    Enable Kodi Service</label
+                                >
+                                <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
+                                    Use Kodi media server for posters.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="kodi-url" class="text-gray-300 block mb-2 font-bold"
+                                    >Kodi Server IP Address</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="kodi-url"
+                                    aria-describedby="kodiurlHelp"
+                                    v-model="settings.kodi_url"
+                                />
+                                <div id="kodiurlHelp" class="text-gray-400 text-sm">
+                                    The IP address of your Kodi server.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="kodi-port" class="text-gray-300 block mb-2 font-bold"
+                                    >Kodi port</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="kodi-port"
+                                    aria-describedby="kodiportHelp"
+                                    v-model="settings.kodi_port"
+                                />
+                                <div id="kodiportHelp" class="text-gray-400 text-sm">
+                                    The port of your Kodi server.
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="kodi-user" class="text-gray-300 block mb-2 font-bold"
+                                    >Kodi Username (optional if set)</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="kodi-user"
+                                    aria-describedby="kodiuserHelp"
+                                    v-model="settings.kodi_username"
+                                />
+                                <div id="kodiuserHelp" class="text-gray-400 text-sm"></div>
+                            </div>
+
+                            <div class="mb-5">
+                                <label for="kodi-pass" class="text-gray-300 block mb-2 font-bold"
+                                    >Kodi Password (optional if set)</label
+                                >
+                                <input
+                                    type="password"
+                                    class="text-black w-full"
+                                    id="kodi-pass"
+                                    aria-describedby="kodipassHelp"
+                                    v-model="settings.kodi_password"
+                                />
+                                <div id="kodipassHelp" class="text-gray-400 text-sm"></div>
+                            </div>
+
+                            <hr class="mt-3 mb-7 border-gray-700" />
+
+                            <div class="mb-5">
+                                <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
+                                    >TMDB Api Key v3</label
+                                >
+                                <input
+                                    type="text"
+                                    class="text-black w-full"
+                                    id="tmdb-v3"
+                                    aria-describedby="tmdb-v3Help"
+                                    v-model="settings.tmdb_api_key_v3"
+                                />
+                                <div id="tmdb-v3Help" class="text-gray-400 text-sm"></div>
+                            </div>
+
+                            <hr class="mt-3 mb-7 border-gray-700" />
+
+                            <div class="mb-5">
                                 <label for="random" class="text-gray-300 block mb-2 font-bold">
                                     <input
                                         type="checkbox"
@@ -205,7 +302,7 @@
                                 <input
                                     type="text"
                                     class="text-black w-full"
-                                    id="coming-soon-text"
+                                    id="now-playing-text"
                                     aria-describedby="now-playing-textHelp"
                                     v-model="settings.now_playing_text"
                                 />
@@ -422,15 +519,15 @@
 
                             <div class="mb-5">
                                 <label
-                                    for="start-power-time"
+                                    for="end-power-time"
                                     class="text-gray-300 block mb-2 font-bold"
-                                    >Display Start Time</label
+                                    >Display End Time</label
                                 >
 
                                 <input
                                     type="text"
                                     class="text-black w-full"
-                                    id="start-power-time"
+                                    id="end-power-time"
                                     aria-describedby="end-power-timeHelp"
                                     v-model="settings.end_power_time"
                                 />

@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\SettingController;
-use App\Models\Poster;
 
 Route::get('/posters', [PosterController::class, 'index']);
 Route::get('/cache-posters', [PosterController::class, 'cache']);
@@ -19,3 +18,4 @@ Route::put('/posters/{poster}', [PosterController::class, 'update']);
 Route::put('/posters/{id}/{column}', [PosterController::class, 'updateSetting']);
 Route::delete('/posters/{id}', [PosterController::class, 'delete']);
 Route::get('/update-application', [SettingController::class, 'updateApplication']);
+Route::get('/kodi-now-playing', [PosterController::class, 'kodiNowPlaying']);
