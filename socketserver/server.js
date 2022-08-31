@@ -6,6 +6,7 @@ const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
         origins: [
+            'http://localhost',
             'http://localhost:*',
             'http://127.0.0.1:*',
             'http://movieposter.local',
