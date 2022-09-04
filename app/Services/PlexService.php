@@ -7,8 +7,9 @@ use App\Models\Poster;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use App\Interfaces\MovieSyncInterface;
 
-class PlexService
+class PlexService implements MovieSyncInterface
 {
     private $plexIpAddress = '';
     private $plexToken = '';
@@ -39,9 +40,10 @@ class PlexService
         return $response->json();
     }
 
-    public function saveMovies($data)
+    public function syncMovies()
     {
-        $movies = $data['MediaContainer']['Metadata'];
+        $json = $this->apiCall('/library/sections/1/all');
+        $movies = $json['MediaContainer']['Metadata'];
         $this->processMovies($movies);
     }
 

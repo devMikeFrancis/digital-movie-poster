@@ -24,14 +24,12 @@ class PosterService
     {
         if ($this->settings->plex_service) {
             $plexService = new PlexService();
-            $json = $plexService->apiCall('/library/sections/1/all');
-            $plexService->saveMovies($json);
+            $plexService->syncMovies();
         }
 
         if ($this->settings->jellyfin_service) {
             $jellyfinService = new JellyfinService();
-            $json = $jellyfinService->apiCall('/Movies');
-            $jellyfinService->saveMovies($json);
+            $jellyfinService->syncMovies();
         }
 
         if ($this->settings->kodi_service) {

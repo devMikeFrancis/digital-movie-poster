@@ -7,8 +7,9 @@ use App\Models\Poster;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use App\Interfaces\MovieSyncInterface;
 
-class KodiService
+class KodiService implements MovieSyncInterface
 {
     private $settings;
 

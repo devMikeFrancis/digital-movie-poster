@@ -7,8 +7,9 @@ use App\Models\Poster;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use App\Interfaces\MovieSyncInterface;
 
-class JellyfinService
+class JellyfinService implements MovieSyncInterface
 {
     private $jellyfinIpAddress = '';
     private $jellyfinToken = '';
@@ -39,25 +40,15 @@ class JellyfinService
         return $response->json();
     }
 
-    public function saveMovies($data)
+    public function syncMovies()
     {
-        //$movies = $data;
-        //$this->processMovies($movies);
+        $json = $this->apiCall('/Items');
+        $movies = $json['Items'];
+        $this->processMovies($movies);
     }
 
     public function processMovies($movies)
     {
-        /*
-        NowPlayingItem
-        ->Id
-        ->Name
-        ->CriticRating
-        ->CommunityRating
-        ->RunTimeTicks
-        ->Type = “Movie”
-        ->OfficialRating
-        */
-
         if (!is_dir(storage_path("app/public/posters"))) {
             mkdir(storage_path("app/public/posters"), 0775, true);
         }
@@ -68,15 +59,17 @@ class JellyfinService
                 $orginalName = Str::slug($movie['Name']);
                 $fileName = $orginalName.'.jpg';
 
-                $image = Image::make($imageUrl);
-                $image->resize(1400, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
-                $image->resize(200, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
+                if ($imageUrl) {
+                    $image = Image::make($imageUrl);
+                    $image->resize(1400, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                    $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+                    $image->resize(200, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                    $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
+                }
 
                 Poster::updateOrCreate(
                     ['object_id' => $movie['Id'] ],
