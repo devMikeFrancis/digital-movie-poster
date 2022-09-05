@@ -4,28 +4,27 @@ echo -e "\n\nUpdating Apt Packages and upgrading latest patches\n"
 apt update -y && apt upgrade -y
 
 echo -e "\n\nInstalling Apache2 Web server\n"
-apt-get install apache2 apache2-doc apache2-mpm-prefork apache2-utils libexpat1 ssl-cert sed -y
+apt-get install apache2 apache2-doc apache2-utils libexpat1 ssl-cert sed -y
 
 echo -e "\n\nInstalling PHP & Requirements\n"
 wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
-apt update -y
-apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql
+apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql -y
 
 echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
 
 echo -e "\n\nPermissions for /var/www\n"
 chown -R www-data:www-data /var/www
-#chown -R www-data:www-data /var/www
-#sudo chmod -R 770 /var/www/html/
+#chown -R pi:www-data /var/www
+#chmod -R 770 /var/www/html/
 echo -e "\n\nPermissions have been set\n"
 
 echo -e "\n\nEnabling Modules\n"
 a2dismod php7.4
 a2enmod php8.1
 a2enmod rewrite
-phpenmod mcrypt
+#phpenmod mcrypt
 
 echo -e "\n\nRestarting Apache\n"
 service apache2 restart
@@ -54,10 +53,17 @@ REPLACE="upload_max_filesize = 50M"
 printf "php.ini: $REPLACE\n"
 sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/php/8.1/apache2/php.ini
 
-FIND="^\s*DocumentRoot\s* \s*.*"
-REPLACE="DocumentRoot /var/www/html/public"
-printf "000-default.conf: $REPLACE\n"
-sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/apache2/sites-enabled/000-default.conf
+FIND="^\s*max_input_time\s*=\s*.*"
+REPLACE="max_input_time = 1800"
+printf "php.ini: $REPLACE\n"
+sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/php/8.1/apache2/php.ini
+
+FIND="^\s*memory_limit\s*=\s*.*"
+REPLACE="memory_limit = 512M"
+printf "php.ini: $REPLACE\n"
+sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/php/8.1/apache2/php.ini
+
+sed -i "s,/var/www/html,/var/www/html/public,g" /etc/apache2/sites-enabled/000-default.conf
 
 echo -e "\n\nRestarting Apache\n"
 service apache2 restart
@@ -122,7 +128,7 @@ rm index.html
 
 git clone https://github.com/newelement/digital-movie-poster.git .
 
-composer install
+composer install --no-interaction
 npm install
 
 cd "/var/www/html/socketserver" && pwd
@@ -157,16 +163,35 @@ chmod 777 /dev/vchiq
 echo -e "\n\nHDMI CEC control finished\n"
 
 echo -e "\n\nKiosk Setup\n"
-apt install xdotool unclutter -y
-apt install chromium-browser -y
+
+cd "~" && pwd
+apt-get install --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox
+apt-get install xdotool unclutter -y
+apt-get install --no-install-recommends chromium-browser -y
+
 #Enable autologin
-#sudo raspi-config
+raspi-config nonint do_boot_behaviour B2
+
 #https://itnext.io/raspberry-pi-read-only-kiosk-mode-the-complete-tutorial-for-2021-58a860474215
-#https://pimylifeup.com/raspberry-pi-kiosk/
-#sudo nano .bash_profile
-#[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor
+
+autostart="
+xset s off
+xset s noblank
+xset -dpms
+setxkbmap -option terminate:ctrl_alt_bksp
+sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'
+sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences
+chromium-browser --remote-debugging-port=9222 --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1024,768 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
+"
+echo $autostart >> /etc/xdg/openbox/autostart
+
+chown pi ~/.bash_profile
+newline="[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor"
+echo $newline >>~/.bash_profile
 echo -e "\n\nKiosk setup finished\n"
 
 echo -e "\n\nAll done!\n"
+
+reboot now
 
 exit 0
