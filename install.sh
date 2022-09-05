@@ -15,9 +15,9 @@ echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
 
 echo -e "\n\nPermissions for /var/www\n"
-chown -R www-data:www-data /var/www
-#chown -R pi:www-data /var/www
-#chmod -R 770 /var/www/html/
+#chown -R www-data:www-data /var/www
+chown -R pi:www-data /var/www/html
+chmod -R 770 /var/www/html
 echo -e "\n\nPermissions have been set\n"
 
 echo -e "\n\nEnabling Modules\n"
@@ -64,6 +64,7 @@ printf "php.ini: $REPLACE\n"
 sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/php/8.1/apache2/php.ini
 
 sed -i "s,/var/www/html,/var/www/html/public,g" /etc/apache2/sites-enabled/000-default.conf
+sed -i "s,AllowOverride None,AllowOverride All,g" /etc/apache2/apache2.conf
 
 echo -e "\n\nRestarting Apache\n"
 service apache2 restart
@@ -164,8 +165,7 @@ echo -e "\n\nHDMI CEC control finished\n"
 
 echo -e "\n\nKiosk Setup\n"
 
-cd "~" && pwd
-apt-get install --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox
+apt-get install --no-install-recommends xserver-xorg x11-xserver-utils xinit openbox -y
 apt-get install xdotool unclutter -y
 apt-get install --no-install-recommends chromium-browser -y
 
@@ -174,13 +174,15 @@ raspi-config nonint do_boot_behaviour B2
 
 #https://itnext.io/raspberry-pi-read-only-kiosk-mode-the-complete-tutorial-for-2021-58a860474215
 
+cd "/home/pi" && pwd
+
 autostart="
-xset s off
-xset s noblank
-xset -dpms
-setxkbmap -option terminate:ctrl_alt_bksp
-sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'
-sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences
+xset s off\n
+xset s noblank\n
+xset -dpms\n
+setxkbmap -option terminate:ctrl_alt_bksp\n
+sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'\n
+sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n
 chromium-browser --remote-debugging-port=9222 --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1024,768 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
 "
 echo $autostart >> /etc/xdg/openbox/autostart
@@ -191,6 +193,8 @@ echo $newline >>~/.bash_profile
 echo -e "\n\nKiosk setup finished\n"
 
 echo -e "\n\nAll done!\n"
+
+rm -rf install.sh
 
 reboot now
 
