@@ -14,11 +14,11 @@ apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.
 echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
 
-echo -e "\n\nPermissions for /var/www\n"
+echo -e "\n\nPermissions for /var/www"
 #chown -R www-data:www-data /var/www
 chown -R pi:www-data /var/www/html
 chmod -R 770 /var/www/html
-echo -e "\n\nPermissions have been set\n"
+echo -e "\nPermissions have been set\n"
 
 echo -e "\n\nEnabling Modules\n"
 a2dismod php7.4
@@ -139,6 +139,9 @@ pm2 save
 
 cd "/var/www/html" && pwd
 
+chown -R pi:www-data /var/www/html
+chmod -R 770 /var/www/html
+
 cp .env.example .env
 php artisan key:generate
 php artisan storage:link
@@ -177,22 +180,22 @@ raspi-config nonint do_boot_behaviour B2
 cd "/home/pi" && pwd
 
 autostart="
-xset s off\n
-xset s noblank\n
-xset -dpms\n
-setxkbmap -option terminate:ctrl_alt_bksp\n
-sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'\n
-sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n
 chromium-browser --remote-debugging-port=9222 --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1024,768 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
 "
+echo "xset s off" >> /etc/xdg/openbox/autostart
+echo "xset s noblank" >> /etc/xdg/openbox/autostart
+echo "xset -dpms" >> /etc/xdg/openbox/autostart
+echo "setxkbmap -option terminate:ctrl_alt_bksp" >> /etc/xdg/openbox/autostart
+echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> /etc/xdg/openbox/autostart
+echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> /etc/xdg/openbox/autostart
 echo $autostart >> /etc/xdg/openbox/autostart
 
 chown pi ~/.bash_profile
 newline="[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor"
 echo $newline >>~/.bash_profile
-echo -e "\n\nKiosk setup finished\n"
+echo -e "\nKiosk setup finished\n"
 
-echo -e "\n\nAll done!\n"
+echo -e "\nAll done!\n"
 
 rm -rf install.sh
 
