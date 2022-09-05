@@ -18,7 +18,7 @@ echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
 
 echo -e "\n\nPermissions for /var/www"
-#chown -R www-data:www-data /var/www
+chown -R www-data:www-data /var/www
 chown -R pi:www-data /var/www/html
 chmod -R 770 /var/www/html
 echo -e "\nPermissions have been set\n"
