@@ -200,7 +200,7 @@ newline="[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor"
 echo $newline >> /home/pi/.bash_profile
 echo -e "\nKiosk setup finished\n"
 
-echo -e "\nAll done!\n"
+echo -e "\nAll done! Rebooting now.\n"
 
 rm -rf install.sh
 
