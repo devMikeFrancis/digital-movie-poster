@@ -196,7 +196,7 @@ echo $autostart >> /etc/xdg/openbox/autostart
 
 touch /home/pi/.bash_profile
 chown pi /home/pi/.bash_profile
-newline="[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor"
+newline="[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && startx -- -nocursor"
 echo $newline >> /home/pi/.bash_profile
 echo -e "\nKiosk setup finished\n"
 
