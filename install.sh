@@ -9,6 +9,9 @@ apt-get install apache2 apache2-doc apache2-utils libexpat1 ssl-cert sed -y
 echo -e "\n\nInstalling PHP & Requirements\n"
 wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
+
+apt update -y
+
 apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql -y
 
 echo -e "\n\nInstalling MySQL\n"
@@ -139,10 +142,11 @@ pm2 save
 
 cd "/var/www/html" && pwd
 
+cp .env.example .env
+
 chown -R pi:www-data /var/www/html
 chmod -R 770 /var/www/html
 
-cp .env.example .env
 php artisan key:generate
 php artisan storage:link
 
@@ -190,9 +194,10 @@ echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chr
 echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> /etc/xdg/openbox/autostart
 echo $autostart >> /etc/xdg/openbox/autostart
 
-chown pi ~/.bash_profile
+touch /home/pi/.bash_profile
+chown pi /home/pi/.bash_profile
 newline="[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor"
-echo $newline >>~/.bash_profile
+echo $newline >> /home/pi/.bash_profile
 echo -e "\nKiosk setup finished\n"
 
 echo -e "\nAll done!\n"
