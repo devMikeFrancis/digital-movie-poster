@@ -1,14 +1,14 @@
-## Digital Movie Poster (DMP)
+# Digital Movie Poster (DMP)
 
 The web application creates a digital movie poster display for use on LED screens. Intended to run on a Raspberry Pi 4, but will run on any web server with Apache/NGINX, PHP 8.1+, and MySQL/Postgres.
 
 ## Features
 
 -   Create/Edit movie posters
+-   Sync posters from Plex, Kodi and Jellyfin and show currently playing
 -   Show content ratings, processing logos, audience ratings
 -   Random order or drag-and-drop ordering
 -   Fade in/out or vertical slide transitions
--   Sync posters from Plex, Kodi and Jellyfin and show currently playing
 -   Automatically fill in data using IMDB ID
 -   Control settings such as playing speed, transition speed, etc ...
 -   Control display power using HDMI-CEC control
@@ -23,14 +23,47 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 
 ## Self Install Requirements
 
-1. Pi 4 or computer with at least 2GB of RAM. 4GB recommended.
-2. Apache/NGINX w/mod_rewrite enabled
-3. PHP 8.1+ with extensions: GD, Curl, Dom, MySql/Postgres
-4. Composer and Git
+1. Pi 4 with at least 2GB of RAM. 4GB recommended.
+2. 16G or higher SD card
 
 ## Self Installation
 
-See the WiKi
+### Prepare the SD Card
+
+1. Download and open the Pi Imager [here](https://www.raspberrypi.com/software/)
+2. For the Operating System choose `Raspberry Pi OS Other` -> `Raspberry Pi OS Lite (64-bit)`
+3. Click the settings cog and check `Enable SSH` and choose `Use password authentication`
+4. Make sure `Set username and password` is checked. Use the default login or enter your own. `raspberry` is the default password.
+5. If you are not using the onboard ethernet port, check `Configure wireless LAN` and enter your wifi information.
+6. Save your settings.
+7. Choose your `Storage` device then click the `Write` button. This will take several minutes.
+8. Once your SD card is ready insert it into your Raspberry Pi and turn it on.
+9. When the Pi is finished booting we need to access the console on the device.
+
+### Access Raspberry Pi Console
+
+1. Accessing Pi console option 1 -
+   a. Connect the Pi to a display and connect a keyboard.
+   b. Type in your password from step 4 above. `raspberry` is the default password.
+   c. Once your are in the console `go to step 3`.
+2. Accessing the Pi console option 2 -
+   a. Using a Mac or Windows open your terminal.
+   b. Type `ssh usernameFromStep4@raspberrypi.local` or use the IP address instead of raspberrypi.local.
+   c. Next enter the password from step 4
+   d. If the terminal asks to accept the ssh connection type Y or yes.
+   e. Once your are in the console `go to step 3`.
+3. In the Pi console enter the following commands:
+   a. `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
+   b. `chmod u+x install.sh`
+   c. `sudo ./install.sh`
+
+The install will take several minutes. Once it is finished the Raspberry Pi will reboot. If all goes well it will boot into the DMP interface.
+
+You can access the settings via any web browser.
+
+`http://raspberrypi.local/posters` or `http://the ip address of the Pi/posters`
+
+---
 
 **Recommended poster size is 1400x2000 or higher, but retain the same ratio.**
 
@@ -39,14 +72,6 @@ After you've added posters and are back on the DMP screen you can always return 
 ### Poster Data Auto-population
 
 When using the IMDB ID to manage poster data the application will use [TMDB API](https://developers.themoviedb.org/3/getting-started/introduction) to populate the metadata and poster image.
-
-### Plex
-
-To use Plex, go to the settings configuration, check the checkbox to use the Plex service and enter your Plex IP address and Plex auth token. You can find your Plex auth token [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
-
-### A Note on Deleting Posters
-
-If you delete a poster that was cached from a service like Plex the poster will return on next cache. `The cache service runs every 4 hours when the DMP screen is active`. You can always choose which posters you want in the rotation.
 
 ## Updating
 
