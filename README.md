@@ -69,9 +69,11 @@ You can access the settings via any web browser.
 
 After you've added posters and are back on the DMP screen you can always return to the posters and settings configuration by clicking or tapping on the 'Coming Soon/Now Playing' header.
 
-### Poster Data Auto-population
+### IMDB/TMDB Poster Data Auto-population
 
 When using the IMDB ID to manage poster data the application will use [TMDB API](https://developers.themoviedb.org/3/getting-started/introduction) to populate the metadata and poster image.
+
+Enter your TMDB api key in the DMP settings.
 
 ## Updating
 
