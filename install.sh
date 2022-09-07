@@ -12,7 +12,7 @@ echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt
 
 apt update -y
 
-apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql -y
+apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql php-imagick -y
 
 echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
@@ -65,6 +65,8 @@ FIND="^\s*memory_limit\s*=\s*.*"
 REPLACE="memory_limit = 512M"
 printf "php.ini: $REPLACE\n"
 sed -i "0,/$FIND/s/$FIND/$REPLACE/m" /etc/php/8.1/apache2/php.ini
+
+echo "extension=imagick" >> /etc/php/8.1/apache2/php.ini
 
 sed -i "s,/var/www/html,/var/www/html/public,g" /etc/apache2/sites-enabled/000-default.conf
 sed -i "s,AllowOverride None,AllowOverride All,g" /etc/apache2/apache2.conf
@@ -137,6 +139,8 @@ npm install
 
 cd "/var/www/html/socketserver" && pwd
 npm install
+pm2 startup
+env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u pi --hp /home/pi
 pm2 start server.js
 pm2 save
 
@@ -184,7 +188,7 @@ raspi-config nonint do_boot_behaviour B2
 cd "/home/pi" && pwd
 
 autostart="
-chromium-browser --remote-debugging-port=9222 --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1024,768 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
+chromium-browser --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1920,1080 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
 "
 echo "xset s off" >> /etc/xdg/openbox/autostart
 echo "xset s noblank" >> /etc/xdg/openbox/autostart
@@ -199,6 +203,8 @@ chown pi /home/pi/.bash_profile
 newline="[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && startx -- -nocursor"
 echo $newline >> /home/pi/.bash_profile
 echo -e "\nKiosk setup finished\n"
+
+usermod -a -G video \$USER
 
 echo -e "\nAll done! Rebooting now.\n"
 
