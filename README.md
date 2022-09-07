@@ -40,13 +40,13 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 8. Once your SD card is ready insert it into your Raspberry Pi and turn it on.
 9. When the Pi is finished booting we need to access the console on the device.
 
-### Access Raspberry Pi Console
+### Access Raspberry Pi Console to Install DMP
 
 1. Accessing Pi console option 1 -
     - Connect the Pi to a display and connect a keyboard.
     - Type in your password from step 4 above. `raspberry` is the default password.
     - Once your are in the console `go to step 3`.
-2. Accessing the Pi console option 2 -
+2. Accessing Pi console option 2 -
     - Using a Mac or Windows open your terminal.
     - Type `ssh usernameFromStep4@raspberrypi.local` or use the IP address instead of raspberrypi.local.
     - Next enter the password from step 4
