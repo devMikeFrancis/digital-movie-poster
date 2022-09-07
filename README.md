@@ -51,7 +51,7 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
     - Type `ssh usernameFromStep4@raspberrypi.local` or use the IP address instead of raspberrypi.local.
     - Next enter the password from step 4
     - If the terminal asks to accept the ssh connection type Y or yes.
-    - Once your are in the console `go to step 3`.
+    - Once you are in the console `go to step 3`.
 3. In the Pi console enter the following commands:
     - `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
     - `chmod u+x install.sh`
