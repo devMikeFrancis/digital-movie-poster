@@ -43,19 +43,19 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 ### Access Raspberry Pi Console
 
 1. Accessing Pi console option 1 -
-   a. Connect the Pi to a display and connect a keyboard.
-   b. Type in your password from step 4 above. `raspberry` is the default password.
-   c. Once your are in the console `go to step 3`.
+    - Connect the Pi to a display and connect a keyboard.
+    - Type in your password from step 4 above. `raspberry` is the default password.
+    - Once your are in the console `go to step 3`.
 2. Accessing the Pi console option 2 -
-   a. Using a Mac or Windows open your terminal.
-   b. Type `ssh usernameFromStep4@raspberrypi.local` or use the IP address instead of raspberrypi.local.
-   c. Next enter the password from step 4
-   d. If the terminal asks to accept the ssh connection type Y or yes.
-   e. Once your are in the console `go to step 3`.
+    - Using a Mac or Windows open your terminal.
+    - Type `ssh usernameFromStep4@raspberrypi.local` or use the IP address instead of raspberrypi.local.
+    - Next enter the password from step 4
+    - If the terminal asks to accept the ssh connection type Y or yes.
+    - Once your are in the console `go to step 3`.
 3. In the Pi console enter the following commands:
-   a. `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
-   b. `chmod u+x install.sh`
-   c. `sudo ./install.sh`
+    - `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
+    - `chmod u+x install.sh`
+    - `sudo ./install.sh`
 
 The install will take several minutes. Once it is finished the Raspberry Pi will reboot. If all goes well it will boot into the DMP interface.
 
