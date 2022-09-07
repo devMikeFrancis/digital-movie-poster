@@ -70,7 +70,7 @@ class KodiService implements MovieSyncInterface
         }
         foreach ($movies as $movie) {
             $orginalName = Str::slug($movie['label']);
-            $fileName = $orginalName.'.jpg';
+            $fileName = $orginalName.'.webp';
 
             if (isset($movie['art']) && isset($movie['art']['poster']) && $movie['art']['poster']) {
                 $imageUrl = urldecode(str_replace('image://', '', rtrim($movie['art']['poster'], '/')));
@@ -78,11 +78,11 @@ class KodiService implements MovieSyncInterface
                 $image->resize(1400, null, function ($constraint) {
                     $constraint->aspectRatio();
                 });
-                $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+                $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
                 $image->resize(200, null, function ($constraint) {
                     $constraint->aspectRatio();
                 });
-                $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
+                $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
             }
 
             Poster::updateOrCreate(

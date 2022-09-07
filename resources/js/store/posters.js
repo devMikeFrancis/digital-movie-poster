@@ -5,6 +5,7 @@ export const usePostersStore = defineStore('posters', {
     state: () => ({
         loading: true,
         loadingMessage: 'Loading Posters ...',
+        bootTime: 5000,
         moviePosters: [],
         moviesQueue: [],
         isConnected: false,
@@ -90,7 +91,7 @@ export const usePostersStore = defineStore('posters', {
                             this.loading = false;
                             this.loadingMessage = 'Loading Posters ...';
                             this.startTransitionImages();
-                        }, 12000);
+                        }, this.bootTime);
                     }
                 })
                 .catch((e) => {
@@ -521,7 +522,7 @@ export const usePostersStore = defineStore('posters', {
             this.loading = value;
         },
         setSocket() {
-            this.socket = io('http://' + import.meta.env.VITE_BASE_URL + ':3000');
+            this.socket = io('http://' + location.host + ':3000'); //' + import.meta.env.VITE_BASE_URL + '
             this.socket.on('receive:command', (data) => {
                 switch (data.command) {
                     case 'reload':

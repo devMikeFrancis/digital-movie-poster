@@ -57,18 +57,18 @@ class JellyfinService implements MovieSyncInterface
                 $imageUrl = 'http://'.$this->jellyfinIpAddress.':8096/Items/'.$movie['Id'].'/Images/Primary';
 
                 $orginalName = Str::slug($movie['Name']);
-                $fileName = $orginalName.'.jpg';
+                $fileName = $orginalName.'.webp';
 
                 if ($imageUrl) {
                     $image = Image::make($imageUrl);
                     $image->resize(1400, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                    $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+                    $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
                     $image->resize(200, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                    $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
+                    $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
                 }
 
                 Poster::updateOrCreate(

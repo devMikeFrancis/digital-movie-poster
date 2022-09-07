@@ -379,8 +379,8 @@ body {
     flex-grow: 2;
     position: absolute;
     top: 0;
-    left: 2vw;
-    right: 2vw;
+    left: 1.8vw;
+    right: 1.8vw;
     backface-visibility: hidden;
     will-change: opacity;
 
@@ -461,7 +461,7 @@ body {
     top: 50%;
     left: 5%;
     color: #fff;
-    font-size: 1.8vw;
+    font-size: 1.4vw;
     font-weight: 400;
     transform: translateY(-50%);
 }
@@ -560,7 +560,7 @@ body {
 
 .slide-poster-enter-active,
 .slide-poster-leave-active {
-    transition: transform 1.2s ease-in-out;
+    transition: transform 1.2s ease;
     transform: translate3d(0, 0, 0);
 }
 
