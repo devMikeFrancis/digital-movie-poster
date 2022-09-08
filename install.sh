@@ -204,7 +204,7 @@ newline="[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && startx -- -nocursor"
 echo $newline >> /home/pi/.bash_profile
 echo -e "\nKiosk setup finished\n"
 
-usermod -a -G video \$USER
+usermod -a -G video pi
 
 echo -e "\nAll done! Rebooting now.\n"
 
