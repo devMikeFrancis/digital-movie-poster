@@ -157,7 +157,7 @@ class PosterService
         }
 
         $orginalName = Str::slug($res['title']);
-        $fileName = $orginalName.'.jpg';
+        $fileName = $orginalName.'.webp';
         $trailerPath = '';
 
         $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
