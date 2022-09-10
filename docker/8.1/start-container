@@ -10,8 +10,19 @@ fi
 
 chmod -R ugo+rw /.composer
 
+
+cd "/var/www/html" && pwd
+composer install --no-interaction
+npm install
+
+cd "/var/www/html/wsserver" && pwd
+npm install
+
+pm2 start /var/www/html/socketserver/server.js
+
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 else
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi
+

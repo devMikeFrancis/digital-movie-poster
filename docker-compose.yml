@@ -13,6 +13,7 @@ services:
         ports:
             - '8084:80'
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - '3000:3000'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
