@@ -200,11 +200,11 @@ class PosterService
         }
 
         try {
-            $image->save(storage_path('app/public/posters/').$fileName, 75, 'jpg');
+            $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
             $image->resize(200, null, function ($constraint) {
                 $constraint->aspectRatio();
             });
-            $image->save(storage_path('app/public/posters/_tn_').$fileName, 65, 'jpg');
+            $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
         } catch (\Exception $e) {
             // Muting this exception because for some reason some images do not save correctly when using Plex. Rare case.
             // This will allow the cache to continue and the user can fix any rarely missing images.
