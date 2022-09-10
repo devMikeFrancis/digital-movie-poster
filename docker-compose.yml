@@ -25,7 +25,6 @@ services:
             - sail
         depends_on:
             - mariadb
-            - imagick
     mariadb:
         image: 'mariadb:10'
         ports:
@@ -46,10 +45,6 @@ services:
             test: ['CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}']
             retries: 3
             timeout: 5s
-    imagick:
-        image: 'dpokidov/imagemagick'
-        networks:
-            - sail
 networks:
     sail:
         driver: bridge
