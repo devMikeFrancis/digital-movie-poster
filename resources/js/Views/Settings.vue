@@ -673,7 +673,7 @@ export default {
 <style scoped lang="scss">
 input[type='text'],
 input[type='number'] {
-    height: 32px;
-    border-radius: 4px;
+    height: 42px;
+    border-radius: 2px;
 }
 </style>

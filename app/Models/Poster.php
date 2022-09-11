@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Poster extends Model
 {
@@ -33,6 +34,13 @@ class Poster extends Model
         'show_auro_3d',
         'show_imax',
     ];
+
+    protected $appends = ['title'];
+
+    protected function getTitleAttribute()
+    {
+        return Str::title(str_replace("-", " ", $this->name));
+    }
 
     protected function showInRotation(): Attribute
     {

@@ -1,6 +1,9 @@
 <template>
-    <div class="sticky top-0 mb-5">
-        <ul class="block text-gray-300 p-4 mb-5" style="background-color: #121212">
+    <div class="sticky top-0 mb-5 px-4 md:px-0">
+        <ul
+            class="block text-gray-300 p-4 mb-5 text-center md:text-left"
+            style="background-color: #121212"
+        >
             <li class="mb-3">
                 <a href="/" class="hover:text-gray-500">&larr; Back to DMP</a>
             </li>

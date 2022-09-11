@@ -3,7 +3,7 @@
         <!-- Dropdown toggle button -->
         <button
             @click.prevent="show = !show"
-            class="py-2 px-3 hover:bg-gray-500 rounded-none"
+            class="py-2 px-4 hover:opacity-40 transition-opacity rounded-none"
             :class="{ 'bg-gray-500': show }"
         >
             <span
