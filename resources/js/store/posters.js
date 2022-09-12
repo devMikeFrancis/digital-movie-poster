@@ -75,7 +75,7 @@ export const usePostersStore = defineStore('posters', {
                     let poster = '';
                     if (this.moviePosters.length === 0) {
                         this.loadingMessage =
-                            'You do not have any posters loaded yet. Open this application in a browser and click here to manage your poster library.';
+                            'You do not have any posters loaded yet. Visit http://Your IP Address/posters to start.';
                     } else {
                         if (this.settings.random_order) {
                             poster = this.getRandomPoster();

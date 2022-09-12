@@ -89,46 +89,7 @@
                         <div class="cache-overlay" v-if="recaching" v-cloak>
                             <span class="text-2xl md:text-3xl">Syncing Posters ...</span>
                         </div>
-                        <div v-if="posters.length === 0">
-                            <div
-                                v-for="(fakePoster, fIndex) in fakePosters"
-                                :key="'fake-' + fIndex"
-                            >
-                                <div class="mb-5" style="background-color: #222">
-                                    <div
-                                        class="
-                                            grid grid-cols-7
-                                            md:grid-cols-12
-                                            lg:grid-cols-12
-                                            gap-4
-                                        "
-                                    >
-                                        <div class="col-span-1 w-10 md:w-12">
-                                            <div
-                                                class="poster-image-block bg-gray-500 rounded-sm"
-                                                style="width: 48px; height: 60px"
-                                            ></div>
-                                        </div>
-                                        <div class="col-span-4 md:col-span-7 flex items-center">
-                                            <div class="w-full h-4 bg-gray-500 rounded-sm"></div>
-                                        </div>
-                                        <div
-                                            class="
-                                                col-span-2
-                                                md:col-span-4
-                                                flex
-                                                items-center
-                                                justify-around
-                                            "
-                                        >
-                                            <div class="w-4 h-5 bg-gray-500 rounded-sm"></div>
-                                            <div class="w-4 h-5 bg-gray-500 rounded-sm"></div>
-                                            <div class="w-4 h-5 bg-gray-500 rounded-sm"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <PostersSkeleton v-if="loading" />
                         <draggable
                             :list="filteredPosters"
                             handle=".handle"
@@ -248,6 +209,7 @@ import { usePostersStore } from '@/store/posters';
 import MainNav from '@/partials/MainNav.vue';
 import PosterOptions from '@/components/poster-options.vue';
 import PosterDelete from '@/components/poster-delete.vue';
+import PostersSkeleton from '@/components/posters-skeleton.vue';
 import draggable from 'vuedraggable';
 
 export default {
@@ -256,6 +218,7 @@ export default {
         draggable,
         PosterOptions,
         PosterDelete,
+        PostersSkeleton,
     },
     data: function () {
         return {

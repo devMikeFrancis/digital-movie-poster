@@ -7,583 +7,619 @@
                         <main-nav />
                     </div>
                     <div class="lg:col-span-6 p-4" style="background-color: #121212">
-                        <form>
-                            <div class="mb-5">
-                                <label
-                                    for="plex-service"
-                                    class="text-gray-300 block mb-2 font-bold"
+                        <ul class="tabs">
+                            <li>
+                                <a class="active" href="#general" @click.prevent="setTab($event)"
+                                    >General</a
                                 >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="plex-service"
-                                        aria-describedby="plex-serviceHelp"
-                                        v-model="settings.plex_service"
-                                    />
-                                    Enable Plex Service</label
+                            </li>
+                            <li>
+                                <a href="#sources" @click.prevent="setTab($event)"
+                                    >Poster Sources</a
                                 >
-                                <div id="plex-serviceHelp" class="text-gray-400 text-sm">
-                                    Use Plex media server for posters.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="ip-address" class="text-gray-300 block mb-2 font-bold"
-                                    >Plex Server IP Address</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="ip-address"
-                                    aria-describedby="ipAddressHelp"
-                                    v-model="settings.plex_ip_address"
-                                />
-                                <div id="ipAddressHelp" class="text-gray-400 text-sm">
-                                    The IP address of your Plex server.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="plex-token" class="text-gray-300 block mb-2 font-bold"
-                                    >Plex Token</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="plex-token"
-                                    aria-describedby="tokenHelp"
-                                    v-model="settings.plex_token"
-                                />
-                                <div id="tokenHelp" class="text-gray-400 text-sm">
-                                    You can find your Plex token
-                                    <a
-                                        href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/"
-                                        target="_blank"
-                                        class="underline"
-                                        >here</a
-                                    >.
-                                </div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label
-                                    for="jellyfin-service"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="jellyfin-service"
-                                        aria-describedby="jellyfin-serviceHelp"
-                                        v-model="settings.jellyfin_service"
-                                    />
-                                    Enable Jellyfin Service</label
-                                >
-                                <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
-                                    Use Jellyfin media server for posters.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="jellyfin-ip-address"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Jellyfin Server IP Address</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="jellyfin-ip-address"
-                                    aria-describedby="jellyfinIpAddressHelp"
-                                    v-model="settings.jellyfin_ip_address"
-                                />
-                                <div id="jellyfinIpAddressHelp" class="text-gray-400 text-sm">
-                                    The IP address of your Jellyfin server.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="jellyfin-token"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Jellyfin API Token</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="jellyfin-token"
-                                    aria-describedby="jellyfintokenHelp"
-                                    v-model="settings.jellyfin_token"
-                                />
-                                <div id="jellyfintokenHelp" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label
-                                    for="jellyfin-service"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="kodi-service"
-                                        aria-describedby="kodi-serviceHelp"
-                                        v-model="settings.kodi_service"
-                                    />
-                                    Enable Kodi Service</label
-                                >
-                                <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
-                                    Use Kodi media server for posters.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="kodi-url" class="text-gray-300 block mb-2 font-bold"
-                                    >Kodi Server IP Address</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="kodi-url"
-                                    aria-describedby="kodiurlHelp"
-                                    v-model="settings.kodi_url"
-                                />
-                                <div id="kodiurlHelp" class="text-gray-400 text-sm">
-                                    The IP address of your Kodi server.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="kodi-port" class="text-gray-300 block mb-2 font-bold"
-                                    >Kodi port</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="kodi-port"
-                                    aria-describedby="kodiportHelp"
-                                    v-model="settings.kodi_port"
-                                />
-                                <div id="kodiportHelp" class="text-gray-400 text-sm">
-                                    The port of your Kodi server.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="kodi-user" class="text-gray-300 block mb-2 font-bold"
-                                    >Kodi Username (optional if set)</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="kodi-user"
-                                    aria-describedby="kodiuserHelp"
-                                    v-model="settings.kodi_username"
-                                />
-                                <div id="kodiuserHelp" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="kodi-pass" class="text-gray-300 block mb-2 font-bold"
-                                    >Kodi Password (optional if set)</label
-                                >
-                                <input
-                                    type="password"
-                                    class="text-black w-full"
-                                    id="kodi-pass"
-                                    aria-describedby="kodipassHelp"
-                                    v-model="settings.kodi_password"
-                                />
-                                <div id="kodipassHelp" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
-                                    >TMDB Api Key v3</label
-                                >
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="tmdb-v3"
-                                    aria-describedby="tmdb-v3Help"
-                                    v-model="settings.tmdb_api_key_v3"
-                                />
-                                <div id="tmdb-v3Help" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label for="random" class="text-gray-300 block mb-2 font-bold">
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="random"
-                                        aria-describedby="randomHelp"
-                                        v-model="settings.random_order"
-                                    />
-                                    Randomize Poster Order
-                                </label>
-                                <div id="randomHelp" class="text-gray-400 text-sm">
-                                    Randomize poster order or display posters in order you selected.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="type" class="text-gray-300 block mb-2 font-bold">
-                                    Transition Type
-                                </label>
-                                <select
-                                    class="text-black"
-                                    id="type"
-                                    aria-describedby="typeHelp"
-                                    v-model="settings.transition_type"
-                                >
-                                    <option value="fade">Fade</option>
-                                    <option value="vertical">Vertical</option>
-                                </select>
-
-                                <div id="typeHelp" class="text-gray-400 text-sm">
-                                    Fade in/out or Vertical slide transition.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="display-speed"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Poster Display Speed</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="display-speed"
-                                    aria-describedby="display-speedHelp"
-                                    v-model="settings.poster_display_speed"
-                                />
-                                <div id="display-speedHelp" class="text-gray-400 text-sm">
-                                    Time between each poster. In ms. 15000 = 15 seconds.
-                                </div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label
-                                    for="coming-soon-text"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Coming Soon Text</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="coming-soon-text"
-                                    aria-describedby="coming-soon-textHelp"
-                                    v-model="settings.coming_soon_text"
-                                />
-                                <div id="coming-soon-textHelp" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="now-playing-text"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Now Playing Text</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="now-playing-text"
-                                    aria-describedby="now-playing-textHelp"
-                                    v-model="settings.now_playing_text"
-                                />
-                                <div id="now-playing-textHelp" class="text-gray-400 text-sm"></div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <h3 class="text-xl font-bold text-white mb-5">Global Options</h3>
-
-                            <div class="mb-5">
-                                <label
-                                    for="show-runtime"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="show-runtime"
-                                        v-model="settings.show_runtime"
-                                    />
-                                    Show Runtime
-                                </label>
-                                <div id="show-runtimeHelp" class="text-gray-400 text-sm">
-                                    Displays the movie runtime in the top left corner.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="mpaa-rating" class="text-gray-300 block mb-2 font-bold">
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="mpaa-rating"
-                                        aria-describedby="mpaa-ratingHelp"
-                                        v-model="settings.show_mpaa_rating"
-                                    />
-                                    Show MPAA Rating
-                                </label>
-                                <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
-                                    Shows the MPAA rating when a movie is playing.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="audience-rating"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="audience-rating"
-                                        aria-describedby="audience-ratingHelp"
-                                        v-model="settings.show_audience_rating"
-                                    />
-                                    Show Audience Rating</label
-                                >
-                                <div id="audience-ratingHelp" class="text-gray-400 text-sm">
-                                    Shows the audience rating when a movie is playing.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="theme-music" class="text-gray-300 block mb-2 font-bold">
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="theme-music"
-                                        aria-describedby="theme-musicHelp"
-                                        v-model="settings.play_theme_music"
-                                    />
-                                    Play Theme Music</label
-                                >
-                                <div id="theme-musicHelp" class="text-gray-400 text-sm">
-                                    Play theme music for posters
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="processing-logos"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="processing-logos"
-                                        aria-describedby="processing-logosHelp"
-                                        v-model="settings.show_processing_logos"
-                                    />
-                                    Show Processing Logos
-                                </label>
-                                <div id="processing-logosHelp" class="text-gray-400 text-sm">
-                                    Shows logos such as Dolby Atmos or Dolby Vision.
-                                </div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_dolby_51"
-                                    />
-                                    Show Dolby Digital 5.1 Logo</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_dolby_atmos_vertical"
-                                    />
-                                    Show Dolby Atmos Logo</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_dolby_vision_vertical"
-                                    />
-                                    Show Dolby Vision Logo</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_dts"
-                                    />
-                                    Show DTS:X Logo</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_imax"
-                                    />
-                                    Show IMAX Enhanced</label
-                                >
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.show_auro_3d"
-                                    />
-                                    Show Auro 3D Logo</label
-                                >
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.use_global_prologos"
-                                    />
-                                    Always use enabled processing logos from settings.
-                                </label>
-                                <label class="text-gray-300 block mb-2 font-bold"
-                                    ><input
-                                        class="text-black"
-                                        type="checkbox"
-                                        v-model="settings.use_global_prologos_if_no_poster_prologos"
-                                    />
-                                    Use settings processing logos only if poster does not have any
-                                    enabled.
-                                </label>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div class="mb-5">
-                                <label
-                                    for="cec-controls"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        class="text-black"
-                                        id="cec-controls"
-                                        aria-describedby="cec-controlsHelp"
-                                        v-model="settings.use_cec_power"
-                                    />
-                                    Use HDMI CEC Controls
-                                </label>
-                                <div id="cec-controlsHelp" class="text-gray-400 text-sm">
-                                    Allow the application to turn on/off your display during certain
-                                    time noted below.
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="start-power-time"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Display Start Time</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="start-power-time"
-                                    aria-describedby="start-power-timeHelp"
-                                    v-model="settings.start_power_time"
-                                />
-                                <div id="start-power-timeHelp" class="text-gray-400 text-sm">
-                                    The start time you want you display to be on. HH:MM:SS
-                                </div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label
-                                    for="end-power-time"
-                                    class="text-gray-300 block mb-2 font-bold"
-                                    >Display End Time</label
-                                >
-
-                                <input
-                                    type="text"
-                                    class="text-black w-full"
-                                    id="end-power-time"
-                                    aria-describedby="end-power-timeHelp"
-                                    v-model="settings.end_power_time"
-                                />
-                                <div id="end-power-timeHelp" class="text-gray-400 text-sm">
-                                    The end time you want you display to be off. HH:MM:SS
-                                </div>
-                            </div>
-
-                            <hr class="mt-3 mb-7 border-gray-700" />
-
-                            <div
-                                class="
-                                    bg-red-100
-                                    border border-red-400
-                                    text-red-700
-                                    px-4
-                                    py-3
-                                    rounded
-                                    relative
-                                    mb-3
-                                "
-                                role="alert"
-                                v-if="settingsMessage"
-                                v-cloak
-                            >
-                                {{ settingsMessage }}
-                            </div>
-                            <div class="grid grid-cols-12">
-                                <div class="col-span-6">
-                                    <button
-                                        type="submit"
-                                        class="
-                                            btn
-                                            text-black
-                                            bg-gray-300
-                                            text-md
-                                            px-3
-                                            py-1
-                                            hover:bg-gray-100
-                                        "
-                                        @click.prevent="saveSettings"
+                            </li>
+                        </ul>
+                        <div class="tabs-content">
+                            <div id="general" class="tab-content active">
+                                <div class="mb-5">
+                                    <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
+                                        >TMDB Api Key v3</label
                                     >
-                                        Save Settings
-                                    </button>
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="tmdb-v3"
+                                        aria-describedby="tmdb-v3Help"
+                                        v-model="settings.tmdb_api_key_v3"
+                                    />
+                                    <div id="tmdb-v3Help" class="text-gray-400 text-sm"></div>
                                 </div>
-                                <div class="col-span-6 text-right">
-                                    <a
-                                        href="#"
-                                        role="button"
-                                        class="text-white"
-                                        @click.prevent="updateApplication"
-                                        >{{ updateBtn }}</a
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label for="random" class="text-gray-300 block mb-2 font-bold">
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="random"
+                                            aria-describedby="randomHelp"
+                                            v-model="settings.random_order"
+                                        />
+                                        Randomize Poster Order
+                                    </label>
+                                    <div id="randomHelp" class="text-gray-400 text-sm">
+                                        Randomize poster order or display posters in order you
+                                        selected.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label for="type" class="text-gray-300 block mb-2 font-bold">
+                                        Transition Type
+                                    </label>
+                                    <select
+                                        class="text-black"
+                                        id="type"
+                                        aria-describedby="typeHelp"
+                                        v-model="settings.transition_type"
+                                    >
+                                        <option value="fade">Fade</option>
+                                        <option value="vertical">Vertical</option>
+                                    </select>
+
+                                    <div id="typeHelp" class="text-gray-400 text-sm">
+                                        Fade in/out or Vertical slide transition.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="display-speed"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Poster Display Speed</label
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="display-speed"
+                                        aria-describedby="display-speedHelp"
+                                        v-model="settings.poster_display_speed"
+                                    />
+                                    <div id="display-speedHelp" class="text-gray-400 text-sm">
+                                        Time between each poster. In ms. 15000 = 15 seconds.
+                                    </div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label
+                                        for="coming-soon-text"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Coming Soon Text</label
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="coming-soon-text"
+                                        aria-describedby="coming-soon-textHelp"
+                                        v-model="settings.coming_soon_text"
+                                    />
+                                    <div
+                                        id="coming-soon-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="now-playing-text"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Now Playing Text</label
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="now-playing-text"
+                                        aria-describedby="now-playing-textHelp"
+                                        v-model="settings.now_playing_text"
+                                    />
+                                    <div
+                                        id="now-playing-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <h3 class="text-xl font-bold text-white mb-5">Global Options</h3>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="show-runtime"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="show-runtime"
+                                            v-model="settings.show_runtime"
+                                        />
+                                        Show Runtime
+                                    </label>
+                                    <div id="show-runtimeHelp" class="text-gray-400 text-sm">
+                                        Displays the movie runtime in the top left corner.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="mpaa-rating"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="mpaa-rating"
+                                            aria-describedby="mpaa-ratingHelp"
+                                            v-model="settings.show_mpaa_rating"
+                                        />
+                                        Show MPAA Rating
+                                    </label>
+                                    <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
+                                        Shows the MPAA rating when a movie is playing.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="audience-rating"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="audience-rating"
+                                            aria-describedby="audience-ratingHelp"
+                                            v-model="settings.show_audience_rating"
+                                        />
+                                        Show Audience Rating</label
+                                    >
+                                    <div id="audience-ratingHelp" class="text-gray-400 text-sm">
+                                        Shows the audience rating when a movie is playing.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="theme-music"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="theme-music"
+                                            aria-describedby="theme-musicHelp"
+                                            v-model="settings.play_theme_music"
+                                        />
+                                        Play Theme Music</label
+                                    >
+                                    <div id="theme-musicHelp" class="text-gray-400 text-sm">
+                                        Play theme music for posters
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="processing-logos"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="processing-logos"
+                                            aria-describedby="processing-logosHelp"
+                                            v-model="settings.show_processing_logos"
+                                        />
+                                        Show Processing Logos
+                                    </label>
+                                    <div id="processing-logosHelp" class="text-gray-400 text-sm">
+                                        Shows logos such as Dolby Atmos or Dolby Vision.
+                                    </div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_dolby_51"
+                                        />
+                                        Show Dolby Digital 5.1 Logo</label
+                                    >
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_dolby_atmos_vertical"
+                                        />
+                                        Show Dolby Atmos Logo</label
+                                    >
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_dolby_vision_vertical"
+                                        />
+                                        Show Dolby Vision Logo</label
+                                    >
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_dts"
+                                        />
+                                        Show DTS:X Logo</label
+                                    >
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_imax"
+                                        />
+                                        Show IMAX Enhanced</label
+                                    >
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_auro_3d"
+                                        />
+                                        Show Auro 3D Logo</label
                                     >
                                 </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.use_global_prologos"
+                                        />
+                                        Always use enabled processing logos from settings.
+                                    </label>
+                                    <label class="text-gray-300 block mb-2 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="
+                                                settings.use_global_prologos_if_no_poster_prologos
+                                            "
+                                        />
+                                        Use settings processing logos only if poster does not have
+                                        any enabled.
+                                    </label>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label
+                                        for="cec-controls"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="cec-controls"
+                                            aria-describedby="cec-controlsHelp"
+                                            v-model="settings.use_cec_power"
+                                        />
+                                        Use HDMI CEC Controls
+                                    </label>
+                                    <div id="cec-controlsHelp" class="text-gray-400 text-sm">
+                                        Allow the application to turn on/off your display during
+                                        certain time noted below.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="start-power-time"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Display Start Time</label
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="start-power-time"
+                                        aria-describedby="start-power-timeHelp"
+                                        v-model="settings.start_power_time"
+                                    />
+                                    <div id="start-power-timeHelp" class="text-gray-400 text-sm">
+                                        The start time you want you display to be on. HH:MM:SS
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="end-power-time"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Display End Time</label
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="end-power-time"
+                                        aria-describedby="end-power-timeHelp"
+                                        v-model="settings.end_power_time"
+                                    />
+                                    <div id="end-power-timeHelp" class="text-gray-400 text-sm">
+                                        The end time you want you display to be off. HH:MM:SS
+                                    </div>
+                                </div>
                             </div>
-                        </form>
+                            <div id="sources" class="tab-content">
+                                <div class="mb-5">
+                                    <label
+                                        for="plex-service"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="plex-service"
+                                            aria-describedby="plex-serviceHelp"
+                                            v-model="settings.plex_service"
+                                        />
+                                        Enable Plex Service</label
+                                    >
+                                    <div id="plex-serviceHelp" class="text-gray-400 text-sm">
+                                        Use Plex media server for posters.
+                                    </div>
+                                </div>
+                                <div class="mb-5">
+                                    <label
+                                        for="ip-address"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Plex Server IP Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="ip-address"
+                                        aria-describedby="ipAddressHelp"
+                                        v-model="settings.plex_ip_address"
+                                    />
+                                    <div id="ipAddressHelp" class="text-gray-400 text-sm">
+                                        The IP address of your Plex server.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="plex-token"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Plex Token</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="plex-token"
+                                        aria-describedby="tokenHelp"
+                                        v-model="settings.plex_token"
+                                    />
+                                    <div id="tokenHelp" class="text-gray-400 text-sm">
+                                        You can find your Plex token
+                                        <a
+                                            href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/"
+                                            target="_blank"
+                                            class="underline"
+                                            >here</a
+                                        >.
+                                    </div>
+                                </div>
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label
+                                        for="jellyfin-service"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="jellyfin-service"
+                                            aria-describedby="jellyfin-serviceHelp"
+                                            v-model="settings.jellyfin_service"
+                                        />
+                                        Enable Jellyfin Service</label
+                                    >
+                                    <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
+                                        Use Jellyfin media server for posters.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="jellyfin-ip-address"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Jellyfin Server IP Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="jellyfin-ip-address"
+                                        aria-describedby="jellyfinIpAddressHelp"
+                                        v-model="settings.jellyfin_ip_address"
+                                    />
+                                    <div id="jellyfinIpAddressHelp" class="text-gray-400 text-sm">
+                                        The IP address of your Jellyfin server.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="jellyfin-token"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Jellyfin API Token</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="jellyfin-token"
+                                        aria-describedby="jellyfintokenHelp"
+                                        v-model="settings.jellyfin_token"
+                                    />
+                                    <div id="jellyfintokenHelp" class="text-gray-400 text-sm"></div>
+                                </div>
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label
+                                        for="jellyfin-service"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="kodi-service"
+                                            aria-describedby="kodi-serviceHelp"
+                                            v-model="settings.kodi_service"
+                                        />
+                                        Enable Kodi Service</label
+                                    >
+                                    <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
+                                        Use Kodi media server for posters.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label for="kodi-url" class="text-gray-300 block mb-2 font-bold"
+                                        >Kodi Server IP Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="kodi-url"
+                                        aria-describedby="kodiurlHelp"
+                                        v-model="settings.kodi_url"
+                                    />
+                                    <div id="kodiurlHelp" class="text-gray-400 text-sm">
+                                        The IP address of your Kodi server.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="kodi-port"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Kodi port</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="kodi-port"
+                                        aria-describedby="kodiportHelp"
+                                        v-model="settings.kodi_port"
+                                    />
+                                    <div id="kodiportHelp" class="text-gray-400 text-sm">
+                                        The port of your Kodi server.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="kodi-user"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Kodi Username (optional if set)</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="kodi-user"
+                                        aria-describedby="kodiuserHelp"
+                                        v-model="settings.kodi_username"
+                                    />
+                                    <div id="kodiuserHelp" class="text-gray-400 text-sm"></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="kodi-pass"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Kodi Password (optional if set)</label
+                                    >
+                                    <input
+                                        type="password"
+                                        class="text-black w-full"
+                                        id="kodi-pass"
+                                        aria-describedby="kodipassHelp"
+                                        v-model="settings.kodi_password"
+                                    />
+                                    <div id="kodipassHelp" class="text-gray-400 text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / .tabs-content -->
+
+                        <div
+                            class="
+                                bg-red-100
+                                border border-red-400
+                                text-red-700
+                                px-4
+                                py-3
+                                rounded
+                                relative
+                                mb-3
+                            "
+                            role="alert"
+                            v-if="settingsMessage"
+                            v-cloak
+                        >
+                            {{ settingsMessage }}
+                        </div>
+
+                        <div class="grid grid-cols-12">
+                            <div class="col-span-6">
+                                <button
+                                    type="submit"
+                                    class="
+                                        btn
+                                        text-black
+                                        bg-gray-300
+                                        text-md
+                                        px-3
+                                        py-1
+                                        rounded-sm
+                                        hover:bg-gray-100
+                                    "
+                                    @click.prevent="saveSettings"
+                                >
+                                    Save Settings
+                                </button>
+                            </div>
+                            <div class="col-span-6 text-right">
+                                <a
+                                    href="#"
+                                    role="button"
+                                    class="text-white"
+                                    @click.prevent="updateApplication"
+                                    >{{ updateBtn }}</a
+                                >
+                            </div>
+                        </div>
                         <div
                             class="update-output text-white p-5"
                             style="white-space: pre"
@@ -622,6 +658,23 @@ export default {
     watch: {},
     computed: {},
     methods: {
+        setTab(event) {
+            let tab = event.target.getAttribute('href');
+            let $tabItems = document.querySelectorAll('.tabs a');
+            let $tabContents = document.querySelectorAll('.tab-content');
+            let $activeTab = event.target;
+            let $activeTabContent = document.querySelector(tab);
+
+            $tabContents.forEach((el) => {
+                el.classList.remove('active');
+            });
+            $tabItems.forEach((el) => {
+                el.classList.remove('active');
+            });
+
+            $activeTab.classList.add('active');
+            $activeTabContent.classList.add('active');
+        },
         getSettings() {
             axios
                 .get('/api/settings')
@@ -675,5 +728,51 @@ input[type='text'],
 input[type='number'] {
     height: 42px;
     border-radius: 2px;
+}
+
+.tabs {
+    display: flex;
+
+    li {
+        margin-right: 12px;
+
+        a {
+            display: block;
+            padding: 8px 24px;
+            text-align: center;
+            color: #888;
+            background-color: #333;
+
+            &:hover {
+                background-color: #777;
+                color: #ccc;
+                transition: background-color 0.25s ease;
+            }
+
+            &.active {
+                color: #fff;
+                background-color: #555;
+
+                &:hover {
+                    background-color: #777;
+                    transition: background-color 0.25s ease;
+                }
+            }
+        }
+    }
+}
+.tabs-content {
+    margin-bottom: 24px;
+    position: relative;
+
+    .tab-content {
+        display: none;
+        padding: 24px;
+
+        &.active {
+            display: block;
+            border-top: 1px solid #555;
+        }
+    }
 }
 </style>
