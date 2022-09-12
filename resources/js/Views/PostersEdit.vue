@@ -288,6 +288,7 @@
                                         text-md
                                         px-3
                                         py-1
+                                        rounded-sm
                                         hover:bg-gray-100
                                     "
                                     @click.prevent="savePoster"
