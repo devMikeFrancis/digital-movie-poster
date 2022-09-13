@@ -50,6 +50,15 @@ class Setting extends Model
         'kodi_password',
         'tmdb_api_key_v3',
         'tmdb_api_key_v4',
+        'header_bg_color',
+        'header_text_color',
+        'show_header_border',
+        'header_border_color',
+        'header_font',
+        'header_font_size',
+        'footer_bg_color',
+        'footer_text_color',
+        'poster_bg_color',
     ];
 
     protected function plexService(): Attribute
@@ -74,6 +83,13 @@ class Setting extends Model
     }
 
     protected function randomOrder(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showHeaderBorder(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,

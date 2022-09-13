@@ -14,6 +14,9 @@
                                 >
                             </li>
                             <li>
+                                <a href="#theme" @click.prevent="setTab($event)">Theme</a>
+                            </li>
+                            <li>
                                 <a href="#sources" @click.prevent="setTab($event)"
                                     >Poster Sources</a
                                 >
@@ -367,6 +370,200 @@
                                     <div id="end-power-timeHelp" class="text-gray-400 text-sm">
                                         The end time you want you display to be off. HH:MM:SS
                                     </div>
+                                </div>
+                            </div>
+                            <div id="theme" class="tab-content">
+                                <div class="mb-5">
+                                    <label
+                                        for="poster-bg-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Poster Background Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="poster-bg-color"
+                                        aria-describedby="poster-bg-color-textHelp"
+                                        v-model="settings.poster_bg_color"
+                                    />
+                                    <div
+                                        id="header-bg-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="header-bg-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Top Background Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="header-bg-color"
+                                        aria-describedby="header-bg-color-textHelp"
+                                        v-model="settings.header_bg_color"
+                                    />
+                                    <div
+                                        id="header-bg-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="header-text-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Top Text Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="header-text-color"
+                                        aria-describedby="header-text-color-textHelp"
+                                        v-model="settings.header_text_color"
+                                    />
+                                    <div
+                                        id="header-text-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="show-header-border"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="show-header-border"
+                                            v-model="settings.show_header_border"
+                                        />
+                                        Show Top Border
+                                    </label>
+                                    <div id="show-header-border-Help" class="text-gray-400 text-sm">
+                                        Displays thin border around "Coming Soon/Now Playing" text.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="header-border-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Top Border Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="header-border-color"
+                                        aria-describedby="header-border-color-textHelp"
+                                        v-model="settings.header_border_color"
+                                    />
+                                    <div
+                                        id="header-border-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="header-font"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Coming Soon/Now Playing Font</label
+                                    >
+
+                                    <select
+                                        class="w-full"
+                                        id="header-font"
+                                        aria-describedby="header-font-textHelp"
+                                        v-model="settings.header_font"
+                                    >
+                                        <option value="default">Default</option>
+                                        <option value="riemann-theater">Riemann Theater</option>
+                                        <option value="great-attraction">Great Attraction</option>
+                                        <option value="midnight-champion">Midnight Champion</option>
+                                        <option value="emerald">Emerald</option>
+                                        <option value="airstrike">Airstrike</option>
+                                        <option value="space-ranger">Space Ranger</option>
+                                        <option value="feast-flesh">Feast of Flesh</option>
+                                        <option value="camp-blood">Camp Blood</option>
+                                        <option value="friday13">Friday 13th</option>
+                                    </select>
+                                    <div
+                                        id="header-font-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="header-font-size"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Coming Soon/Now Playing Font Size</label
+                                    >
+
+                                    <select
+                                        class="w-full"
+                                        id="header-font-size"
+                                        aria-describedby="header-font-size-textHelp"
+                                        v-model="settings.header_font_size"
+                                    >
+                                        <option value="xsmall">X-Small</option>
+                                        <option value="small">Small</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="large">Large</option>
+                                        <option value="xlarge">X-Large</option>
+                                    </select>
+                                    <div
+                                        id="header-font-size-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="footer-bg-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Bottom Background Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="footer-bg-color"
+                                        aria-describedby="footer-bg-color-textHelp"
+                                        v-model="settings.footer_bg_color"
+                                    />
+                                    <div
+                                        id="footer-bg-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="footer-text-color"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Bottom Text Color</label
+                                    >
+
+                                    <input
+                                        type="color"
+                                        class="w-full"
+                                        id="footer-text-color"
+                                        aria-describedby="footer-text-color-textHelp"
+                                        v-model="settings.footer_text_color"
+                                    />
+                                    <div
+                                        id="footer-text-color-textHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
                                 </div>
                             </div>
                             <div id="sources" class="tab-content">

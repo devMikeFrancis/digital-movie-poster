@@ -10,15 +10,39 @@
                 @click.prevent="gotoPosters()"
                 v-if="!nowPlaying"
             >
-                <header class="coming-soon-header">
-                    <span class="runtime" v-if="settings.show_runtime && runtime"
+                <header
+                    class="coming-soon-header"
+                    :style="'background-color:' + settings.header_bg_color"
+                >
+                    <span
+                        class="runtime"
+                        v-if="settings.show_runtime && runtime"
+                        :style="'color:' + settings.header_text_color"
                         >{{ runtime.toFixed(0) }} min</span
                     >
-                    <h1>{{ settings.coming_soon_text }}</h1>
+                    <h1
+                        :style="
+                            headerSize +
+                            headerFont +
+                            'color:' +
+                            settings.header_text_color +
+                            '; border-color: ' +
+                            settings.header_border_color +
+                            ';' +
+                            (settings.show_header_border
+                                ? 'border-size: 1px; border-type: solid'
+                                : 'border: none; padding: 0')
+                        "
+                    >
+                        {{ settings.coming_soon_text }}
+                    </h1>
                 </header>
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
-                        <div class="poster-items">
+                        <div
+                            class="poster-items"
+                            :style="'background-color: ' + settings.poster_bg_color"
+                        >
                             <div
                                 v-for="(poster, index) in moviePosters"
                                 v-bind:key="`key-${index}`"
@@ -52,56 +76,22 @@
                         <div id="music"></div>
                     </div>
                 </div>
-                <footer class="coming-soon-footer">
-                    <div class="content-rating" v-if="settings.show_mpaa_rating">
-                        <img
-                            v-if="mpaaRating"
-                            :src="'/images/' + mpaaRating + '.svg'"
-                            alt="Content Rating"
-                            v-cloak
-                        />
-                    </div>
-                    <div class="dolby-logos" v-if="settings.show_processing_logos">
-                        <div v-if="show_imax">
-                            <img class="imax" src="/images/imax.png" alt="IMAX" />
-                        </div>
-                        <div v-if="show_auro_3d">
-                            <img class="auro3d" src="/images/auro3d.svg" alt="Auro 3D" />
-                        </div>
-                        <div v-if="show_dolby_vision_vertical">
-                            <img
-                                src="/images/dolby-vision-stacked.svg"
-                                alt="Dolby Vision"
-                                class="dolby-vision-stacked"
-                            />
-                        </div>
-                        <div v-if="show_dolby_atmos_vertical">
-                            <img
-                                src="/images/dolby-atmos-stacked.svg"
-                                alt="Dolby Atmos"
-                                class="dolby-atmos-stacked"
-                            />
-                        </div>
-                        <div v-if="show_dolby_51">
-                            <img
-                                src="/images/dolby-51.svg"
-                                alt="Dolby Digital 5.1"
-                                class="dolby-atmos-stacked"
-                            />
-                        </div>
-                        <div v-if="show_dts">
-                            <img class="dts" src="/images/dts-x.svg" alt="DTS" />
-                        </div>
-                    </div>
+                <footer
+                    class="coming-soon-footer"
+                    :style="'background-color:' + settings.footer_bg_color"
+                >
+                    <ContentRating />
+                    <ProcessingLogos />
+
                     <div class="audience-rating" v-if="settings.show_audience_rating">
                         <star-rating
                             :increment="0.1"
                             :max-rating="5"
                             :inactive-color="'#000'"
-                            :active-color="'#fff'"
+                            :active-color="settings.footer_text_color"
                             :star-size="starSize"
                             :rating="audienceRating"
-                            :border-color="'#fff'"
+                            :border-color="settings.footer_text_color"
                             :border-width="borderWidth"
                             :show-rating="false"
                             :read-only="true"
@@ -116,11 +106,32 @@
                     v-if="nowPlaying"
                     @click.prevent="gotoPosters()"
                 >
-                    <header class="now-playing-header">
-                        <span class="runtime" v-if="settings.show_runtime && nowPlayingRuntime"
+                    <header
+                        class="now-playing-header"
+                        :style="'background-color:' + settings.header_bg_color"
+                    >
+                        <span
+                            class="runtime"
+                            v-if="settings.show_runtime && nowPlayingRuntime"
+                            :style="'color:' + settings.header_text_color"
                             >{{ nowPlayingRuntime.toFixed(0) }} min</span
                         >
-                        <h1>{{ settings.now_playing_text }}</h1>
+                        <h1
+                            :style="
+                                headerSize +
+                                headerFont +
+                                'color:' +
+                                settings.header_text_color +
+                                '; border-color: ' +
+                                settings.header_border_color +
+                                ';' +
+                                (settings.show_header_border
+                                    ? 'border-size: 1px; border-type: solid'
+                                    : 'border: none; padding: 0')
+                            "
+                        >
+                            {{ settings.now_playing_text }}
+                        </h1>
                     </header>
                     <div class="now-playing-container">
                         <div
@@ -128,57 +139,22 @@
                             :style="'background-image: url(' + nowPlayingPoster + ')'"
                         ></div>
                     </div>
-                    <div class="now-playing-footer">
-                        <div class="content-rating" v-if="settings.show_mpaa_rating">
-                            <img
-                                v-if="contentRating"
-                                :src="'/images/' + contentRating + '.svg'"
-                                alt="Content Rating"
-                                v-cloak
-                            />
-                        </div>
+                    <div
+                        class="now-playing-footer"
+                        :style="'background-color:' + settings.footer_bg_color"
+                    >
+                        <ContentRating />
+                        <ProcessingLogos />
 
-                        <div class="dolby-logos" v-if="settings.show_processing_logos">
-                            <img
-                                class="imax"
-                                src="/images/imax.png"
-                                alt="IMAX"
-                                v-if="settings.show_imax"
-                            />
-                            <img
-                                class="auro3d"
-                                src="/images/auro3d.svg"
-                                alt="Auro 3D"
-                                v-if="settings.show_auro_3d"
-                            />
-                            <img
-                                src="/images/dolby-vision-stacked.svg"
-                                alt="Dolby Vision"
-                                class="dolby-vision-stacked"
-                                v-if="settings.show_dolby_vision_vertical"
-                            />
-                            <img
-                                src="/images/dolby-atmos-stacked.svg"
-                                alt="Dolby Atmos"
-                                class="dolby-atmos-stacked"
-                                v-if="settings.show_dolby_atmos_vertical"
-                            />
-                            <img
-                                class="dts"
-                                src="/images/dts-x.svg"
-                                alt="DTS"
-                                v-if="settings.show_dts"
-                            />
-                        </div>
                         <div class="audience-rating" v-if="settings.show_audience_rating">
                             <star-rating
                                 :increment="0.1"
                                 :max-rating="5"
                                 inactive-color="#000"
-                                active-color="#fff"
+                                :active-color="settings.footer_text_color"
                                 :star-size="starSize"
                                 v-model:rating="rating"
-                                border-color="#fff"
+                                :border-color="settings.footer_text_color"
                                 :border-width="borderWidth"
                                 :show-rating="false"
                                 :read-only="true"
@@ -195,6 +171,8 @@
 import StarRating from 'vue-star-rating';
 import { mapState, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';
+import ProcessingLogos from '@/components/processing-logos.vue';
+import ContentRating from '@/components/content-rating.vue';
 
 const $recentAdded = document.querySelector('#recent-added-container');
 let $video = document.getElementById('youtube-player');
@@ -208,6 +186,8 @@ export default {
     },
     components: {
         StarRating,
+        ProcessingLogos,
+        ContentRating,
     },
     watch: {
         nowPlaying: {
@@ -248,6 +228,55 @@ export default {
             'show_dts',
             'socket',
         ]),
+        headerFont() {
+            if (this.settings.header_font === 'default') {
+                return '';
+            }
+            if (this.settings.header_font === 'riemann-theater') {
+                return "font-family: 'Riemann Theatre'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'great-attraction') {
+                return "font-family: 'Great Attraction'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'midnight-champion') {
+                return "font-family: 'Midnight Champion'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'emerald') {
+                return "font-family: 'Emerald Grey'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'airstrike') {
+                return "font-family: 'Airstrike'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'space-ranger') {
+                return "font-family: 'Space Ranger'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'feast-flesh') {
+                return "font-family: 'Feast of Flesh BB'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'camp-blood') {
+                return "font-family: 'CSNPWDT NFI'; font-weight: normal; ";
+            }
+            if (this.settings.header_font === 'friday13') {
+                return "font-family: 'Friday13'; font-weight: normal; ";
+            }
+        },
+        headerSize() {
+            if (this.settings.header_font_size === 'normal') {
+                return '';
+            }
+            if (this.settings.header_font_size === 'xsmall') {
+                return 'font-size: 3.5vh; ';
+            }
+            if (this.settings.header_font_size === 'small') {
+                return 'font-size: 5vh; ';
+            }
+            if (this.settings.header_font_size === 'large') {
+                return 'font-size: 7.5vh; padding: 8px 20px 10px 20px; ';
+            }
+            if (this.settings.header_font_size === 'xlarge') {
+                return 'font-size: 9vh; padding: 6px 18px 8px 18px; ';
+            }
+        },
     },
     methods: {
         ...mapActions(usePostersStore, [
@@ -268,14 +297,14 @@ export default {
         setStarSizes() {
             const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
             if (vw > 2000) {
-                this.starSize = 34;
+                this.starSize = 30;
             }
             if (vw > 3000) {
-                this.starSize = 48;
+                this.starSize = 44;
                 this.borderWidth = 4;
             }
             if (vw <= 2000) {
-                this.starSize = 28;
+                this.starSize = 24;
             }
         },
         gotoSettings() {
@@ -379,8 +408,8 @@ body {
     flex-grow: 2;
     position: absolute;
     top: 0;
-    left: 1.8vw;
-    right: 1.8vw;
+    left: 1.7vw;
+    right: 1.7vw;
     backface-visibility: hidden;
     will-change: opacity;
 
@@ -411,8 +440,8 @@ body {
 
 .now-playing-poster {
     height: 100%;
-    left: 2vw;
-    right: 2vw;
+    left: 1.7vw;
+    right: 1.7vw;
     flex-grow: 2;
     background-size: cover;
     background-repeat: no-repeat;
@@ -428,7 +457,6 @@ body {
     min-height: 18vh;
     align-items: center;
     justify-content: center;
-    padding: 2vw;
     text-align: center;
     position: relative;
 
@@ -464,71 +492,6 @@ body {
     font-size: 1.4vw;
     font-weight: 400;
     transform: translateY(-50%);
-}
-
-.content-rating {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-right: auto;
-    width: 13vw;
-
-    img {
-        width: 100%;
-        height: auto;
-    }
-}
-
-.dolby-logos {
-    flex-grow: 2;
-    padding: 0 1.5vw;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    div {
-        flex-grow: 1;
-        padding: 0 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
-.dolby-atmos {
-    width: 100%;
-    height: auto;
-}
-.dolby-vision {
-    width: 100%;
-    height: auto;
-}
-
-.dolby-atmos-stacked {
-    width: 100%;
-    max-width: 8vw;
-    height: auto;
-}
-.dolby-vision-stacked {
-    width: 100%;
-    max-width: 8vw;
-    height: auto;
-}
-
-.dts {
-    width: 100%;
-    max-width: 8vw;
-    height: auto;
-}
-
-.imax {
-    width: 100%;
-    max-width: 8vw;
-    height: auto;
-}
-.auro3d {
-    width: 100%;
-    height: auto;
 }
 
 .audience-rating {
