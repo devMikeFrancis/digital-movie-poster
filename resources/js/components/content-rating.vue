@@ -4,7 +4,7 @@
         v-if="settings.show_mpaa_rating"
         :style="'color: ' + settings.footer_text_color"
     >
-        <div v-if="rating === 'Not Rated'">
+        <div v-if="rating === 'Not Rated' || rating === ''">
             <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1365.7 265.7">
                 >
                 <g class="cls-1">

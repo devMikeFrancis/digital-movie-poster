@@ -6,20 +6,23 @@ export const usePostersStore = defineStore('posters', {
         loading: true,
         loadingMessage: 'Loading Posters ...',
         bootTime: 5000,
+        settingsIntervalTime: 10000,
         moviePosters: [],
         moviesQueue: [],
         isConnected: false,
         baseUrl: '',
-        plexToken: '',
         settings: {
             poster_display_speed: 15000,
             transition_type: 'fade',
         },
         nowPlayingPoster: '',
+        settingsInterval: null,
+
         recentlyAddedInterval: null,
         nowPlayingInterval: null,
         jellyfinDevicePlaying: null,
         servicePlaying: null,
+        canRefreshTransitionTime: false,
         transitionImagesInterval: null,
         contentRating: '',
         mpaaRating: '',
@@ -47,26 +50,54 @@ export const usePostersStore = defineStore('posters', {
     getters: {},
     actions: {
         boot() {
-            axios
+            console.log('--- BOOTING ---');
+            this.getSettings().then((response) => {
+                this.getMoviePosters();
+                this.startSyncPosters();
+                this.controlTV('on');
+                setTimeout(() => {
+                    this.canRefreshTransitionTime = true;
+                    this.startSettingsInterval();
+                }, this.settingsIntervalTime);
+                setTimeout(() => {
+                    this.startSockets();
+                }, this.bootTime + 3000);
+            });
+        },
+        getSettings() {
+            return axios
                 .get('/api/settings')
                 .then((response) => {
-                    this.settings = response.data;
-                    if (this.settings.plex_service) {
-                        this.startSockets();
-                        localStorage.setItem('plexIpAddress', this.settings.plex_ip_address);
-                        localStorage.setItem('plexToken', this.settings.plex_token);
+                    console.log('-- GET SETTINGS');
+                    if (
+                        this.canRefreshTransitionTime &&
+                        this.settings.poster_display_speed !== response.data.poster_display_speed
+                    ) {
+                        console.log('RESETTING TRANSITION TIME');
+                        this.stopTransitionImages();
+                        setTimeout(() => {
+                            this.startTransitionImages();
+                        }, 1000);
                     }
-                    this.getMoviePosters();
-                    this.recentlyAddedInterval = setInterval(() => {
-                        this.cachePosters();
-                    }, 60000 * 60 * 60 * 1000 * 4); // Every 4 hours
-                    this.controlTV('on');
+                    this.settings = response.data;
+                    return response;
                 })
                 .catch((e) => {
                     console.log(e.message);
                 });
         },
+        startSettingsInterval() {
+            console.log('START SETTINGS INTERVAL');
+            this.settingsInterval = setInterval(() => {
+                this.getSettings();
+            }, this.settingsIntervalTime);
+        },
+        stopSettingsInterval() {
+            console.log('STOP SETTINGS INTERVAL');
+            clearInterval(this.settingsInterval);
+        },
         getMoviePosters() {
+            console.log('GET MOVIE POSTERS');
             this.stopTransitionImages();
             axios
                 .get('/api/posters?show_in_rotation=true')
@@ -99,6 +130,7 @@ export const usePostersStore = defineStore('posters', {
                 });
         },
         handlePosterView(poster) {
+            console.log('HANDLE POSTER VIEW');
             this.mpaaRating = poster.mpaa_rating;
             if (poster.audience_rating) {
                 this.audienceRating = poster.audience_rating / 2;
@@ -141,7 +173,13 @@ export const usePostersStore = defineStore('posters', {
                 this.useSettingsProLogos();
             }
         },
+        startSyncPosters() {
+            this.recentlyAddedInterval = setInterval(() => {
+                this.cachePosters();
+            }, 60000 * 60 * 60 * 1000 * 4); // Every 4 hours
+        },
         getNowPlaying() {
+            console.log('GET NOW PLAYING');
             if (this.settings.plex_service && this.servicePlaying === 'plex') {
                 this.plexNowPlaying();
             }
@@ -227,6 +265,7 @@ export const usePostersStore = defineStore('posters', {
                 .catch(() => {});
         },
         setNowPlaying(data) {
+            console.log('SET NOW PLAYING');
             this.nowPlayingPoster = data.poster;
             this.contentRating = data.contentRating;
 
@@ -255,24 +294,34 @@ export const usePostersStore = defineStore('posters', {
             this.show_dolby_51 = this.settings.show_dolby_51;
         },
         getInSequencePoster() {
+            console.log('GET NEXT POSTER');
             const len = this.moviePosters.length;
             const currIndex = this.moviePosters.findIndex((poster) => poster.show === true);
-            let activeIndex = 0;
+            let poster,
+                pastPoster,
+                activeIndex = 0;
+
             if (this.settings.random_order) {
                 activeIndex = Math.floor(Math.random() * len);
             } else {
                 activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
             }
 
-            let poster = this.moviePosters[activeIndex];
-            let pastPoster = this.moviePosters[currIndex];
-
-            poster.show = true;
-            pastPoster.show = false;
+            if (len === 1) {
+                poster = this.moviePosters[0];
+                pastPoster = Object.assign(this.moviePosters[0], {});
+                poster.show = true;
+            } else {
+                poster = this.moviePosters[activeIndex];
+                pastPoster = this.moviePosters[currIndex];
+                poster.show = true;
+                pastPoster.show = false;
+            }
 
             return poster;
         },
         transitionImages() {
+            console.log('TRANSITION IMAGES');
             let poster = '';
             if (this.videoPlayer) {
                 this.videoPlayer.innerHTML = '';
@@ -285,16 +334,18 @@ export const usePostersStore = defineStore('posters', {
             }
         },
         cachePosters() {
+            console.log('SYNCING POSTERS');
             axios
                 .get('/api/cache-posters')
                 .then((response) => {
+                    this.stopTransitionImages();
                     this.moviePosters = response.data.posters;
                     setTimeout(() => {
                         if (this.loading === true) {
                             this.loading = false;
                             this.startTransitionImages();
                         }
-                    }, 5000);
+                    }, this.bootTime);
                 })
                 .catch((e) => {
                     console.log(e.message);
@@ -354,6 +405,7 @@ export const usePostersStore = defineStore('posters', {
                 .catch((e) => {});
         },
         startSockets() {
+            console.log('STARTING SOCKETS');
             if (this.settings.plex_service) {
                 this.plexSocket();
             }
@@ -406,37 +458,39 @@ export const usePostersStore = defineStore('posters', {
         jellyfinSocket() {
             // Jellyfin - we have to poll. Does not have socket for now playing
             setInterval(() => {
-                axios
-                    .get(
-                        'http://' +
-                            this.settings.jellyfin_ip_address +
-                            ':8096/Sessions?api_key=' +
-                            this.settings.jellyfin_token
-                    )
-                    .then((response) => {
-                        let devices = response.data;
-                        this.jellyfinDevicePlaying = devices.find((device) => {
-                            if (
-                                device.hasOwnProperty('NowPlayingItem') &&
-                                device.NowPlayingItem.Type === 'Movie'
-                            ) {
-                                return device;
-                            }
-                        });
+                if (this.settings.jellyfin_service) {
+                    axios
+                        .get(
+                            'http://' +
+                                this.settings.jellyfin_ip_address +
+                                ':8096/Sessions?api_key=' +
+                                this.settings.jellyfin_token
+                        )
+                        .then((response) => {
+                            let devices = response.data;
+                            this.jellyfinDevicePlaying = devices.find((device) => {
+                                if (
+                                    device.hasOwnProperty('NowPlayingItem') &&
+                                    device.NowPlayingItem.Type === 'Movie'
+                                ) {
+                                    return device;
+                                }
+                            });
 
-                        if (this.jellyfinDevicePlaying) {
-                            this.servicePlaying = 'jellyfin';
-                            this.controlPlayerState('playing');
-                        } else {
+                            if (this.jellyfinDevicePlaying) {
+                                this.servicePlaying = 'jellyfin';
+                                this.controlPlayerState('playing');
+                            } else {
+                                this.servicePlaying = null;
+                                this.controlPlayerState('stopped');
+                            }
+                        })
+                        .catch(() => {
+                            this.jellyfinDevicePlaying = null;
                             this.servicePlaying = null;
                             this.controlPlayerState('stopped');
-                        }
-                    })
-                    .catch(() => {
-                        this.jellyfinDevicePlaying = null;
-                        this.servicePlaying = null;
-                        this.controlPlayerState('stopped');
-                    });
+                        });
+                }
             }, 7000);
         },
         controlPlayerState(state) {
@@ -502,21 +556,27 @@ export const usePostersStore = defineStore('posters', {
         },
 
         startTransitionImages() {
+            console.log('START TRANSITIONS');
             window.transitionImagesInterval = setInterval(() => {
                 this.transitionImages();
             }, this.settings.poster_display_speed);
         },
         stopTransitionImages() {
+            console.log('STOP TRANSITIONS');
             clearInterval(window.transitionImagesInterval);
         },
         reload() {
+            console.log('--- RELOADING ---');
             this.loadingMessage = 'Re-loading Posters ...';
             this.loading = true;
             this.stopTransitionImages();
             clearInterval(this.recentlyAddedInterval);
             this.stopMusic();
             this.videoPlaying = false;
-            this.boot();
+            this.nowPlaying = false;
+            setTimeout(() => {
+                this.boot();
+            }, 2000);
         },
         setLoading(value) {
             this.loading = value;
