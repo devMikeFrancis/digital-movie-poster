@@ -16,7 +16,7 @@ touch /etc/supervisor/conf.d/laravel-worker.conf
 
 echo "[program:laravel-worker]" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "process_name=%(program_name)s_%(process_num)02d" >> /etc/supervisor/conf.d/laravel-worker.conf
-echo "command=php /var/www/html/artisan queue:work sqs --sleep=3 --tries=1 --max-time=4800" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "command=php /var/www/html/artisan queue:work --sleep=3 --tries=1 --timeout=5600" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "autostart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "autorestart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "stopasgroup=true" >> /etc/supervisor/conf.d/laravel-worker.conf
@@ -25,7 +25,7 @@ echo "user=pi" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "numprocs=4" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "redirect_stderr=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "stdout_logfile=/var/www/html/worker.log" >> /etc/supervisor/conf.d/laravel-worker.conf
-echo "stopwaitsecs=4800" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "stopwaitsecs=5600" >> /etc/supervisor/conf.d/laravel-worker.conf
 
 apt update -y
 

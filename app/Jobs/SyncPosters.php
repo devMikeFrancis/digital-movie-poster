@@ -17,6 +17,8 @@ class SyncPosters implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public $timeout = 5600;
+
     /**
      * Create a new job instance.
      *
