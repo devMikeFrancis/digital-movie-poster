@@ -1,0 +1,33 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 400;
+}
+
+.modal-overlay {
+    position: fixed;
+    background-color: rgba(000, 000, 000, 0.55);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 401;
+}
+
+.modal-content {
+    background-color: #222;
+    position: relative;
+    z-index: 402;
+
+    .inner {
+    }
+}
+
+.modal-header {
+}

@@ -291,7 +291,33 @@
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label class="text-gray-300 block mb-1 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.validate_movie_titles"
+                                        />
+                                        Validate movie titles when syncing
+                                    </label>
+                                    <div class="text-sm mb-3">
+                                        Useful when using multiple sync services. The movie titles
+                                        will have to match exactly.
+                                    </div>
+
+                                    <label class="text-gray-300 block mb-1 font-bold"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.remove_black_bars"
+                                        />
+                                        Remove side black bars.
+                                    </label>
+                                    <div class="text-sm mb-3">
+                                        The small space on each side of the poster. The space is
+                                        helpful when framing the TV.
+                                    </div>
+
+                                    <label class="text-gray-300 block mb-3 font-bold"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
@@ -299,7 +325,7 @@
                                         />
                                         Always use enabled processing logos from settings.
                                     </label>
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label class="text-gray-300 block mb-3 font-bold"
                                         ><input
                                             class="text-black"
                                             type="checkbox"

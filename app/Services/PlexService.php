@@ -13,13 +13,14 @@ class PlexService implements MovieSyncInterface
 {
     private $plexIpAddress = '';
     private $plexToken = '';
+    private $settings;
 
     public function __construct()
     {
-        $settings = Setting::first();
+        $this->settings = Setting::first();
 
-        $this->plexIpAddress = $settings->plex_ip_address;
-        $this->plexToken = $settings->plex_token;
+        $this->plexIpAddress = $this->settings->plex_ip_address;
+        $this->plexToken = $this->settings->plex_token;
     }
 
     /**
@@ -71,19 +72,27 @@ class PlexService implements MovieSyncInterface
                 });
                 $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
 
+                $whereUpdate = ['object_id' => $movie['key'] ];
+
+                $update = [
+                    'name' => $orginalName,
+                    'file_name' => $fileName,
+                    'can_delete' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
+                    'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
+                    'runtime' => is_numeric($movie['duration']) ? $movie['duration']/1000/60 : null
+                ];
+
+                if ($this->settings->validate_movie_titles) {
+                    $whereUpdate['name'] = $orginalName;
+                    unset($update['name']);
+                }
+
                 Poster::updateOrCreate(
-                    ['object_id' => $movie['key'] ],
-                    [
-                        'object_id' => $movie['key'],
-                        'name' => $orginalName,
-                        'file_name' => $fileName,
-                        'can_delete' => false,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                        'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
-                        'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
-                        'runtime' => is_numeric($movie['duration']) ? $movie['duration']/1000/60 : null
-                    ]
+                    $whereUpdate,
+                    $update
                 );
             }
         }

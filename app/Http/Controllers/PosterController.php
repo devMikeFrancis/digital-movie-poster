@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
+use App\Jobs\SyncPosters;
 use App\Services\PosterService;
 use App\Services\KodiService;
 use App\Http\Resources\PostersCollection;
@@ -53,13 +54,29 @@ class PosterController extends Controller
      *
      * @return array
      */
-    public function cache(PosterService $service)
+    public function cache()
     {
-        $service->cache();
+        SyncPosters::dispatch();
 
-        return new PostersCollection(
-            Poster::where('show_in_rotation', true)->orderBy('ordinal')->orderBy('name')->get()
-        );
+        return ['message' => 'sync job queued'];
+    }
+
+    /**
+     * Re download posters from external service
+     *
+     * @param PosterService $service
+     *
+     * @return array
+     */
+    public function checkSyncStatus()
+    {
+        $status = 'clear';
+        $jobCount = \DB::table('jobs')->where('payload', 'like', '%SyncPosters%')->count();
+        if ($jobCount > 0) {
+            $status = 'running';
+        }
+
+        return ['status' => $status, 'count' => $jobCount];
     }
 
     /**

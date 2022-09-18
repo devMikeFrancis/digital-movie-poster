@@ -57,9 +57,9 @@
                                         hover:bg-gray-100
                                     "
                                     @click.prevent="cachePosters"
-                                    :disabled="recaching"
+                                    :disabled="recaching || syncInProcess"
                                 >
-                                    <span v-show="!recaching"
+                                    <span v-show="!recaching && !syncInProcess"
                                         ><svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 512 512"
@@ -71,7 +71,7 @@
                                         </svg>
                                         Sync Posters</span
                                     >
-                                    <span v-show="recaching"
+                                    <span v-show="recaching || syncInProcess"
                                         ><svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 512 512"
@@ -85,9 +85,6 @@
                                     >
                                 </button>
                             </div>
-                        </div>
-                        <div class="cache-overlay" v-if="recaching" v-cloak>
-                            <span class="text-2xl md:text-3xl">Syncing Posters ...</span>
                         </div>
                         <PostersSkeleton v-if="loading" />
                         <draggable
@@ -199,6 +196,10 @@
                 </div>
             </div>
         </div>
+
+        <Transition name="fade">
+            <SyncModal @close="closeSyncModal" v-if="showSyncingModal" />
+        </Transition>
     </div>
 </template>
 
@@ -210,6 +211,7 @@ import MainNav from '@/partials/MainNav.vue';
 import PosterOptions from '@/components/poster-options.vue';
 import PosterDelete from '@/components/poster-delete.vue';
 import PostersSkeleton from '@/components/posters-skeleton.vue';
+import SyncModal from '@/components/sync-modal.vue';
 import draggable from 'vuedraggable';
 
 export default {
@@ -219,9 +221,11 @@ export default {
         PosterOptions,
         PosterDelete,
         PostersSkeleton,
+        SyncModal,
     },
     data: function () {
         return {
+            showSyncingModal: false,
             loading: false,
             saving: false,
             errors: [],
@@ -232,6 +236,7 @@ export default {
             formMessage: '',
             searchQuery: '',
             fakePosters: [1, 2, 3, 4],
+            syncInProcess: false,
         };
     },
     watch: {},
@@ -268,18 +273,49 @@ export default {
                     this.loading = false;
                 });
         },
-        cachePosters() {
-            this.recaching = true;
+        reloadPosters() {
             axios
-                .get('/api/cache-posters')
+                .get('/api/posters')
                 .then((response) => {
-                    this.recaching = false;
                     this.posters = response.data.posters;
                 })
                 .catch((e) => {
-                    this.recaching = false;
                     console.log(e.message);
                 });
+        },
+        cachePosters() {
+            this.showSyncingModal = true;
+            this.recaching = true;
+            axios
+                .get('/api/cache-posters')
+                .then(() => {
+                    this.recaching = false;
+                    this.syncInProcess = true;
+                })
+                .catch((e) => {
+                    this.recaching = false;
+                    this.syncInProcess = false;
+                    console.log(e.message);
+                });
+        },
+        checkSyncStatus() {
+            axios
+                .get('/api/sync-status')
+                .then((response) => {
+                    if (response.data.status === 'running') {
+                        this.syncInProcess = true;
+                    } else {
+                        this.syncInProcess = false;
+                        this.showSyncingModal = false;
+                    }
+                })
+                .catch((e) => {
+                    this.syncInProcess = false;
+                    console.log(e.message);
+                });
+        },
+        closeSyncModal() {
+            this.showSyncingModal = false;
         },
         deletePoster(poster) {
             const params = {
@@ -323,6 +359,12 @@ export default {
     created() {},
     mounted() {
         this.getPosters();
+
+        this.checkSyncStatus();
+        setInterval(() => {
+            this.checkSyncStatus();
+            this.reloadPosters();
+        }, 7000);
     },
 };
 </script>
@@ -438,5 +480,15 @@ input[type='number'] {
 }
 .spin {
     animation: rotating 2s linear infinite;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

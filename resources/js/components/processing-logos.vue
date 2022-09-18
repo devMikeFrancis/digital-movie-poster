@@ -357,7 +357,7 @@ export default {
 }
 .dolby-logos {
     flex-grow: 2;
-    //padding: 0 1vw;
+    padding-right: 1vw;
     display: flex;
     align-items: center;
     justify-content: space-between;

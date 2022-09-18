@@ -71,19 +71,27 @@ class JellyfinService implements MovieSyncInterface
                     $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
                 }
 
+                $whereUpdate = ['object_id' => $movie['Id'] ];
+
+                $update = [
+                    'name' => $orginalName,
+                    'file_name' => $fileName,
+                    'can_delete' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'mpaa_rating' => isset($movie['OfficialRating']) ? $movie['OfficialRating'] : null,
+                    'audience_rating' => isset($movie['CommunityRating']) ? $movie['CommunityRating'] : 0,
+                    'runtime' => is_numeric($movie['RunTimeTicks']) ? $movie['RunTimeTicks']/1000/60 : null
+                ];
+
+                if ($this->settings->validate_movie_titles) {
+                    $whereUpdate['name'] = $orginalName;
+                    unset($update['name']);
+                }
+
                 Poster::updateOrCreate(
-                    ['object_id' => $movie['Id'] ],
-                    [
-                        'object_id' => $movie['Id'],
-                        'name' => $orginalName,
-                        'file_name' => $fileName,
-                        'can_delete' => false,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                        'mpaa_rating' => isset($movie['OfficialRating']) ? $movie['OfficialRating'] : null,
-                        'audience_rating' => isset($movie['CommunityRating']) ? $movie['CommunityRating'] : 0,
-                        'runtime' => is_numeric($movie['RunTimeTicks']) ? $movie['RunTimeTicks']/1000/60 : null
-                    ]
+                    $whereUpdate,
+                    $update
                 );
             }
         }

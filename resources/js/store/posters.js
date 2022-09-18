@@ -7,6 +7,7 @@ export const usePostersStore = defineStore('posters', {
         loadingMessage: 'Loading Posters ...',
         bootTime: 5000,
         settingsIntervalTime: 10000,
+        reloadPostersIntervalTime: 20000,
         moviePosters: [],
         moviesQueue: [],
         isConnected: false,
@@ -46,12 +47,13 @@ export const usePostersStore = defineStore('posters', {
         show_imax: false,
         show_dolby_51: false,
         socket: '',
+        checkedPlexMediaType: false,
     }),
     getters: {},
     actions: {
         boot() {
             console.log('--- BOOTING ---');
-            this.getSettings().then((response) => {
+            this.getSettings().then(() => {
                 this.getMoviePosters();
                 this.startSyncPosters();
                 this.controlTV('on');
@@ -62,6 +64,9 @@ export const usePostersStore = defineStore('posters', {
                 setTimeout(() => {
                     this.startSockets();
                 }, this.bootTime + 3000);
+                /*setTimeout(() => {
+                    this.startReloadMoviePostersInterval();
+                }, this.reloadPostersIntervalTime);*/
             });
         },
         getSettings() {
@@ -96,6 +101,12 @@ export const usePostersStore = defineStore('posters', {
             console.log('STOP SETTINGS INTERVAL');
             clearInterval(this.settingsInterval);
         },
+        startReloadMoviePostersInterval() {
+            console.log('START MOVIE POSTERS INTERVAL');
+            setInterval(() => {
+                this.reloadMoviePosters();
+            }, this.reloadPostersIntervalTime);
+        },
         getMoviePosters() {
             console.log('GET MOVIE POSTERS');
             this.stopTransitionImages();
@@ -103,31 +114,58 @@ export const usePostersStore = defineStore('posters', {
                 .get('/api/posters?show_in_rotation=true')
                 .then((response) => {
                     this.moviePosters = response.data.posters;
-                    let poster = '';
                     if (this.moviePosters.length === 0) {
                         this.loadingMessage =
                             'You do not have any posters loaded yet. Visit http://Your IP Address/posters to start.';
                     } else {
-                        if (this.settings.random_order) {
-                            poster = this.getRandomPoster();
-                        } else {
-                            poster = this.moviePosters[0];
-                        }
-
-                        poster.show = true;
-
-                        this.handlePosterView(poster);
-
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.loadingMessage = 'Loading Posters ...';
-                            this.startTransitionImages();
-                        }, this.bootTime);
+                        this.setInitialPosterView();
+                        this.bootReady();
                     }
                 })
                 .catch((e) => {
                     console.log(e.message);
                 });
+        },
+        reloadMoviePosters() {
+            console.log('RELOADING MOVIE POSTERS');
+            axios
+                .get('/api/posters?show_in_rotation=true')
+                .then((response) => {
+                    let posters = response.data.posters;
+                    if (this.moviePosters.length === 0 && posters.length > 0) {
+                        this.moviePosters = posters;
+                        this.loading = false;
+                        this.loadingMessage = 'Loading Posters ...';
+                        this.setInitialPosterView();
+                        setTimeout(() => {
+                            this.startTransitionImages();
+                        }, 250);
+                    } else {
+                        this.moviePosters = posters;
+                    }
+                })
+                .catch((e) => {
+                    console.log(e.message);
+                });
+        },
+        setInitialPosterView() {
+            let poster = '';
+            if (this.settings.random_order) {
+                poster = this.getRandomPoster();
+            } else {
+                poster = this.moviePosters[0];
+            }
+
+            poster.show = true;
+
+            this.handlePosterView(poster);
+        },
+        bootReady() {
+            setTimeout(() => {
+                this.loading = false;
+                this.loadingMessage = 'Loading Posters ...';
+                this.startTransitionImages();
+            }, this.bootTime);
         },
         handlePosterView(poster) {
             console.log('HANDLE POSTER VIEW');
@@ -432,7 +470,27 @@ export const usePostersStore = defineStore('posters', {
                 const action = data.NotificationContainer.type;
                 if (action === 'playing') {
                     const state = data.NotificationContainer.PlaySessionStateNotification[0].state;
-                    this.servicePlaying = 'plex';
+
+                    // Make status session call to check if its a movie
+                    if (!this.checkedPlexMediaType) {
+                        Api.apiCallPlex('/status/sessions/')
+                            .then((response) => {
+                                const size = response.data.MediaContainer.size;
+                                if (size > 0) {
+                                    let data = response.data.MediaContainer.Metadata[0];
+                                    this.checkedPlexMediaType = true;
+                                    if (data.type === 'movie') {
+                                        this.servicePlaying = 'plex';
+                                        this.controlPlayerState(state);
+                                    }
+                                }
+                            })
+                            .catch(() => {});
+                    }
+                }
+
+                if (action === 'stopped' && this.servicePlaying === 'plex' && this.nowPlaying) {
+                    this.checkedPlexMediaType = false;
                     this.controlPlayerState(state);
                 }
             });

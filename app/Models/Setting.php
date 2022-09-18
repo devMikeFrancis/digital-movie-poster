@@ -59,6 +59,8 @@ class Setting extends Model
         'footer_bg_color',
         'footer_text_color',
         'poster_bg_color',
+        'validate_movie_titles',
+        'remove_black_bars'
     ];
 
     protected function plexService(): Attribute
@@ -209,6 +211,20 @@ class Setting extends Model
     }
 
     protected function showBottomText(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function validateMovieTitles(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function removeBlackBars(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,

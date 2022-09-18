@@ -24,6 +24,7 @@
                                 :class="{
                                     'has-trailer': poster.show_trailer && poster.trailer_path,
                                 }"
+                                :style="blackBars"
                             >
                                 <Transition
                                     :name="
@@ -64,7 +65,7 @@
                     <div class="now-playing-container">
                         <div
                             class="now-playing-poster"
-                            :style="'background-image: url(' + nowPlayingPoster + ')'"
+                            :style="'background-image: url(' + nowPlayingPoster + ')' + blackBars"
                         ></div>
                     </div>
 
@@ -125,6 +126,11 @@ export default {
             'theme_music',
             'socket',
         ]),
+        blackBars() {
+            return this.settings.remove_black_bars
+                ? ' left: 0; right: 0; '
+                : ' left: 1.5vw; right: 1.5vw; ';
+        },
     },
     methods: {
         ...mapActions(usePostersStore, [
@@ -242,8 +248,6 @@ body {
     flex-grow: 2;
     position: absolute;
     top: 0;
-    left: 1.7vw;
-    right: 1.7vw;
     backface-visibility: hidden;
     will-change: opacity;
 
@@ -274,8 +278,6 @@ body {
 
 .now-playing-poster {
     height: 100%;
-    left: 1.7vw;
-    right: 1.7vw;
     flex-grow: 2;
     background-size: cover;
     background-repeat: no-repeat;

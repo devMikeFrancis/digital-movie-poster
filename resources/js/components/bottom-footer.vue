@@ -76,7 +76,7 @@ export default {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 4vh;
+    padding: 2.8vh;
 }
 .audience-rating {
     display: flex;

@@ -10,6 +10,23 @@ echo -e "\n\nInstalling PHP & Requirements\n"
 wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
 
+apt-get install supervisor -y
+
+touch /etc/supervisor/conf.d/laravel-worker.conf
+
+echo "[program:laravel-worker]" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "process_name=%(program_name)s_%(process_num)02d" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "command=php /var/www/html/artisan queue:work sqs --sleep=3 --tries=1 --max-time=4800" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "autostart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "autorestart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "stopasgroup=true" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "killasgroup=true" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "user=pi" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "numprocs=4" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "redirect_stderr=true" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "stdout_logfile=/var/www/html/worker.log" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "stopwaitsecs=4800" >> /etc/supervisor/conf.d/laravel-worker.conf
+
 apt update -y
 
 apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-zip php8.1-mysql php-imagick -y
@@ -164,6 +181,10 @@ php artisan optimize:clear
 php artisan optimize
 
 echo -e "\n\nDMP install finished\n"
+
+supervisorctl reread
+supervisorctl update
+supervisorctl start laravel-worker:*
 
 echo -e "\n\nInstalling HDMI CEC Control\n"
 

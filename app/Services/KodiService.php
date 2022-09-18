@@ -25,7 +25,7 @@ class KodiService implements MovieSyncInterface
      *
      * @return json
      */
-    public function apiCall($jsonRpc)
+    public function apiCall($jsonRpc, $method = 'GET', $params = [])
     {
         $request = 'http://'.$this->settings->kodi_url.':'.$this->settings->kodi_port.'/jsonrpc?request='.$jsonRpc;
 
@@ -85,19 +85,27 @@ class KodiService implements MovieSyncInterface
                 $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
             }
 
+            $whereUpdate = ['object_id' => 'kodi-'.$movie['movieid'] ];
+
+            $update = [
+                'name' => $orginalName,
+                'file_name' => $fileName,
+                'can_delete' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'mpaa_rating' => isset($movie['mpaa']) ? str_replace('Rated ', '', $movie['mpaa']) : null,
+                'audience_rating' => isset($movie['rating']) ? $movie['rating'] : 0,
+                'runtime' => is_numeric($movie['runtime']) ? $movie['runtime']/60 : null
+            ];
+
+            if ($this->settings->validate_movie_titles) {
+                $whereUpdate['name'] = $orginalName;
+                unset($update['name']);
+            }
+
             Poster::updateOrCreate(
-                ['object_id' => 'kodi-'.$movie['movieid'] ],
-                [
-                    'object_id' => 'kodi-'.$movie['movieid'],
-                    'name' => $orginalName,
-                    'file_name' => $fileName,
-                    'can_delete' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                    'mpaa_rating' => isset($movie['mpaa']) ? str_replace('Rated ', '', $movie['mpaa']) : null,
-                    'audience_rating' => isset($movie['rating']) ? $movie['rating'] : 0,
-                    'runtime' => is_numeric($movie['runtime']) ? $movie['runtime']/60 : null
-                ]
+                $whereUpdate,
+                $update
             );
         }
     }
