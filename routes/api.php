@@ -7,6 +7,7 @@ use App\Http\Controllers\SettingController;
 
 Route::get('/posters', [PosterController::class, 'index']);
 Route::get('/cache-posters', [PosterController::class, 'cache']);
+Route::post('/show-in-rotation', [PosterController::class, 'showInRotation']);
 Route::get('/sync-status', [PosterController::class, 'checkSyncStatus']);
 Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
 

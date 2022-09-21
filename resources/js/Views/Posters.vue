@@ -86,6 +86,62 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-4"></div>
+                            <div
+                                class="
+                                    col-span-12
+                                    md:col-span-8
+                                    flex
+                                    justify-between
+                                    md:justify-end
+                                    mb-4
+                                "
+                            >
+                                <label
+                                    class="
+                                        text-white
+                                        cursor-pointer
+                                        hover:opacity-40
+                                        transition-opacity
+                                        flex
+                                        items-center
+                                    "
+                                >
+                                    <span class="mr-2">All in/out rotation</span>
+                                    <input
+                                        type="checkbox"
+                                        v-model="all_show_in_rotation"
+                                        class="hidden"
+                                    />
+                                    <span v-if="!all_show_in_rotation" class="block opacity-60"
+                                        ><img
+                                            src="/images/eye-slash-regular.svg"
+                                            alt="Not in rotation"
+                                            style="width: 24px; height: auto"
+                                    /></span>
+                                    <span v-if="all_show_in_rotation"
+                                        ><img
+                                            src="/images/eye-regular.svg"
+                                            alt="In rotation"
+                                            style="width: 24px; height: auto"
+                                    /></span>
+                                </label>
+                                <button
+                                    class="
+                                        text-sm text-white
+                                        border border-white
+                                        hover:bg-gray-700
+                                        px-2
+                                        py-1
+                                        ml-3
+                                    "
+                                    @click="setAllRotation"
+                                >
+                                    Set
+                                </button>
+                            </div>
+                        </div>
                         <PostersSkeleton v-if="loading" />
                         <draggable
                             :list="filteredPosters"
@@ -237,6 +293,7 @@ export default {
             searchQuery: '',
             fakePosters: [1, 2, 3, 4],
             syncInProcess: false,
+            all_show_in_rotation: false,
         };
     },
     watch: {},
@@ -278,6 +335,18 @@ export default {
                 .get('/api/posters')
                 .then((response) => {
                     this.posters = response.data.posters;
+                })
+                .catch((e) => {
+                    console.log(e.message);
+                });
+        },
+        setAllRotation() {
+            axios
+                .post('/api/show-in-rotation', { all_show_in_rotation: this.all_show_in_rotation })
+                .then((response) => {
+                    this.posters.forEach((el) => {
+                        el.show_in_rotation = this.all_show_in_rotation;
+                    });
                 })
                 .catch((e) => {
                     console.log(e.message);

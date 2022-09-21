@@ -136,6 +136,14 @@ class PosterController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function showInRotation(Request $request)
+    {
+        $allShowInRotation = $request->boolean('all_show_in_rotation');
+        Poster::query()->update(['show_in_rotation' => $allShowInRotation]);
+
+        return ['success' => true];
+    }
+
     /**
      * Delete poster
      *
