@@ -1,7 +1,7 @@
 <template>
     <div class="md:sticky top-0 px-4 md:px-0">
         <div class="relative">
-            <div @click="showMenu = !showMenu" class="flex md:hidden justify-end">
+            <div @click="showMenu = !showMenu" class="flex lg:hidden justify-end">
                 <button
                     type="button"
                     class="text-gray-500 hover:text-gray-300 focus:outline-none focus:text-gray-300"
@@ -16,7 +16,7 @@
             </div>
             <ul
                 class="block text-gray-300 p-4 mb-5 mt-2 text-left"
-                :class="showMenu ? 'block' : 'hidden'"
+                :class="menuVisible ? 'block' : 'hidden'"
                 style="background-color: #121212"
             >
                 <li class="mb-3">
@@ -48,8 +48,27 @@ export default {
     },
     data() {
         return {
+            windowWidth: 0,
             showMenu: false,
+            mdBreakpoint: 1024,
         };
+    },
+    computed: {
+        menuVisible() {
+            return this.windowWidth > this.mdBreakpoint ? true : this.showMenu;
+        },
+    },
+    methods: {
+        updateWindowSize() {
+            this.windowWidth = window.innerWidth;
+        },
+    },
+    mounted() {
+        this.updateWindowSize();
+        window.addEventListener('resize', this.updateWindowSize);
+    },
+    beforeDestroyed() {
+        window.removeEventListener('resize', this.updateWindowSize);
     },
 };
 </script>

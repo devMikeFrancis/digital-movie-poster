@@ -9,15 +9,26 @@
                     <div class="lg:col-span-6 p-4" style="background-color: #121212">
                         <ul class="tabs">
                             <li>
-                                <a class="active" href="#general" @click.prevent="setTab($event)"
+                                <a
+                                    class="active text-sm md:text-md"
+                                    href="#general"
+                                    @click.prevent="setTab($event)"
                                     >General</a
                                 >
                             </li>
                             <li>
-                                <a href="#theme" @click.prevent="setTab($event)">Theme</a>
+                                <a
+                                    href="#theme"
+                                    class="text-sm md:text-md"
+                                    @click.prevent="setTab($event)"
+                                    >Theme</a
+                                >
                             </li>
                             <li>
-                                <a href="#sources" @click.prevent="setTab($event)"
+                                <a
+                                    href="#sources"
+                                    class="text-sm md:text-md"
+                                    @click.prevent="setTab($event)"
                                     >Poster Sources</a
                                 >
                             </li>
@@ -957,11 +968,16 @@ input[type='number'] {
     display: flex;
 
     li {
-        margin-right: 12px;
+        margin-right: 6px;
+
+        &:last-child {
+            margin-right: 0;
+        }
 
         a {
             display: block;
-            padding: 8px 24px;
+            padding: 8px 0;
+            min-width: 112px;
             text-align: center;
             color: #888;
             background-color: #333;
