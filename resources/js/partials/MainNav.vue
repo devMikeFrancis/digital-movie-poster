@@ -1,10 +1,14 @@
 <template>
     <div class="md:sticky top-0 px-4 md:px-0">
         <div class="relative">
-            <div @click="showMenu = !showMenu" class="flex lg:hidden justify-end">
+            <div @click="showMenu = !showMenu" class="flex lg:hidden mb-2 justify-between">
+                <h1 class="font-bold text-xl text-white flex items-center">
+                    <img src="/favicon-96x96.png" width="52" height="52" alt="DMP" class="mr-2" />
+                    Digital Movie Poster
+                </h1>
                 <button
                     type="button"
-                    class="text-gray-500 hover:text-gray-300 focus:outline-none focus:text-gray-300"
+                    class="text-white hover:text-gray-300 focus:outline-none focus:text-gray-300"
                 >
                     <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current">
                         <path
@@ -15,23 +19,37 @@
                 </button>
             </div>
             <ul
-                class="block text-gray-300 p-4 mb-5 mt-2 text-left"
+                class="block text-gray-300 mb-5 mt-2 md:mt-0 text-left"
                 :class="menuVisible ? 'block' : 'hidden'"
                 style="background-color: #121212"
             >
-                <li class="mb-3">
-                    <a href="/" class="hover:text-gray-500">&larr; Back to DMP</a>
+                <li class="px-2 py-4 mb-3 hidden lg:list-item" style="background-color: #000">
+                    <a href="/"
+                        ><h1 class="font-bold text-lg xl:text-xl text-white flex items-center">
+                            <img
+                                src="/favicon-96x96.png"
+                                width="52"
+                                height="52"
+                                alt="DMP"
+                                class="mr-2"
+                            />
+                            Digital Movie Poster
+                        </h1>
+                    </a>
                 </li>
-                <li class="mb-3">
+                <li class="lg:hidden py-2 px-4 pt-5 lg:pt-2 mb-3">
+                    <a href="/"><strong>DMP</strong></a>
+                </li>
+                <li class="py-2 px-4 mb-3">
                     <router-link class="hover:text-gray-500" to="/posters">Posters</router-link>
                 </li>
-                <li class="mb-3">
+                <li class="py-2 px-4 mb-3">
                     <router-link class="hover:text-gray-500" to="/voting">Voting</router-link>
                 </li>
-                <li class="mb-5">
+                <li class="py-2 px-4 mb-5">
                     <router-link class="hover:text-gray-500" to="/settings">Settings</router-link>
                 </li>
-                <li>
+                <li class="pt-4" style="background-color: #000">
                     <refresh-button></refresh-button>
                 </li>
             </ul>
