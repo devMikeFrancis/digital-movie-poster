@@ -3,10 +3,10 @@
         <div class="admin py-5">
             <div class="md:container md:mx-auto lg:container lg:mx-auto">
                 <div class="grid lg:grid-cols-12 gap-4">
-                    <div class="lg:col-span-2">
+                    <div class="lg:col-span-3">
                         <main-nav />
                     </div>
-                    <div class="lg:col-span-6 p-4" style="background-color: #121212">
+                    <div class="lg:col-span-9 p-4" style="background-color: #121212">
                         <ul class="tabs">
                             <li>
                                 <a
