@@ -45,45 +45,12 @@
                                     placeholder="Search ..."
                                     :disabled="recaching"
                                 />
-                                <button
-                                    class="
-                                        btn
-                                        text-black
-                                        bg-gray-300
-                                        text-md
-                                        px-3
-                                        py-1
-                                        rounded-none
-                                        hover:bg-gray-100
-                                    "
-                                    @click.prevent="cachePosters"
-                                    :disabled="recaching || syncInProcess"
-                                >
-                                    <span v-show="!recaching && !syncInProcess"
-                                        ><svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 512 512"
-                                            class="mr-3"
-                                        >
-                                            <path
-                                                d="M492 8h-10c-6.627 0-12 5.373-12 12v110.627C426.929 57.261 347.224 8 256 8 123.228 8 14.824 112.338 8.31 243.493 7.971 250.311 13.475 256 20.301 256h10.016c6.353 0 11.646-4.949 11.977-11.293C48.157 132.216 141.097 42 256 42c82.862 0 154.737 47.077 190.289 116H332c-6.627 0-12 5.373-12 12v10c0 6.627 5.373 12 12 12h160c6.627 0 12-5.373 12-12V20c0-6.627-5.373-12-12-12zm-.301 248h-10.015c-6.352 0-11.647 4.949-11.977 11.293C463.841 380.158 370.546 470 256 470c-82.608 0-154.672-46.952-190.299-116H180c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H20c-6.627 0-12 5.373-12 12v160c0 6.627 5.373 12 12 12h10c6.627 0 12-5.373 12-12V381.373C85.071 454.739 164.777 504 256 504c132.773 0 241.176-104.338 247.69-235.493.339-6.818-5.165-12.507-11.991-12.507z"
-                                            />
-                                        </svg>
-                                        Sync Posters</span
-                                    >
-                                    <span v-show="recaching || syncInProcess"
-                                        ><svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 512 512"
-                                            class="mr-3 spin"
-                                        >
-                                            <path
-                                                d="M492 8h-10c-6.627 0-12 5.373-12 12v110.627C426.929 57.261 347.224 8 256 8 123.228 8 14.824 112.338 8.31 243.493 7.971 250.311 13.475 256 20.301 256h10.016c6.353 0 11.646-4.949 11.977-11.293C48.157 132.216 141.097 42 256 42c82.862 0 154.737 47.077 190.289 116H332c-6.627 0-12 5.373-12 12v10c0 6.627 5.373 12 12 12h160c6.627 0 12-5.373 12-12V20c0-6.627-5.373-12-12-12zm-.301 248h-10.015c-6.352 0-11.647 4.949-11.977 11.293C463.841 380.158 370.546 470 256 470c-82.608 0-154.672-46.952-190.299-116H180c6.627 0 12-5.373 12-12v-10c0-6.627-5.373-12-12-12H20c-6.627 0-12 5.373-12 12v160c0 6.627 5.373 12 12 12h10c6.627 0 12-5.373 12-12V381.373C85.071 454.739 164.777 504 256 504c132.773 0 241.176-104.338 247.69-235.493.339-6.818-5.165-12.507-11.991-12.507z"
-                                            />
-                                        </svg>
-                                        Syncing Posters</span
-                                    >
-                                </button>
+
+                                <SyncButton
+                                    :recaching="recaching"
+                                    :syncInProcess="syncInProcess"
+                                    @cachePosters="cachePosters"
+                                />
                             </div>
                         </div>
                         <div class="grid grid-cols-12 gap-4">
@@ -161,83 +128,66 @@
                                             gap-4
                                             relative
                                         "
+                                        :class="{ 'not-in-rotation': !element.show_in_rotation }"
                                     >
                                         <div class="col-span-1 w-10 md:w-12">
                                             <div
-                                                class="poster-image-block handle"
+                                                class="
+                                                    poster-image-block
+                                                    relative
+                                                    handle
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    overflow-hidden
+                                                "
                                                 :style="
                                                     'background-image: url(storage/posters/_tn_' +
                                                     element.file_name +
                                                     ')'
                                                 "
-                                            ></div>
+                                            >
+                                                <span
+                                                    class="
+                                                        block
+                                                        w-4
+                                                        h-4
+                                                        border border-white
+                                                        rounded-full
+                                                        bg-red-700
+                                                    "
+                                                    v-if="!element.show_in_rotation"
+                                                ></span>
+                                            </div>
                                         </div>
-                                        <div class="col-span-4 md:col-span-7 flex items-center">
+                                        <div class="col-span-5 md:col-span-10 flex items-center">
                                             <router-link
                                                 class="
-                                                    w-full
-                                                    text-white
+                                                    poster-title
                                                     block
                                                     py-1
                                                     font-bold
                                                     hover:text-gray-500
                                                 "
+                                                :class="{
+                                                    'text-gray-400 line-through':
+                                                        !element.show_in_rotation,
+                                                    'text-white': element.show_in_rotation,
+                                                }"
                                                 :to="'/posters/' + element.id"
                                             >
                                                 {{ element.title }}</router-link
                                             >
                                         </div>
 
-                                        <div
-                                            class="
-                                                col-span-2
-                                                md:col-span-4
-                                                flex
-                                                items-center
-                                                justify-around
-                                            "
-                                        >
-                                            <label
-                                                class="
-                                                    text-white
-                                                    cursor-pointer
-                                                    hover:opacity-40
-                                                    transition-opacity
-                                                "
-                                                ><input
-                                                    type="checkbox"
-                                                    v-model="element.show_in_rotation"
-                                                    class="hidden"
-                                                    @change="
-                                                        updateSetting(
-                                                            element,
-                                                            'show_in_rotation',
-                                                            element.show_in_rotation
-                                                        )
-                                                    "
+                                        <div class="col-span-1 flex items-center justify-around">
+                                            <div class="flex items-center justify-around">
+                                                <PosterOptions
+                                                    :poster="element"
+                                                    @editPoster="editPoster"
+                                                    @deletePoster="deletePoster"
                                                 />
-                                                <span
-                                                    v-if="!element.show_in_rotation"
-                                                    class="block opacity-60"
-                                                    ><img
-                                                        src="/images/eye-slash-regular.svg"
-                                                        alt="Not in rotation"
-                                                        style="width: 24px; height: auto"
-                                                /></span>
-                                                <span v-if="element.show_in_rotation"
-                                                    ><img
-                                                        src="/images/eye-regular.svg"
-                                                        alt="In rotation"
-                                                        style="width: 24px; height: auto"
-                                                /></span>
-                                            </label>
-
-                                            <PosterOptions :poster="element" />
-
-                                            <PosterDelete
-                                                :poster="element"
-                                                @deletePoster="deletePoster"
-                                            />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -255,13 +205,14 @@
 </template>
 
 <script>
+import router from '@/router';
 import { mapState, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 
 import MainNav from '@/partials/MainNav.vue';
 import PosterOptions from '@/components/poster-options.vue';
-import PosterDelete from '@/components/poster-delete.vue';
 import PostersSkeleton from '@/components/posters-skeleton.vue';
+import SyncButton from '@/components/sync-button.vue';
 import SyncModal from '@/components/sync-modal.vue';
 import draggable from 'vuedraggable';
 
@@ -270,8 +221,8 @@ export default {
         MainNav,
         draggable,
         PosterOptions,
-        PosterDelete,
         PostersSkeleton,
+        SyncButton,
         SyncModal,
     },
     data: function () {
@@ -335,6 +286,9 @@ export default {
                     console.log(e.message);
                 });
         },
+        editPoster(poster) {
+            router.push({ name: 'PostersEdit', params: { id: poster.id } });
+        },
         setAllRotation() {
             axios
                 .post('/api/show-in-rotation', { all_show_in_rotation: this.all_show_in_rotation })
@@ -369,8 +323,14 @@ export default {
                     if (response.data.status === 'running') {
                         this.syncInProcess = true;
                     } else {
-                        this.syncInProcess = false;
-                        this.showSyncingModal = false;
+                        if (this.syncInProcess) {
+                            this.reloadPosters();
+                        }
+
+                        setTimeout(() => {
+                            this.syncInProcess = false;
+                            this.showSyncingModal = false;
+                        }, 200);
                     }
                 })
                 .catch((e) => {
@@ -427,7 +387,7 @@ export default {
         this.checkSyncStatus();
         setInterval(() => {
             this.checkSyncStatus();
-            this.reloadPosters();
+            //this.reloadPosters();
         }, 7000);
     },
 };
@@ -474,26 +434,6 @@ input[type='number'] {
     }
 }
 
-.btn {
-    min-height: 34px;
-
-    svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    span {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    &:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-    }
-}
-
 .search-input {
     background-color: #555;
     transition: background-color 0.25s ease;
@@ -514,36 +454,17 @@ input[type='number'] {
     }
 }
 
+.not-in-rotation {
+    .poster-title {
+    }
+}
+
 .handle {
     cursor: ns-resize;
 }
 
 .v-draggable__placeholder {
     background: #888;
-}
-
-@-webkit-keyframes rotating /* Safari and Chrome */ {
-    from {
-        -webkit-transform: rotate(0deg);
-        -o-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    to {
-        -webkit-transform: rotate(360deg);
-        -o-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-@keyframes rotating {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-.spin {
-    animation: rotating 2s linear infinite;
 }
 
 .fade-enter-active,

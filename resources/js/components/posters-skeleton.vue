@@ -6,12 +6,10 @@
                     <div class="col-span-1 w-10 md:w-12">
                         <div class="skeleton-poster-tn shimmer bg-gray-500 rounded-sm"></div>
                     </div>
-                    <div class="col-span-4 md:col-span-7 flex items-center">
+                    <div class="col-span-5 md:col-span-10 flex items-center">
                         <div class="w-full h-4 bg-gray-500 rounded-sm shimmer"></div>
                     </div>
-                    <div class="col-span-2 md:col-span-4 flex items-center justify-around">
-                        <div class="w-4 h-5 bg-gray-500 rounded-sm shimmer"></div>
-                        <div class="w-4 h-5 bg-gray-500 rounded-sm shimmer"></div>
+                    <div class="col-span-1 flex items-center justify-around">
                         <div class="w-4 h-5 bg-gray-500 rounded-sm shimmer"></div>
                     </div>
                 </div>

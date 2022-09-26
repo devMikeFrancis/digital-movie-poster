@@ -99,7 +99,7 @@ export default {
 .top-header {
     width: 100%;
     display: flex;
-    min-height: 18vh;
+    min-height: 12vh;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -109,7 +109,7 @@ export default {
         text-transform: uppercase;
         padding: 12px 24px 14px 24px;
         border: 4px solid #fff;
-        font-size: 6.5vh;
+        font-size: 6.5vw;
         font-weight: 700;
         color: #fff;
         line-height: 1;
@@ -121,10 +121,23 @@ export default {
 .runtime {
     position: absolute;
     top: 50%;
-    left: 5%;
+    left: 2%;
     color: #fff;
-    font-size: 1.4vw;
+    font-size: 3vw;
     font-weight: 400;
     transform: translateY(-50%);
+}
+
+.rotated {
+    .top-header {
+        min-height: 18vh;
+        h1 {
+            font-size: 6.5vh;
+        }
+    }
+    .runtime {
+        font-size: 1.4vw;
+        left: 5%;
+    }
 }
 </style>

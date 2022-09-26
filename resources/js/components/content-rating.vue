@@ -148,31 +148,12 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.cls-1 {
-    isolation: isolate;
-}
-.cls-2 {
-    fill: #fff;
-}
-.cls-3,
-.cls-4,
-.cls-5 {
-    fill: none;
-    stroke: #fff;
-    stroke-miterlimit: 10;
-}
-.cls-3 {
-    stroke-width: 14px;
-}
-.cls-4 {
-    stroke-width: 15px;
-}
 .content-rating {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     margin-right: auto;
-    width: 7vw;
+    width: 9vh;
     padding-right: 1vw;
     color: #fff;
 
@@ -180,6 +161,12 @@ export default {
     svg {
         width: 100%;
         height: auto;
+    }
+}
+
+.rotated {
+    .content-rating {
+        width: 7vw;
     }
 }
 </style>

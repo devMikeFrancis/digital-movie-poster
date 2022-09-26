@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="movie-posters">
+        <div class="movie-posters" :class="{ rotated: rotated }">
             <div class="loading-overlay" v-if="loading">
-                <div class="p-12" @click="gotoPosters()">{{ loadingMessage }}</div>
+                <div class="p-6" @click="gotoPosters()">{{ loadingMessage }}</div>
             </div>
             <div
                 id="recent-added-container"
@@ -131,6 +131,9 @@ export default {
                 ? ' left: 0; right: 0; '
                 : ' left: 1.5vw; right: 1.5vw; ';
         },
+        rotated() {
+            return window.navigator.userAgent === 'chrome-movieposter' ? true : false;
+        },
     },
     methods: {
         ...mapActions(usePostersStore, [
@@ -170,28 +173,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-body {
-    overflow: hidden;
-
-    .movie-posters {
-        transform: rotate(90deg);
-        transform-origin: bottom left;
-
-        position: absolute;
-        top: -100vw;
-        left: 0;
-
-        height: 100vw;
-        width: 100vh;
-
-        background-color: #000;
-        color: #fff;
-
-        overflow: auto;
-    }
-}
-
+<style lang="scss">
 .poster-container {
     position: fixed;
     top: 0;
@@ -202,6 +184,25 @@ body {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.movie-posters {
+    background-color: #000;
+    color: #fff;
+    overflow: auto;
+}
+
+.rotated {
+    .movie-posters {
+        height: 100vw;
+        width: 100vh;
+        transform: rotate(90deg);
+        transform-origin: bottom left;
+
+        position: absolute;
+        top: -100vw;
+        left: 0;
+    }
 }
 
 #recent-added-container {

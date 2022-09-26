@@ -209,7 +209,7 @@ raspi-config nonint do_boot_behaviour B2
 cd "/home/pi" && pwd
 
 autostart="
-chromium-browser --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1920,1080 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost'
+chromium-browser --user-agent=chrome-movieposter --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1920,1080 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost?rotate=true'
 "
 echo "xset s off" >> /etc/xdg/openbox/autostart
 echo "xset s noblank" >> /etc/xdg/openbox/autostart

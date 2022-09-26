@@ -52,11 +52,20 @@ export default {
                 this.starSize = 30;
             }
             if (vw > 3000) {
-                this.starSize = 44;
+                this.starSize = 40;
                 this.borderWidth = 4;
             }
             if (vw <= 2000) {
-                this.starSize = 24;
+                this.starSize = 22;
+            }
+            if (vw <= 1200) {
+                this.starSize = 20;
+            }
+            if (vw <= 900) {
+                this.starSize = 18;
+            }
+            if (vw <= 700) {
+                this.starSize = 10;
             }
         },
     },
@@ -71,19 +80,19 @@ export default {
 <style lang="scss" scoped>
 .poster-footer {
     width: 100%;
-    min-height: 18vh;
+    min-height: 12vh;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 2.8vh;
+    padding: 2vw;
 }
 .audience-rating {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     margin-left: auto;
-    width: 14vh;
+    width: 11vh;
     margin-left: auto;
 }
 .vue-star-rating {
@@ -92,5 +101,15 @@ export default {
 
 .vue-star-rating-star {
     margin-right: 4px !important;
+}
+
+.rotated {
+    .poster-footer {
+        min-height: 18vh;
+        padding: 2.8vh;
+    }
+    .audience-rating {
+        width: 14vh;
+    }
 }
 </style>
