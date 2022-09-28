@@ -66,7 +66,7 @@ You can access the settings via any web browser.
 ## Using Laravel Sail (Docker)
 
 1. In the project root run `cp .env.example .env`
-2. The n run the following commands:
+2. Then run the following commands:
     - `php artisan key:generate`
     - `php artisan storage:link`
     - `chgrp -R www-data storage bootstrap/cache`
