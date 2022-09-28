@@ -29,6 +29,7 @@
         "eventemitter3": "^4.0.7",
         "pinia": "^2.0.17",
         "socket.io-client": "^4.5.1",
+        "socketserver": "file:socketserver",
         "vue-click-outside": "^1.1.0",
         "vue-router": "^4.1.3",
         "vue-star-rating": "^2.1.0",

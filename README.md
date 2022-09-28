@@ -67,8 +67,12 @@ You can access the settings via any web browser.
 
 1. In the project root run `cp .env.example .env`
 2. Then run the following commands:
-    - `php artisan key:generate`
-    - `php artisan storage:link`
+    - `./vendor/bin/sail artisan key:generate`
+    - `./vendor/bin/sail artisan storage:link`
+    - `./vendor/bin/sail composer install`
+    - `./vendor/bin/sail artisan migrate`
+    - `./vendor/bin/sail npm install`
+    - `./vendor/bin/sail npm run build`
     - `chgrp -R www-data storage bootstrap/cache`
     - `chmod -R ug+rwx storage bootstrap/cache`
 3. In the project root folder edit the `.env` file. Set `DB_HOST` to `mariadb`

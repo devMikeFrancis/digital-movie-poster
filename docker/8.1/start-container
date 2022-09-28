@@ -10,12 +10,6 @@ fi
 
 chmod -R ugo+rw /.composer
 
-
-cd "/var/www/html" && pwd
-composer install --no-interaction
-php artisan migrate
-npm install
-
 cd "/var/www/html/socketserver" && pwd
 npm install
 
