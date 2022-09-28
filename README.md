@@ -66,7 +66,8 @@ You can access the settings via any web browser.
 ## Using Laravel Sail (Docker)
 
 1. In the project root run `cp .env.example .env`
-2. Then run the following commands:
+2. In the project root folder edit the `.env` file. Set `DB_HOST` to `mariadb`
+3. Then run the following commands:
     - `./vendor/bin/sail artisan key:generate`
     - `./vendor/bin/sail artisan storage:link`
     - `./vendor/bin/sail composer install`
@@ -75,7 +76,6 @@ You can access the settings via any web browser.
     - `./vendor/bin/sail npm run build`
     - `chgrp -R www-data storage bootstrap/cache`
     - `chmod -R ug+rwx storage bootstrap/cache`
-3. In the project root folder edit the `.env` file. Set `DB_HOST` to `mariadb`
 4. In the project root folder run `./vendor/bin/sail up -d`. When you run this command for the very first time it will install the docker containers and start the site.
 5. After the container first boots it may take 30-45 secs for the site to load.
 6. Visit `http://localhost:8074` in your browser.
