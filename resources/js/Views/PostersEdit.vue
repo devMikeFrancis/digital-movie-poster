@@ -167,111 +167,121 @@
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_trailer"
                                         />
-                                        Show Trailer</label
+                                        <span class="ml-2">Show Trailer</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_runtime"
                                         />
-                                        Show Runtime</label
+                                        <span class="ml-2">Show Runtime</span></label
                                     >
                                 </div>
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_in_rotation"
                                         />
-                                        Show in Rotation</label
+                                        <span class="ml-2">Show in Rotation</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.play_theme_music"
                                         />
-                                        Play Theme Music</label
+                                        <span class="ml-2">Play Theme Music</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_dolby_atmos"
                                         />
-                                        Show Dolby Atmos Logo</label
+                                        <span class="ml-2">Show Dolby Atmos Logo</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_dolby_51"
                                         />
-                                        Show Dolby 5.1 Logo</label
+                                        <span class="ml-2">Show Dolby 5.1 Logo</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_dolby_vision"
                                         />
-                                        Show Dolby Vision Logo</label
+                                        <span class="ml-2">Show Dolby Vision Logo</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_dtsx"
                                         />
-                                        Show DTS:X Logo</label
+                                        <span class="ml-2">Show DTS:X Logo</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_auro_3d"
                                         />
-                                        Show Auro 3D Logo</label
+                                        <span class="ml-2">Show Auro 3D Logo</span></label
                                     >
                                 </div>
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             type="checkbox"
                                             class="text-black"
                                             v-model="poster.show_imax"
                                         />
-                                        Show IMAX Enhanced Logo</label
+                                        <span class="ml-2">Show IMAX Enhanced Logo</span></label
                                     >
                                 </div>
 
@@ -495,7 +505,7 @@ export default {
         }
         this.setSavePosterBtn();
         if (typeof io !== 'undefined') {
-            this.socket = io('http://' + location.host + ':3000');
+            this.socket = io('http://' + location.hostname + ':3000');
         }
     },
 };

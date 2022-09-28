@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 export const usePostersStore = defineStore('posters', {
     state: () => ({
         loading: true,
-        loadingMessage: 'Loading Posters ...',
+        loadingMessage: 'Loading<br/>Posters ...',
         bootTime: 5000,
         settingsIntervalTime: 10000,
         reloadPostersIntervalTime: 20000,
@@ -116,7 +116,7 @@ export const usePostersStore = defineStore('posters', {
                     this.moviePosters = response.data.posters;
                     if (this.moviePosters.length === 0) {
                         this.loadingMessage =
-                            'You do not have any posters loaded yet. Visit http://Your IP Address/posters to start.';
+                            'You do not have any posters loaded yet.<br/>Visit http://Your IP Address/posters to start.';
                     } else {
                         this.setInitialPosterView();
                         this.bootReady();
@@ -135,7 +135,7 @@ export const usePostersStore = defineStore('posters', {
                     if (this.moviePosters.length === 0 && posters.length > 0) {
                         this.moviePosters = posters;
                         this.loading = false;
-                        this.loadingMessage = 'Loading Posters ...';
+                        this.loadingMessage = 'Loading<br />Posters ...';
                         this.setInitialPosterView();
                         setTimeout(() => {
                             this.startTransitionImages();
@@ -163,7 +163,7 @@ export const usePostersStore = defineStore('posters', {
         bootReady() {
             setTimeout(() => {
                 this.loading = false;
-                this.loadingMessage = 'Loading Posters ...';
+                this.loadingMessage = 'Loading<br />Posters ...';
                 this.startTransitionImages();
             }, this.bootTime);
         },
@@ -625,7 +625,7 @@ export const usePostersStore = defineStore('posters', {
         },
         reload() {
             console.log('--- RELOADING ---');
-            this.loadingMessage = 'Re-loading Posters ...';
+            this.loadingMessage = 'Re-loading<br />Posters ...';
             this.loading = true;
             this.stopTransitionImages();
             clearInterval(this.recentlyAddedInterval);
@@ -640,10 +640,12 @@ export const usePostersStore = defineStore('posters', {
             this.loading = value;
         },
         setSocket() {
-            this.socket = io('http://' + location.host + ':3000'); //' + import.meta.env.VITE_BASE_URL + '
+            this.socket = io('http://' + location.hostname + ':3000');
+            // location.host || ' + import.meta.env.VITE_BASE_URL + '
             this.socket.on('receive:command', (data) => {
                 switch (data.command) {
                     case 'reload':
+                        console.log('-- RELOAD COMMAND --');
                         this.reload();
                         break;
                 }

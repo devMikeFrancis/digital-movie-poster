@@ -28,7 +28,7 @@ services:
     mariadb:
         image: 'mariadb:10'
         ports:
-            - '${FORWARD_DB_PORT:-3307}:3306'
+            - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'

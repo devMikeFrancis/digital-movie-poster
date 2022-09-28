@@ -2,7 +2,7 @@
     <div>
         <div class="movie-posters" :class="{ rotated: rotated }">
             <div class="loading-overlay" v-if="loading">
-                <div class="p-6" @click="gotoPosters()">{{ loadingMessage }}</div>
+                <div class="p-6" @click="gotoPosters()" v-html="loadingMessage"></div>
             </div>
             <div
                 id="recent-added-container"

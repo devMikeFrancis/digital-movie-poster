@@ -27,72 +27,136 @@
                     Edit
                 </button>
             </div>
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_in_rotation"
                     @change="updateSetting(poster, 'show_in_rotation', poster.show_in_rotation)"
                 />
-                Show in rotation
+                <span class="ml-2">Show in rotation</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_trailer"
                     @change="updateSetting(poster, 'show_trailer', poster.show_trailer)"
                 />
-                Show trailer
+                <span class="ml-2">Show trailer</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_dolby_atmos"
                     @change="updateSetting(poster, 'show_dolby_atmos', poster.show_dolby_atmos)"
                 />
-                Show Dolby Atmos Logo
+                <span class="ml-2">Show Dolby Atmos Logo</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_dolby_51"
                     @change="updateSetting(poster, 'show_dolby_51', poster.show_dolby_51)"
                 />
-                Show Dolby 5.1 Logo
+                <span class="ml-2">Show Dolby 5.1 Logo</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_dolby_vision"
                     @change="updateSetting(poster, 'show_dolby_vision', poster.show_dolby_vision)"
                 />
-                Show Dolby Vision Logo
+                <span class="ml-2">Show Dolby Vision Logo</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_dtsx"
                     @change="updateSetting(poster, 'show_dtsx', poster.show_dtsx)"
                 />
-                Show DTS:X Logo
+                <span class="ml-2">Show DTS:X Logo</span>
             </label>
 
-            <label class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white"
+            <label
+                class="
+                    flex
+                    items-center
+                    px-4
+                    py-2
+                    text-sm text-gray-700
+                    hover:bg-gray-500
+                    hover:text-white
+                "
                 ><input
                     type="checkbox"
                     v-model="poster.show_auro_3d"
                     @change="updateSetting(poster, 'show_auro_3d', poster.show_auro_3d)"
                 />
-                Show Auro 3D Logo
+                <span class="ml-2">Show Auro 3D Logo</span>
             </label>
 
             <label
                 class="
-                    block
+                    flex
+                    items-center
                     px-4
                     py-2
                     text-sm text-gray-700
@@ -105,7 +169,7 @@
                     v-model="poster.show_imax"
                     @change="updateSetting(poster, 'show_imax', poster.show_imax)"
                 />
-                Show IMAX Enhanced Logo
+                <span class="ml-2">Show IMAX Enhanced Logo</span>
             </label>
 
             <div class="px-3">

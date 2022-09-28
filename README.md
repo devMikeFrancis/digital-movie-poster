@@ -63,6 +63,15 @@ You can access the settings via any web browser.
 
 `http://raspberrypi.local/posters` or `http://the ip address of the Pi/posters`
 
+## Using Laravel Sail (Docker)
+
+1. In the project root folder edit the `.env` file. Set `DB_HOST` to `mariadb`
+2. In the project root folder run `./vendor/bin/sail up -d`. When you run this command for the very first time it will install the docker containers and start the site.
+3. After the container first boots it may take 30-45 secs for the site to load.
+4. Visit `http://localhost:8074` in your browser.
+5. If you are loading up the site using a remote browser that is connected to a TV add the `rotate` param to the URL like this: `http://localhost:8074?rotate=true`
+6. If you need more help on Laravel Sail, please visit `https://laravel.com/docs/sail`
+
 ---
 
 **Recommended poster size is 1400x2000 or higher, but retain the same ratio.**

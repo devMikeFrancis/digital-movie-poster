@@ -52,7 +52,10 @@
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
-                                    <label for="random" class="text-gray-300 block mb-2 font-bold">
+                                    <label
+                                        for="random"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
                                         <input
                                             type="checkbox"
                                             class="text-black"
@@ -60,7 +63,7 @@
                                             aria-describedby="randomHelp"
                                             v-model="settings.random_order"
                                         />
-                                        Randomize Poster Order
+                                        <span class="ml-2">Randomize Poster Order</span>
                                     </label>
                                     <div id="randomHelp" class="text-gray-400 text-sm">
                                         Randomize poster order or display posters in order you
@@ -155,7 +158,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="show-runtime"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -163,7 +166,7 @@
                                             id="show-runtime"
                                             v-model="settings.show_runtime"
                                         />
-                                        Show Runtime
+                                        <span class="ml-2">Show Runtime</span>
                                     </label>
                                     <div id="show-runtimeHelp" class="text-gray-400 text-sm">
                                         Displays the movie runtime in the top left corner.
@@ -173,7 +176,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="mpaa-rating"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -182,7 +185,7 @@
                                             aria-describedby="mpaa-ratingHelp"
                                             v-model="settings.show_mpaa_rating"
                                         />
-                                        Show MPAA Rating
+                                        <span class="ml-2">Show MPAA Rating</span>
                                     </label>
                                     <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
                                         Shows the MPAA rating when a movie is playing.
@@ -192,7 +195,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="audience-rating"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -201,7 +204,7 @@
                                             aria-describedby="audience-ratingHelp"
                                             v-model="settings.show_audience_rating"
                                         />
-                                        Show Audience Rating</label
+                                        <span class="ml-2">Show Audience Rating</span></label
                                     >
                                     <div id="audience-ratingHelp" class="text-gray-400 text-sm">
                                         Shows the audience rating when a movie is playing.
@@ -211,7 +214,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="theme-music"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -220,7 +223,7 @@
                                             aria-describedby="theme-musicHelp"
                                             v-model="settings.play_theme_music"
                                         />
-                                        Play Theme Music</label
+                                        <span class="ml-2">Play Theme Music</span></label
                                     >
                                     <div id="theme-musicHelp" class="text-gray-400 text-sm">
                                         Play theme music for posters
@@ -230,7 +233,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="processing-logos"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -239,7 +242,7 @@
                                             aria-describedby="processing-logosHelp"
                                             v-model="settings.show_processing_logos"
                                         />
-                                        Show Processing Logos
+                                        <span class="ml-2">Show Processing Logos</span>
                                     </label>
                                     <div id="processing-logosHelp" class="text-gray-400 text-sm">
                                         Shows logos such as Dolby Atmos or Dolby Vision.
@@ -249,94 +252,106 @@
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_dolby_51"
                                         />
-                                        Show Dolby Digital 5.1 Logo</label
+                                        <span class="ml-2">Show Dolby Digital 5.1 Logo</span></label
                                     >
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_dolby_atmos_vertical"
                                         />
-                                        Show Dolby Atmos Logo</label
+                                        <span class="ml-2">Show Dolby Atmos Logo</span></label
                                     >
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_dolby_vision_vertical"
                                         />
-                                        Show Dolby Vision Logo</label
+                                        <span class="ml-2">Show Dolby Vision Logo</span></label
                                     >
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_dts"
                                         />
-                                        Show DTS:X Logo</label
+                                        <span class="ml-2">Show DTS:X Logo</span></label
                                     >
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_imax"
                                         />
-                                        Show IMAX Enhanced</label
+                                        <span class="ml-2">Show IMAX Enhanced</span></label
                                     >
-                                    <label class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_auro_3d"
                                         />
-                                        Show Auro 3D Logo</label
+                                        <span class="ml-2">Show Auro 3D Logo</span></label
                                     >
                                 </div>
 
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
-                                    <label class="text-gray-300 block mb-1 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-1 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.validate_movie_titles"
                                         />
-                                        Validate movie titles when syncing
+                                        <span class="ml-2">Validate movie titles when syncing</span>
                                     </label>
                                     <div class="text-sm mb-3">
                                         Useful when using multiple sync services. The movie titles
                                         will have to match exactly.
                                     </div>
 
-                                    <label class="text-gray-300 block mb-1 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-1 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.remove_black_bars"
                                         />
-                                        Remove side black bars.
+                                        <span class="ml-2">Remove side black bars</span>
                                     </label>
                                     <div class="text-sm mb-3">
                                         The small space on each side of the poster. The space is
                                         helpful when framing the TV.
                                     </div>
 
-                                    <label class="text-gray-300 block mb-3 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-3 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.use_global_prologos"
                                         />
-                                        Always use enabled processing logos from settings.
+                                        <span class="ml-2"
+                                            >Use processing logos from global settings</span
+                                        >
                                     </label>
-                                    <label class="text-gray-300 block mb-3 font-bold"
+                                    <label
+                                        class="text-gray-300 block mb-3 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
@@ -344,8 +359,9 @@
                                                 settings.use_global_prologos_if_no_poster_prologos
                                             "
                                         />
-                                        Use settings processing logos only if poster does not have
-                                        any enabled.
+                                        <span class="ml-2"
+                                            >Use global processing logos if no poster logos</span
+                                        >
                                     </label>
                                 </div>
 
@@ -354,7 +370,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="cec-controls"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -363,7 +379,7 @@
                                             aria-describedby="cec-controlsHelp"
                                             v-model="settings.use_cec_power"
                                         />
-                                        Use HDMI CEC Controls
+                                        <span class="ml-2">Use HDMI CEC Controls</span>
                                     </label>
                                     <div id="cec-controlsHelp" class="text-gray-400 text-sm">
                                         Allow the application to turn on/off your display during
@@ -473,7 +489,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="show-header-border"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -481,7 +497,7 @@
                                             id="show-header-border"
                                             v-model="settings.show_header_border"
                                         />
-                                        Show Top Border
+                                        <span class="ml-2">Show Top Border</span>
                                     </label>
                                     <div id="show-header-border-Help" class="text-gray-400 text-sm">
                                         Displays thin border around "Coming Soon/Now Playing" text.
@@ -607,7 +623,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="plex-service"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -616,7 +632,7 @@
                                             aria-describedby="plex-serviceHelp"
                                             v-model="settings.plex_service"
                                         />
-                                        Enable Plex Service</label
+                                        <span class="ml-2">Enable Plex Service</span></label
                                     >
                                     <div id="plex-serviceHelp" class="text-gray-400 text-sm">
                                         Use Plex media server for posters.
@@ -668,7 +684,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="jellyfin-service"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -677,7 +693,7 @@
                                             aria-describedby="jellyfin-serviceHelp"
                                             v-model="settings.jellyfin_service"
                                         />
-                                        Enable Jellyfin Service</label
+                                        <span class="ml-2">Enable Jellyfin Service</span></label
                                     >
                                     <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
                                         Use Jellyfin media server for posters.
@@ -722,7 +738,7 @@
                                 <div class="mb-5">
                                     <label
                                         for="jellyfin-service"
-                                        class="text-gray-300 block mb-2 font-bold"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
                                         <input
                                             type="checkbox"
@@ -731,7 +747,7 @@
                                             aria-describedby="kodi-serviceHelp"
                                             v-model="settings.kodi_service"
                                         />
-                                        Enable Kodi Service</label
+                                        <span class="ml-2">Enable Kodi Service</span></label
                                     >
                                     <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
                                         Use Kodi media server for posters.
@@ -951,7 +967,7 @@ export default {
     mounted() {
         this.getSettings();
         if (typeof io !== 'undefined') {
-            this.socket = io('http://' + location.host + ':3000');
+            this.socket = io('http://' + location.hostname + ':3000');
         }
     },
 };
