@@ -331,6 +331,9 @@ export const usePostersStore = defineStore('posters', {
             this.show_imax = this.settings.show_imax;
             this.show_dolby_51 = this.settings.show_dolby_51;
         },
+        getRandomPoster() {
+            return Math.floor(Math.random() * this.moviePosters.length);
+        },
         getInSequencePoster() {
             console.log('GET NEXT POSTER');
             const len = this.moviePosters.length;
@@ -340,7 +343,7 @@ export const usePostersStore = defineStore('posters', {
                 activeIndex = 0;
 
             if (this.settings.random_order) {
-                activeIndex = Math.floor(Math.random() * len);
+                activeIndex = this.getRandomPoster();
             } else {
                 activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
             }

@@ -39,16 +39,7 @@ class Poster extends Model
 
     protected function getTitleAttribute()
     {
-        $lowers = [
-        'of','a','the','and','an','or','nor','but','is','if','then','else','when',
-        'at','from','by','on','off','for','in','out','over','to','into','with'
-        ];
-        $title = Str::headline($this->name);
-        $title = str_replace(" Iii", " III", $title);
-        $title = str_replace(" IIi", " III", $title);
-        $title = str_replace(" Ii", " II", $title);
-
-        return $title;
+        return $this->name;
     }
 
     protected function showInRotation(): Attribute

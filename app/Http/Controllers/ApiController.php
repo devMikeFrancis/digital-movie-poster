@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SyncPosters;
+use App\Services\KodiService;
+
 class ApiController extends Controller
 {
     public function __construct()
@@ -23,5 +26,50 @@ class ApiController extends Controller
         }
 
         return response()->json(['message' => $output]);
+    }
+
+    /**
+     * Re download posters from external service
+     *
+     * @param PosterService $service
+     *
+     * @return array
+     */
+    public function cache()
+    {
+        SyncPosters::dispatch();
+
+        return ['message' => 'sync job queued'];
+    }
+
+    /**
+     * Re download posters from external service
+     *
+     * @param PosterService $service
+     *
+     * @return array
+     */
+    public function checkSyncStatus()
+    {
+        $status = 'clear';
+        $jobCount = \DB::table('jobs')->where('payload', 'like', '%SyncPosters%')->count();
+        if ($jobCount > 0) {
+            $status = 'running';
+        }
+
+        return ['status' => $status, 'count' => $jobCount];
+    }
+
+    /**
+     * Get now playing from Kodi service
+     *
+     * @param App\Services\KodiService $service
+     *
+     * @return array
+     */
+    public function kodiNowPlaying(KodiService $service)
+    {
+        $nowPlaying = $service->nowPlaying();
+        return $nowPlaying;
     }
 }

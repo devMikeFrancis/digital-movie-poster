@@ -3,17 +3,20 @@
 namespace App\Services;
 
 use App\Models\Setting;
-use App\Models\Poster;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
 use App\Interfaces\MovieSyncInterface;
+use App\Traits\PosterProcess;
 
 class KodiService implements MovieSyncInterface
 {
-    private $settings;
+    use PosterProcess;
 
     public function __construct()
+    {
+        $this->setSettings();
+    }
+
+    public function setSettings()
     {
         $this->settings = Setting::first();
     }
@@ -68,45 +71,24 @@ class KodiService implements MovieSyncInterface
         if (!is_dir(storage_path("app/public/posters"))) {
             mkdir(storage_path("app/public/posters"), 0775, true);
         }
-        foreach ($movies as $movie) {
-            $orginalName = Str::slug($movie['label']);
-            $fileName = $orginalName.'.webp';
 
+        foreach ($movies as $movie) {
             if (isset($movie['art']) && isset($movie['art']['poster']) && $movie['art']['poster']) {
                 $imageUrl = urldecode(str_replace('image://', '', rtrim($movie['art']['poster'], '/')));
-                $image = Image::make($imageUrl);
-                $image->resize(1400, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
-                $image->resize(200, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
-                $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
+
+                $savedImage = $this->saveImage($movie['label'], $imageUrl);
+
+                $params = [
+                    'name' => $movie['label'],
+                    'file_name' => $savedImage['file_name'],
+                    'id' => 'kodi-'.$movie['movieid'],
+                    'mpaa_rating' => isset($movie['mpaa']) ? str_replace('Rated ', '', $movie['mpaa']) : null,
+                    'audience_rating' => isset($movie['rating']) ? $movie['rating'] : 0,
+                    'runtime' => is_numeric($movie['runtime']) ? $movie['runtime']/60 : null
+                ];
+
+                $this->savePoster($params);
             }
-
-            $whereUpdate = ['object_id' => 'kodi-'.$movie['movieid'] ];
-
-            $update = [
-                'name' => $orginalName,
-                'file_name' => $fileName,
-                'can_delete' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'mpaa_rating' => isset($movie['mpaa']) ? str_replace('Rated ', '', $movie['mpaa']) : null,
-                'audience_rating' => isset($movie['rating']) ? $movie['rating'] : 0,
-                'runtime' => is_numeric($movie['runtime']) ? $movie['runtime']/60 : null
-            ];
-
-            if ($this->settings->validate_movie_titles) {
-                $whereUpdate['name'] = $orginalName;
-                unset($update['name']);
-            }
-
-            Poster::updateOrCreate(
-                $whereUpdate,
-                $update
-            );
         }
     }
 

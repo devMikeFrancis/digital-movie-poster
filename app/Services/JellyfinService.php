@@ -3,23 +3,28 @@
 namespace App\Services;
 
 use App\Models\Setting;
-use App\Models\Poster;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
 use App\Interfaces\MovieSyncInterface;
+use App\Traits\PosterProcess;
 
 class JellyfinService implements MovieSyncInterface
 {
+    use PosterProcess;
+
     private $jellyfinIpAddress = '';
     private $jellyfinToken = '';
 
     public function __construct()
     {
-        $settings = Setting::first();
+        $this->setSettings();
 
-        $this->jellyfinIpAddress = $settings->jellyfin_ip_address;
-        $this->jellyfinToken = $settings->jellyfin_token;
+        $this->jellyfinIpAddress = $this->settings->jellyfin_ip_address;
+        $this->jellyfinToken = $this->settings->jellyfin_token;
+    }
+
+    public function setSettings()
+    {
+        $this->settings = Setting::first();
     }
 
     /**
@@ -49,50 +54,22 @@ class JellyfinService implements MovieSyncInterface
 
     public function processMovies($movies)
     {
-        if (!is_dir(storage_path("app/public/posters"))) {
-            mkdir(storage_path("app/public/posters"), 0775, true);
-        }
         foreach ($movies as $movie) {
             if ($movie['Type'] === 'Movie') {
                 $imageUrl = 'http://'.$this->jellyfinIpAddress.':8096/Items/'.$movie['Id'].'/Images/Primary';
 
-                $orginalName = Str::slug($movie['Name']);
-                $fileName = $orginalName.'.webp';
+                $savedImage = $this->saveImage($movie['Name'], $imageUrl);
 
-                if ($imageUrl) {
-                    $image = Image::make($imageUrl);
-                    $image->resize(1400, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-                    $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
-                    $image->resize(200, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-                    $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
-                }
-
-                $whereUpdate = ['object_id' => $movie['Id'] ];
-
-                $update = [
-                    'name' => $orginalName,
-                    'file_name' => $fileName,
-                    'can_delete' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                $params = [
+                    'name' => $movie['Name'],
+                    'file_name' => $savedImage['file_name'],
+                    'id' => $movie['Id'],
                     'mpaa_rating' => isset($movie['OfficialRating']) ? $movie['OfficialRating'] : null,
                     'audience_rating' => isset($movie['CommunityRating']) ? $movie['CommunityRating'] : 0,
                     'runtime' => is_numeric($movie['RunTimeTicks']) ? $movie['RunTimeTicks']/1000/60 : null
                 ];
 
-                if ($this->settings->validate_movie_titles) {
-                    $whereUpdate['name'] = $orginalName;
-                    unset($update['name']);
-                }
-
-                Poster::updateOrCreate(
-                    $whereUpdate,
-                    $update
-                );
+                $this->savePoster($params);
             }
         }
     }

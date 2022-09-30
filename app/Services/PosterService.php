@@ -3,17 +3,16 @@
 namespace App\Services;
 
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Http;
 use App\Services\PlexService;
 use App\Services\JellyfinService;
 use App\Services\KodiService;
 use App\Models\Poster;
 use App\Models\Setting;
+use App\Traits\PosterProcess;
 
 class PosterService
 {
-    private $settings;
+    use PosterProcess;
 
     public function __construct()
     {
@@ -47,18 +46,18 @@ class PosterService
         $data = $request->formatted();
 
         if ($request->imdb_id) {
-            $tmdb = $this->callTMDB($request->imdb_id);
+            $tmdb = $this->posterMeta($request->imdb_id);
             $data['name'] = $tmdb['title'];
-            $data['file_name'] = $tmdb['file_name'];
             $data['audience_rating'] = $tmdb['audience_rating'];
             $data['mpaa_rating'] = $tmdb['mpaa_rating'];
-            $data['trailer_path'] = $tmdb['trailer_path'];
+            $data['trailer_path'] = $tmdb['trailer_id'];
             $data['runtime'] = $tmdb['runtime'];
-            $image = $tmdb['image_location'];
+            $image = $tmdb['image'];
         }
 
         if ($image) {
-            $this->saveImage($image, $data['file_name']);
+            $savedImage = $this->saveImage($data['name'], $image);
+            $data['file_name'] = $savedImage['file_name'];
         }
 
         if ($request->music) {
@@ -75,18 +74,18 @@ class PosterService
         $data = $request->formatted();
 
         if ($request->imdb_id) {
-            $tmdb = $this->callTMDB($request->imdb_id);
+            $tmdb = $this->posterMeta($request->imdb_id);
             $data['name'] = $tmdb['title'];
-            $data['file_name'] = $tmdb['file_name'];
             $data['audience_rating'] = $tmdb['audience_rating'];
             $data['mpaa_rating'] = $tmdb['mpaa_rating'];
-            $data['trailer_path'] = $tmdb['trailer_path'];
+            $data['trailer_path'] = $tmdb['trailer_id'];
             $data['runtime'] = $tmdb['runtime'];
-            $image = $tmdb['image_location'];
+            $image = $tmdb['image'];
         }
 
         if ($image) {
-            $this->saveImage($image, $data['file_name']);
+            $savedImage = $this->saveImage($data['name'], $image);
+            $data['file_name'] = $savedImage['file_name'];
         }
 
         if ($request->music) {
@@ -141,73 +140,6 @@ class PosterService
             $poster = Poster::find($item['id']);
             $poster->ordinal = $item['order'];
             $poster->save();
-        }
-    }
-
-    private function callTMDB($imdbId): array
-    {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
-
-        $res = $response->json();
-
-        if (isset($res['success']) && !$res['success']) {
-            abort(404, 'Cannot find movie in TMDB.');
-        }
-
-        $orginalName = Str::slug($res['title']);
-        $fileName = $orginalName.'.webp';
-        $trailerPath = '';
-
-        $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
-
-        $audienceRating = $res['vote_average'];
-
-        foreach ($res['release_dates']['results'] as $country) {
-            if ($country['iso_3166_1'] === 'US') {
-                $mpaaRating = $country['release_dates'][0]['certification'];
-            }
-        }
-
-        foreach ($res['videos']['results'] as $video) {
-            if ($video['type'] === 'Trailer' && $video['official'] === true && $video['site'] === 'YouTube') {
-                $trailerPath = $video['key'];
-                break;
-            }
-        }
-
-        return [
-            'title' => Str::slug($res['title']),
-            'image_location' => $imageLocation,
-            'file_name' => $fileName,
-            'mpaa_rating' => $mpaaRating,
-            'audience_rating' => $audienceRating,
-            'trailer_path' => $trailerPath,
-            'runtime' => $res['runtime']
-        ];
-    }
-
-    private function saveImage($imageLocation, $fileName)
-    {
-        $image = Image::make($imageLocation);
-        $image->resize(1400, null, function ($constraint) {
-            $constraint->aspectRatio();
-        });
-
-        if (!is_dir(storage_path("app/public/posters"))) {
-            mkdir(storage_path("app/public/posters"), 0775, true);
-        }
-
-        try {
-            $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
-            $image->resize(200, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-            $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
-        } catch (\Exception $e) {
-            // Muting this exception because for some reason some images do not save correctly when using Plex. Rare case.
-            // This will allow the cache to continue and the user can fix any rarely missing images.
         }
     }
 

@@ -454,11 +454,6 @@ input[type='number'] {
     }
 }
 
-.not-in-rotation {
-    .poster-title {
-    }
-}
-
 .handle {
     cursor: ns-resize;
 }
