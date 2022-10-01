@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
-use App\Jobs\SyncPosters;
 use App\Services\PosterService;
-use App\Services\KodiService;
 use App\Http\Resources\PostersCollection;
 use App\Http\Resources\PosterResource;
 use App\Models\Poster;
@@ -45,38 +43,6 @@ class PosterController extends Controller
     public function show(Poster $poster)
     {
         return new PosterResource($poster);
-    }
-
-    /**
-     * Re download posters from external service
-     *
-     * @param PosterService $service
-     *
-     * @return array
-     */
-    public function cache()
-    {
-        SyncPosters::dispatch();
-
-        return ['message' => 'sync job queued'];
-    }
-
-    /**
-     * Re download posters from external service
-     *
-     * @param PosterService $service
-     *
-     * @return array
-     */
-    public function checkSyncStatus()
-    {
-        $status = 'clear';
-        $jobCount = \DB::table('jobs')->where('payload', 'like', '%SyncPosters%')->count();
-        if ($jobCount > 0) {
-            $status = 'running';
-        }
-
-        return ['status' => $status, 'count' => $jobCount];
     }
 
     /**
@@ -156,18 +122,5 @@ class PosterController extends Controller
     {
         $service->delete($id);
         return response()->json(['success' => true]);
-    }
-
-    /**
-     * Get now playing from Kodi service
-     *
-     * @param App\Services\KodiService $service
-     *
-     * @return array
-     */
-    public function kodiNowPlaying(KodiService $service)
-    {
-        $nowPlaying = $service->nowPlaying();
-        return $nowPlaying;
     }
 }

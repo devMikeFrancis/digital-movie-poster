@@ -429,10 +429,10 @@ export default {
         max-width: 7.5vw;
     }
     .dolby-atmos-stacked {
-        max-width: 8vw;
+        max-width: 7vw;
     }
     .dolby-vision-stacked {
-        max-width: 8vw;
+        max-width: 7vw;
     }
     .dts {
         max-width: 6.75vw;
