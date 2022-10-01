@@ -151,7 +151,7 @@ export const usePostersStore = defineStore('posters', {
         setInitialPosterView() {
             let poster = '';
             if (this.settings.random_order) {
-                poster = this.getRandomPoster();
+                poster = this.moviePosters[this.getRandomPoster()];
             } else {
                 poster = this.moviePosters[0];
             }
