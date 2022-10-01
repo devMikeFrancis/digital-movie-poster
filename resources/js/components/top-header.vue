@@ -109,7 +109,7 @@ export default {
         text-transform: uppercase;
         padding: 12px 24px 14px 24px;
         border: 4px solid #fff;
-        font-size: 6.5vw;
+        font-size: 5vw;
         font-weight: 700;
         color: #fff;
         line-height: 1;
@@ -130,9 +130,9 @@ export default {
 
 .rotated {
     .top-header {
-        min-height: 18vh;
+        min-height: 13.5vh;
         h1 {
-            font-size: 6.5vh;
+            font-size: 6vh;
         }
     }
     .runtime {

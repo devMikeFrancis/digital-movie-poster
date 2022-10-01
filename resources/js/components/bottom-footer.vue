@@ -105,7 +105,7 @@ export default {
 
 .rotated {
     .poster-footer {
-        min-height: 18vh;
+        min-height: 13.5vh;
         padding: 2.8vh;
     }
     .audience-rating {

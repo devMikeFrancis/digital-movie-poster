@@ -253,8 +253,9 @@ export default {
     will-change: opacity;
 
     > div {
-        width: 100%;
-        height: 100%;
+        //width: 100%;
+        //height: 100%;
+        aspect-ratio: 2/3;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
@@ -299,12 +300,13 @@ export default {
 
 .slide-poster-enter-active,
 .slide-poster-leave-active {
-    transition: transform 1.2s ease;
+    transition: transform 1.2s ease, opacity 1s ease;
     transform: translate3d(0, 0, 0);
 }
 
 .slide-poster-leave-to {
     transform: translate3d(0, -100%, 0);
+    opacity: 0;
 }
 .slide-poster-enter-from {
     transform: translate3d(0, 100%, 0);
