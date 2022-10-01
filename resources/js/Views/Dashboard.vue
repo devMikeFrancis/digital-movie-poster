@@ -205,7 +205,7 @@ export default {
     }
 }
 
-#recent-added-container {
+#posters-container {
     z-index: 2;
 }
 
@@ -247,14 +247,14 @@ export default {
 .poster {
     height: 100%;
     flex-grow: 2;
+    display: flex;
+    justify-content: center;
     position: absolute;
     top: 0;
     backface-visibility: hidden;
     will-change: opacity;
 
     > div {
-        //width: 100%;
-        //height: 100%;
         aspect-ratio: 2/3;
         background-size: cover;
         background-repeat: no-repeat;

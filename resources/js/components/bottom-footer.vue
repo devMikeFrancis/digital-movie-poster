@@ -80,7 +80,7 @@ export default {
 <style lang="scss" scoped>
 .poster-footer {
     width: 100%;
-    min-height: 12vh;
+    min-height: 14vh;
     display: flex;
     flex-direction: row;
     align-items: center;

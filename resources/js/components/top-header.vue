@@ -99,7 +99,7 @@ export default {
 .top-header {
     width: 100%;
     display: flex;
-    min-height: 12vh;
+    min-height: 14vh;
     align-items: center;
     justify-content: center;
     text-align: center;
