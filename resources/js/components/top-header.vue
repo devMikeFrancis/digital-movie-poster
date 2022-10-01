@@ -109,7 +109,7 @@ export default {
         text-transform: uppercase;
         padding: 12px 24px 14px 24px;
         border: 4px solid #fff;
-        font-size: 5vw;
+        font-size: 4vw;
         font-weight: 700;
         color: #fff;
         line-height: 1;
