@@ -9,6 +9,8 @@ use App\Http\Resources\PostersCollection;
 use App\Http\Resources\PosterResource;
 use App\Models\Poster;
 
+//use App\Models\Setting;
+
 class PosterController extends Controller
 {
     public function __construct()
@@ -27,6 +29,8 @@ class PosterController extends Controller
         $posters = $request->show_in_rotation ?
         Poster::where('show_in_rotation', true) :
         Poster::orderBy('ordinal');
+
+        //$settings = Setting::first();
 
         return new PostersCollection(
             $posters->orderBy('ordinal')->orderBy('name')->get()

@@ -249,6 +249,36 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-5">
+                                    <label
+                                        for="mpaa-limit"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        MPAA Display Limit
+                                    </label>
+                                    <select
+                                        class="text-black mb-2"
+                                        id="mpaa-limit"
+                                        aria-describedby="processing-mpaalimitHelp"
+                                        v-model="settings.mpaa_limit"
+                                    >
+                                        <option value="">None</option>
+                                        <option value="G">G</option>
+                                        <option value="PG">PG</option>
+                                        <option value="PG-13">PG-13</option>
+                                        <option value="R">R</option>
+                                        <option value="NC-17">NC-17</option>
+                                    </select>
+
+                                    <div
+                                        id="processing-mpaalimitHelp"
+                                        class="text-gray-400 text-sm"
+                                    >
+                                        Hide any media that is higher than the selected MPAA limit.
+                                        Media that is not rated will not be shown.
+                                    </div>
+                                </div>
+
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
@@ -943,6 +973,9 @@ export default {
                 .post('/api/settings', this.settings)
                 .then((response) => {
                     this.settingsMessage = 'Settings saved.';
+                    setTimeout(() => {
+                        this.settingsMessage = null;
+                    }, 2500);
                 })
                 .catch((e) => {
                     this.settingsMessage = e.message;

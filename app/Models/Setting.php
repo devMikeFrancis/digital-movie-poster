@@ -60,7 +60,8 @@ class Setting extends Model
         'footer_text_color',
         'poster_bg_color',
         'validate_movie_titles',
-        'remove_black_bars'
+        'remove_black_bars',
+        'mpaa_limit'
     ];
 
     protected function plexService(): Attribute
