@@ -25,23 +25,29 @@ class PosterRequest extends FormRequest
     public function rules()
     {
         return [
-            'image' => 'sometimes|image|max:8192|dimensions:max_width=3000,max_height=6000'
+            'imdb_id' => 'nullable|string',
+            'name' => 'required_unless:imbd_id,null|string',
+            'audience_rating' => 'nullable',
+            'mpaa_rating' => 'nullable|string',
+            'trailer_path' => 'nullable|string',
+            'runtime' => 'nullable|integer',
+            'image' => 'nullable|sometimes|image|max:8192|dimensions:max_width=3000,max_height=6000',
+            'show_trailer' => 'required|boolean',
+            'show_runtime' => 'required|boolean',
+            'show_in_rotation' => 'required|boolean',
+            'play_theme_music' => 'required|boolean',
+            'show_dolby_atmos' => 'required|boolean',
+            'show_dolby_51' => 'required|boolean',
+            'show_dolby_vision' => 'required|boolean',
+            'show_dtsx' => 'required|boolean',
+            'show_imax' => 'required|boolean',
+            'show_auro_3d' => 'required|boolean',
         ];
     }
 
-    public function formatted()
+    protected function prepareForValidation()
     {
-        $name = Str::slug($this->title);
-        $fileName = $name.'.jpg';
-
-        return [
-            'file_name' => $fileName,
-            'name' => $name,
-            'imdb_id' => $this->imdb_id,
-            'audience_rating' => $this->audience_rating,
-            'mpaa_rating' => $this->mpaa_rating,
-            'trailer_path' => $this->trailer_path,
-            'runtime' => $this->runtime,
+        $this->merge([
             'show_trailer' => $this->boolean('show_trailer'),
             'show_runtime' => $this->boolean('show_runtime'),
             'show_in_rotation' => $this->boolean('show_in_rotation'),
@@ -52,6 +58,6 @@ class PosterRequest extends FormRequest
             'show_dtsx' => $this->boolean('show_dtsx'),
             'show_imax' => $this->boolean('show_imax'),
             'show_auro_3d' => $this->boolean('show_auro_3d'),
-        ];
+        ]);
     }
 }

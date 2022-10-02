@@ -66,7 +66,6 @@
                                     <input
                                         type="file"
                                         class="text-black w-full"
-                                        id="movie-poster"
                                         aria-describedby="movie-posterHelp"
                                         @change="selectFile($event)"
                                     />
@@ -74,14 +73,17 @@
                                 </div>
 
                                 <div class="mb-5 bg-gray-700 p-3">
-                                    <label for="music" class="text-gray-300 block mb-2 font-bold"
+                                    <label
+                                        for="music-input"
+                                        class="text-gray-300 block mb-2 font-bold"
                                         >Theme Music</label
                                     >
 
                                     <input
                                         type="file"
                                         class="text-black w-full"
-                                        id="music"
+                                        name="music_file"
+                                        id="music-unput"
                                         aria-describedby="musicHelp"
                                         @change="selectMusicFile($event)"
                                     />
@@ -285,9 +287,24 @@
                                     >
                                 </div>
 
-                                <div class="py-3 text-white">
-                                    {{ formMessage }}
-                                    <div v-for="error in errors">{{ error }}</div>
+                                <div class="mb-5">
+                                    <h5
+                                        v-if="formMessage.length"
+                                        class="text-white text-lg font-bold mb-2"
+                                    >
+                                        {{ formMessage }}
+                                    </h5>
+                                    <div
+                                        v-if="errors.length > 0"
+                                        class="bg-red-700 text-white px-3 py-2"
+                                    >
+                                        <div
+                                            v-for="(error, eIndex) in errors"
+                                            :key="'err-' + eIndex"
+                                        >
+                                            {{ error }}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <button
@@ -337,12 +354,12 @@ export default {
             showPosterModal: false,
             formMessage: '',
             mode: '',
+            music: null,
             poster: {
                 id: '',
                 imdb_id: '',
                 name: '',
                 image: null,
-                music: null,
                 mpaa_rating: '',
                 audience_rating: '',
                 trailer_path: '',
@@ -373,7 +390,7 @@ export default {
             this.poster.image = event.target.files[0];
         },
         selectMusicFile(event) {
-            this.poster.music = event.target.files[0];
+            this.music = event.target.files[0];
         },
         savePoster() {
             this.errors = [];
@@ -381,52 +398,38 @@ export default {
             this.saving = true;
             this.savePosterBtn = 'Saving ...';
             let url = '';
-            const error = this.validated();
+            let error = this.validated();
 
             if (error) {
                 return false;
             }
 
-            const params = new FormData();
+            let params = {};
             if (this.poster.image) {
-                params.append('image', this.poster.image);
+                params.image = this.poster.image;
             }
-            if (this.poster.music) {
-                params.append('music', this.poster.music);
+            if (this.poster.image) {
+                params.music = this.music;
             }
-
-            if (this.poster.name) {
-                params.append('title', this.poster.name);
-            }
-            if (this.poster.imdb_id) {
-                params.append('imdb_id', this.poster.imdb_id);
-            }
-            if (this.poster.mpaa_rating) {
-                params.append('mpaa_rating', this.poster.mpaa_rating);
-            }
-            if (this.poster.audience_rating) {
-                params.append('audience_rating', this.poster.audience_rating);
-            }
-            if (this.poster.trailer_path) {
-                params.append('trailer_path', this.poster.trailer_path);
-            }
-            if (this.poster.runtime) {
-                params.append('runtime', this.poster.runtime);
-            }
-
-            params.append('show_trailer', this.poster.show_trailer);
-            params.append('show_runtime', this.poster.show_runtime);
-            params.append('show_in_rotation', this.poster.show_in_rotation);
-            params.append('play_theme_music', this.poster.play_theme_music);
-            params.append('show_dolby_atmos', this.poster.show_dolby_atmos);
-            params.append('show_dolby_51', this.poster.show_dolby_51);
-            params.append('show_dolby_vision', this.poster.show_dolby_vision);
-            params.append('show_dtsx', this.poster.show_dtsx);
-            params.append('show_auro_3d', this.poster.show_auro_3d);
-            params.append('show_imax', this.poster.show_imax);
+            params.name = this.poster.name;
+            params.imdb_id = this.poster.imdb_id;
+            params.mpaa_rating = this.poster.mpaa_rating;
+            params.audience_rating = this.poster.audience_rating;
+            params.trailer_path = this.poster.trailer_path;
+            params.runtime = this.poster.runtime;
+            params.show_trailer = this.poster.show_trailer;
+            params.show_runtime = this.poster.show_runtime;
+            params.show_in_rotation = this.poster.show_in_rotation;
+            params.play_theme_music = this.poster.play_theme_music;
+            params.show_dolby_atmos = this.poster.show_dolby_atmos;
+            params.show_dolby_51 = this.poster.show_dolby_51;
+            params.show_dolby_vision = this.poster.show_dolby_vision;
+            params.show_dtsx = this.poster.show_dtsx;
+            params.show_auro_3d = this.poster.show_auro_3d;
+            params.show_imax = this.poster.show_imax;
 
             if (this.mode === 'edit') {
-                params.append('_method', 'put');
+                params._method = 'put';
                 url = '/api/posters/' + this.poster.id;
             } else {
                 url = '/api/posters';
@@ -440,7 +443,7 @@ export default {
 
                     this.poster = response.data.poster;
                     this.mode = 'edit';
-                    this.poster.music = null;
+                    this.music = null;
                     this.poster.image = null;
 
                     setTimeout(() => {
@@ -448,11 +451,20 @@ export default {
                     }, 2000);
                 })
                 .catch((e) => {
-                    console.log(e.message);
                     this.saving = false;
-                    setSavePosterBtn();
-                    this.errors = e.response.data.errors;
+                    this.setSavePosterBtn();
+                    let errors = e.response.data.errors;
                     this.formMessage = e.response.data.message;
+
+                    if (Object.keys(errors).length !== 0) {
+                        for (var prop in errors) {
+                            if (errors[prop] instanceof Array) {
+                                errors[prop].forEach((err) => {
+                                    this.errors.push(err);
+                                });
+                            }
+                        }
+                    }
                 });
         },
         clearPoster() {
@@ -462,6 +474,8 @@ export default {
             this.poster.id = 0;
             this.poster.show_runtime = 1;
             this.poster.show_in_rotation = 1;
+            this.poster.image = null;
+            this.music = null;
             this.mode = 'new';
             this.setSavePosterBtn();
         },
@@ -469,7 +483,7 @@ export default {
             this.formMessage = '';
             let error = false;
 
-            if (this.poster.title === '' && this.poster.imdb_id === '') {
+            if (this.poster.name === '' && this.poster.imdb_id === '') {
                 error = true;
                 this.formMessage = 'IMDB ID or the title is required.';
             }
@@ -489,9 +503,6 @@ export default {
         setSavePosterBtn() {
             this.savePosterBtn = this.mode === 'edit' ? 'Update Poster' : 'Create Poster';
         },
-        reloadPosters() {
-            this.socket.emit('dispatch:command', { command: 'reload' });
-        },
     },
     created() {},
     mounted() {
@@ -504,9 +515,6 @@ export default {
             this.getPoster(id);
         }
         this.setSavePosterBtn();
-        if (typeof io !== 'undefined') {
-            this.socket = io('http://' + location.hostname + ':3000');
-        }
     },
 };
 </script>

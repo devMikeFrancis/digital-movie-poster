@@ -8,7 +8,7 @@
                 id="recent-added-container"
                 class="poster-container"
                 @click.prevent="gotoPosters()"
-                v-if="!nowPlaying"
+                v-if="!isPlaying"
             >
                 <TopHeader />
                 <div class="recent-poster-container">
@@ -18,13 +18,13 @@
                             :style="'background-color: ' + settings.poster_bg_color"
                         >
                             <div
-                                v-for="(poster, index) in moviePosters"
+                                v-for="(poster, index) in mediaPosters"
                                 v-bind:key="`key-${index}`"
                                 class="poster"
                                 :class="{
                                     'has-trailer': poster.show_trailer && poster.trailer_path,
                                 }"
-                                :style="blackBars"
+                                :style="blackBars(poster)"
                             >
                                 <Transition
                                     :name="
@@ -57,7 +57,7 @@
                 <div
                     id="now-playing-container"
                     class="poster-container"
-                    v-if="nowPlaying"
+                    v-if="isPlaying"
                     @click.prevent="gotoPosters()"
                 >
                     <TopHeader />
@@ -65,7 +65,12 @@
                     <div class="now-playing-container">
                         <div
                             class="now-playing-poster"
-                            :style="'background-image: url(' + nowPlayingPoster + ')' + blackBars"
+                            :style="
+                                'background-image: url(' +
+                                nowPlayingPoster +
+                                ');' +
+                                blackBars(false)
+                            "
                         ></div>
                     </div>
 
@@ -77,7 +82,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'pinia';
+import { mapState, mapGetters, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import TopHeader from '@/components/top-header.vue';
 import BottomFooter from '@/components/bottom-footer.vue';
@@ -100,12 +105,22 @@ export default {
         nowPlaying: {
             handler: function (val) {
                 if (val) {
+                    this.getNowPlaying();
+                } else {
+                    this.setVideoPlayerRef(this.$refs.videoPlayer);
+                    this.setIsPlaying(false);
+                }
+            },
+            deep: true,
+        },
+        isPlaying: {
+            handler: function (val) {
+                if (val) {
                     this.stopMusic();
                     this.getNowPlaying();
                     this.stopTransitionImages();
                     this.controlTV('on');
                 } else {
-                    this.setVideoPlayerRef(this.$refs.videoPlayer);
                     if (!this.loading) {
                         console.log('WATCHER - nowPlaying START TRANSITION IMAGES');
                         this.startTransitionImages();
@@ -122,15 +137,12 @@ export default {
             'settings',
             'moviePosters',
             'nowPlaying',
+            'isPlaying',
             'nowPlayingPoster',
             'theme_music',
             'socket',
         ]),
-        blackBars() {
-            return this.settings.remove_black_bars
-                ? ' left: 0; right: 0; '
-                : ' left: 1.5vw; right: 1.5vw; ';
-        },
+        ...mapGetters(usePostersStore, ['mediaPosters']),
         rotated() {
             return window.navigator.userAgent === 'chrome-movieposter' ? true : false;
         },
@@ -144,6 +156,7 @@ export default {
             'setLoading',
             'setSocket',
             'getNowPlaying',
+            'setIsPlaying',
             'setNowPlayingPoster',
             'setVideoPlayerRef',
             'playMusic',
@@ -151,7 +164,16 @@ export default {
             'playTrailer',
             'playVideo',
         ]),
-
+        blackBars(poster) {
+            if (poster) {
+                if (poster.show_trailer && poster.trailer_path) {
+                    return '';
+                }
+            }
+            return this.settings.remove_black_bars
+                ? ' left: 0; right: 0; '
+                : ' left: 1.5vw; right: 1.5vw; ';
+        },
         gotoSettings() {
             this.$router.push('settings');
         },
@@ -236,12 +258,19 @@ export default {
 }
 
 #trailer {
-    height: 28vw;
+    height: 48vw;
     width: 100%;
     position: absolute;
     left: 0;
     bottom: 0;
     z-index: 4;
+}
+
+.rotated {
+    #trailer {
+        height: 28vw;
+        width: 100%;
+    }
 }
 
 .poster {
@@ -264,10 +293,22 @@ export default {
     }
 
     &.has-trailer {
-        width: 35vw;
-        height: 50vw;
+        width: auto;
+        height: 42vh;
+        aspect-ratio: 2/3;
         left: 50%;
         transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.rotated {
+    .poster {
+        &.has-trailer {
+            width: 35vw;
+            height: 52vw;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+        }
     }
 }
 

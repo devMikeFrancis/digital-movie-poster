@@ -22,7 +22,7 @@ class SettingController extends Controller
 
     public function update(SettingsRequest $request)
     {
-        $updated = Setting::where('id', 1)->update($request->except('_method', '_token'));
+        $updated = Setting::where('id', 1)->update($request->validated());
 
         return response()->json(['saved' => $updated]);
     }

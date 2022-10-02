@@ -39,6 +39,7 @@ export const usePostersStore = defineStore('posters', {
         nowPlayingRuntime: 0,
         theme_music: null,
         nowPlaying: false,
+        isPlaying: false,
         videoPlaying: false,
         show_dolby_atmos_vertical: false,
         show_dolby_vision_vertical: false,
@@ -48,8 +49,18 @@ export const usePostersStore = defineStore('posters', {
         show_dolby_51: false,
         socket: '',
         checkedPlexMediaType: false,
+        pgLimits: ['G', 'PG'],
+        pg13Limits: ['G', 'PG', 'PG-13'],
+        rLimits: ['G', 'PG', 'PG-13', 'R'],
+        nc17Limits: ['G', 'PG', 'PG-13', 'R', 'NC-17'],
     }),
-    getters: {},
+    getters: {
+        mediaPosters() {
+            return this.moviePosters.filter((poster) => {
+                return this.withinMpaaLimit(poster.mpaa_rating);
+            });
+        },
+    },
     actions: {
         boot() {
             console.log('--- BOOTING ---');
@@ -64,9 +75,6 @@ export const usePostersStore = defineStore('posters', {
                 setTimeout(() => {
                     this.startSockets();
                 }, this.bootTime + 3000);
-                /*setTimeout(() => {
-                    this.startReloadMoviePostersInterval();
-                }, this.reloadPostersIntervalTime);*/
             });
         },
         getSettings() {
@@ -100,12 +108,6 @@ export const usePostersStore = defineStore('posters', {
         stopSettingsInterval() {
             console.log('STOP SETTINGS INTERVAL');
             clearInterval(this.settingsInterval);
-        },
-        startReloadMoviePostersInterval() {
-            console.log('START MOVIE POSTERS INTERVAL');
-            setInterval(() => {
-                this.reloadMoviePosters();
-            }, this.reloadPostersIntervalTime);
         },
         getMoviePosters() {
             console.log('GET MOVIE POSTERS');
@@ -151,9 +153,9 @@ export const usePostersStore = defineStore('posters', {
         setInitialPosterView() {
             let poster = '';
             if (this.settings.random_order) {
-                poster = this.moviePosters[this.getRandomPoster()];
+                poster = this.mediaPosters[this.getRandomPoster()];
             } else {
-                poster = this.moviePosters[0];
+                poster = this.mediaPosters[0];
             }
 
             poster.show = true;
@@ -215,6 +217,28 @@ export const usePostersStore = defineStore('posters', {
             this.recentlyAddedInterval = setInterval(() => {
                 this.cachePosters();
             }, 60000 * 60 * 60 * 1000 * 4); // Every 4 hours
+        },
+        withinMpaaLimit(rating) {
+            let mpaaLimit = this.settings.mpaa_limit;
+            if (!mpaaLimit) {
+                return true;
+            }
+            if (mpaaLimit === 'G') {
+                return poster.mpaa_rating === 'G';
+            }
+            if (mpaaLimit === 'PG') {
+                return this.pgLimits.includes(rating);
+            }
+            if (mpaaLimit === 'PG-13') {
+                return this.pg13Limits.includes(rating);
+            }
+            if (mpaaLimit === 'R') {
+                return this.rLimits.includes(rating);
+            }
+            if (mpaaLimit === 'NC-17') {
+                return this.nc17Limits.includes(rating);
+            }
+            return false;
         },
         getNowPlaying() {
             console.log('GET NOW PLAYING');
@@ -303,17 +327,26 @@ export const usePostersStore = defineStore('posters', {
                 .catch(() => {});
         },
         setNowPlaying(data) {
-            console.log('SET NOW PLAYING');
-            this.nowPlayingPoster = data.poster;
-            this.contentRating = data.contentRating;
+            let withinMpaaLimit = this.withinMpaaLimit(data.contentRating);
+            if (withinMpaaLimit) {
+                console.log('SET NOW PLAYING');
+                this.nowPlayingPoster = data.poster;
+                this.contentRating = data.contentRating;
 
-            if (data.audienceRating) {
-                this.rating = data.audienceRating / 2;
-            }
+                if (data.audienceRating) {
+                    this.rating = data.audienceRating / 2;
+                }
 
-            if (data.duration && this.settings.show_runtime) {
-                this.nowPlayingRuntime = data.duration;
+                if (data.duration && this.settings.show_runtime) {
+                    this.nowPlayingRuntime = data.duration;
+                }
+                this.isPlaying = true;
+            } else {
+                this.isPlaying = false;
             }
+        },
+        setIsPlaying(state) {
+            this.isPlaying = state;
         },
         usePosterProLogos(poster) {
             this.show_dolby_atmos_vertical = poster.show_dolby_atmos;
@@ -336,8 +369,8 @@ export const usePostersStore = defineStore('posters', {
         },
         getInSequencePoster() {
             console.log('GET NEXT POSTER');
-            const len = this.moviePosters.length;
-            const currIndex = this.moviePosters.findIndex((poster) => poster.show === true);
+            const len = this.mediaPosters.length;
+            const currIndex = this.mediaPosters.findIndex((poster) => poster.show === true);
             let poster,
                 pastPoster,
                 activeIndex = 0;
@@ -349,14 +382,18 @@ export const usePostersStore = defineStore('posters', {
             }
 
             if (len === 1) {
-                poster = this.moviePosters[0];
-                pastPoster = Object.assign(this.moviePosters[0], {});
+                poster = this.mediaPosters[0];
+                pastPoster = Object.assign(this.mediaPosters[0], {});
                 poster.show = true;
             } else {
-                poster = this.moviePosters[activeIndex];
-                pastPoster = this.moviePosters[currIndex];
-                poster.show = true;
-                pastPoster.show = false;
+                poster = this.mediaPosters[activeIndex];
+                pastPoster = this.mediaPosters[currIndex];
+                if (poster) {
+                    poster.show = true;
+                }
+                if (pastPoster) {
+                    pastPoster.show = false;
+                }
             }
 
             return poster;
@@ -369,7 +406,7 @@ export const usePostersStore = defineStore('posters', {
             }
             this.stopMusic();
 
-            if (this.moviePosters.length > 0) {
+            if (this.mediaPosters.length > 0) {
                 poster = this.getInSequencePoster();
                 this.handlePosterView(poster);
             }
@@ -471,11 +508,14 @@ export const usePostersStore = defineStore('posters', {
             socket.addEventListener('message', (event) => {
                 const data = JSON.parse(event.data);
                 const action = data.NotificationContainer.type;
+                let state;
+                console.log('PLEX ACTION: ', action);
                 if (action === 'playing') {
-                    const state = data.NotificationContainer.PlaySessionStateNotification[0].state;
-
+                    state = data.NotificationContainer.PlaySessionStateNotification[0].state;
+                    console.log('PLEX STATE: ', state);
                     // Make status session call to check if its a movie
                     if (!this.checkedPlexMediaType) {
+                        console.log('PLEX CHECK SESSION TYPE');
                         Api.apiCallPlex('/status/sessions/')
                             .then((response) => {
                                 const size = response.data.MediaContainer.size;
@@ -492,7 +532,7 @@ export const usePostersStore = defineStore('posters', {
                     }
                 }
 
-                if (action === 'stopped' && this.servicePlaying === 'plex' && this.nowPlaying) {
+                if (state === 'stopped' && this.servicePlaying === 'plex' && this.nowPlaying) {
                     this.checkedPlexMediaType = false;
                     this.controlPlayerState(state);
                 }
@@ -557,11 +597,14 @@ export const usePostersStore = defineStore('posters', {
         controlPlayerState(state) {
             switch (state) {
                 case 'playing':
+                    console.log('-- STARTED NOW PLAYING');
                     this.nowPlaying = true;
                     break;
                 case 'paused':
                 case 'stopped':
+                    console.log('-- STOPPED NOW PLAYING');
                     this.nowPlaying = false;
+                    this.isPlaying = false;
                     break;
             }
         },
@@ -635,6 +678,7 @@ export const usePostersStore = defineStore('posters', {
             this.stopMusic();
             this.videoPlaying = false;
             this.nowPlaying = false;
+            this.isPlaying = false;
             setTimeout(() => {
                 this.boot();
             }, 2000);

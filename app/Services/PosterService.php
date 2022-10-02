@@ -43,10 +43,10 @@ class PosterService
     {
         $image = $request->image;
 
-        $data = $request->formatted();
+        $data = $request->validated();
 
-        if ($request->imdb_id) {
-            $tmdb = $this->posterMeta($request->imdb_id);
+        if ($data['imdb_id']) {
+            $tmdb = $this->posterMeta($data['imdb_id']);
             $data['name'] = $tmdb['title'];
             $data['audience_rating'] = $tmdb['audience_rating'];
             $data['mpaa_rating'] = $tmdb['mpaa_rating'];
@@ -60,8 +60,8 @@ class PosterService
             $data['file_name'] = $savedImage['file_name'];
         }
 
-        if ($request->music) {
-            $data['theme_music_path'] = $this->saveMusic($request, $data['file_name']);
+        if ($data['music']) {
+            $data['theme_music_path'] = $this->saveMusic($request);
         }
 
         return Poster::create($data);
@@ -71,10 +71,10 @@ class PosterService
     {
         $image = $request->image;
 
-        $data = $request->formatted();
+        $data = $request->validated();
 
-        if ($request->imdb_id) {
-            $tmdb = $this->posterMeta($request->imdb_id);
+        if ($data['imdb_id']) {
+            $tmdb = $this->posterMeta($data['imdb_id']);
             $data['name'] = $tmdb['title'];
             $data['audience_rating'] = $tmdb['audience_rating'];
             $data['mpaa_rating'] = $tmdb['mpaa_rating'];
@@ -88,7 +88,7 @@ class PosterService
             $data['file_name'] = $savedImage['file_name'];
         }
 
-        if ($request->music) {
+        if (isset($data['music'])) {
             $data['theme_music_path'] = $this->saveMusic($request);
         }
 
