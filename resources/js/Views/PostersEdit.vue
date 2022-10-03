@@ -42,6 +42,24 @@
 
                                 <div class="mb-5">
                                     <label
+                                        for="media-type"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Media Type</label
+                                    >
+
+                                    <select
+                                        class="text-black w-full"
+                                        id="media-type"
+                                        v-model="poster.media_type"
+                                        required
+                                    >
+                                        <option value="movie">Movie</option>
+                                        <option value="tv">TV</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
                                         for="movie-title"
                                         class="text-gray-300 block mb-2 font-bold"
                                         >Poster Name</label
@@ -95,7 +113,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-5">
+                                <div class="mb-5" v-if="poster.media_type === 'movie'">
                                     <label
                                         for="content-rating"
                                         class="text-gray-300 block mb-2 font-bold"
@@ -113,6 +131,28 @@
                                         <option value="PG-13">PG-13</option>
                                         <option value="R">R</option>
                                         <option value="NC-17">NC-17</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-5" v-if="poster.media_type === 'tv'">
+                                    <label
+                                        for="content-rating"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                        >Content Rating</label
+                                    >
+
+                                    <select
+                                        class="text-black w-full"
+                                        id="mpaa-rating"
+                                        v-model="poster.mpaa_rating"
+                                    >
+                                        <option value="">Not Rated</option>
+                                        <option value="TV-Y">TV-Y</option>
+                                        <option value="TV-Y7">TV-Y7</option>
+                                        <option value="TV-G">TV-G</option>
+                                        <option value="TV-PG">TV-PG</option>
+                                        <option value="TV-14">TV-14</option>
+                                        <option value="TV-14">TV-MA</option>
                                     </select>
                                 </div>
 
@@ -157,7 +197,7 @@
                                     <label
                                         for="trailer-path"
                                         class="text-gray-300 block mb-2 font-bold"
-                                        >YouTube Movie ID</label
+                                        >YouTube ID</label
                                     >
 
                                     <input
@@ -358,6 +398,7 @@ export default {
             poster: {
                 id: '',
                 imdb_id: '',
+                media_type: 'movie',
                 name: '',
                 image: null,
                 mpaa_rating: '',
@@ -413,6 +454,7 @@ export default {
             }
             params.name = this.poster.name;
             params.imdb_id = this.poster.imdb_id;
+            params.media_type = this.poster.media_type;
             params.mpaa_rating = this.poster.mpaa_rating;
             params.audience_rating = this.poster.audience_rating;
             params.trailer_path = this.poster.trailer_path;

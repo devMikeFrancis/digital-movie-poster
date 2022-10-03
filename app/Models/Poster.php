@@ -33,6 +33,7 @@ class Poster extends Model
         'show_dtsx',
         'show_auro_3d',
         'show_imax',
+        'media_type',
     ];
 
     protected $appends = ['title'];

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 
 class PosterRequest extends FormRequest
 {
@@ -25,8 +24,9 @@ class PosterRequest extends FormRequest
     public function rules()
     {
         return [
+            'media_type' => 'required|string',
             'imdb_id' => 'nullable|string',
-            'name' => 'required_unless:imbd_id,null|string',
+            'name' => 'required_without:imdb_id|nullable|string',
             'audience_rating' => 'nullable',
             'mpaa_rating' => 'nullable|string',
             'trailer_path' => 'nullable|string',

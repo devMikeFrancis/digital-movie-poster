@@ -27,10 +27,11 @@ trait PosterProcess
      *
      * @param string $mediaTitle The media title
      * @param string $imageLocation URL or path to the image
+     * @param string $mediaType movie|tv
      *
      * @return array
      */
-    public function saveImage($mediaTitle, $imageLocation): array
+    public function saveImage($mediaTitle, $imageLocation, $mediaType = 'movie'): array
     {
         $message = 'Image saved';
         $success = true;
@@ -41,6 +42,9 @@ trait PosterProcess
 
         $orginalName = Str::slug($mediaTitle);
         $fileName = $orginalName.'.webp';
+        if (strtolower($mediaType) === 'tv') {
+            $fileName = 'tv_'.$fileName;
+        }
 
         try {
             $image = Image::make($imageLocation);
@@ -72,9 +76,11 @@ trait PosterProcess
      *    'name' => string movie title,
      *    'file_name' string ['file_name'] returned from saveImage,
      *    'id' => string unique,
-     *    'mpaa_rating' => string G|PG|PG-13|R|NC-17|Not Rated,
+     *    'mpaa_rating' => string G|PG|PG-13|R|NC-17|Not Rated|NR,
+     *    'tv_rating' => string TV-Y|TV-Y7|TG-G|TV-PG|TV-14|TV-MA|Not Rated|NR,
      *    'audience_rating' => float Scale 1-10 | 0,
      *    'runtime' => integer in minutes
+     *    'media_type' => string movie|tv
      * ];
      *
      * @param array $params
@@ -91,12 +97,13 @@ trait PosterProcess
             'can_delete' => false,
             'created_at' => now(),
             'updated_at' => now(),
-            'mpaa_rating' => $params['mpaa_rating'],
+            'mpaa_rating' => strtoupper($params['rating']),
             'audience_rating' => $params['audience_rating'],
-            'runtime' => $params['runtime']
+            'runtime' => $params['runtime'],
+            'media_type' => strtolower($params['media_type'])
         ];
 
-        if ($this->settings->validate_movie_titles) {
+        if ($this->settings->validate_movie_titles && strtolower($params['media_type']) === 'movie') {
             $whereUpdate['name'] = $params['name'];
             unset($update['name']);
         }
@@ -121,12 +128,12 @@ trait PosterProcess
     {
         if ($type === 'movie') {
             $res = $this->movieEndpoint($mediaId);
-            return $this->getTvData($res);
+            return $this->getMovieData($res);
         }
 
-        if ($type === 'movie') {
+        if ($type === 'tv') {
             $res = $this->tvEndpoint($mediaId);
-            return $this->getMovieData($res);
+            return $this->getTvData($res);
         }
     }
 
@@ -139,15 +146,15 @@ trait PosterProcess
         return $response->json();
     }
 
-    private function tvEndpoint($query)
+    private function tvEndpoint($imdbId)
     {
         $response = Http::withHeaders([
             'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/movie/'.$query.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
+        ])->get('https://api.themoviedb.org/3/find/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&external_source=imdb_id');
 
         $items = $response->json();
 
-        return $items[0];
+        return $items['tv_results'];
     }
 
     private function getMovieData($res): array
@@ -156,8 +163,9 @@ trait PosterProcess
         $message = '';
 
         if (isset($res['success']) && !$res['success']) {
-            $success = false;
-            $message = 'Movie not found';
+            $arr['success'] = false;
+            $arr['message'] = 'Movie not found';
+            return $arr;
         }
 
         $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
@@ -181,25 +189,41 @@ trait PosterProcess
     {
         $success = true;
         $message = '';
+        $arr = [];
 
-        if (isset($res['success']) && !$res['success']) {
-            $success = false;
-            $message = 'Tv show not found';
+        if (count($res) === 0) {
+            $arr['success'] = false;
+            $arr['message'] = 'Tv show not found';
+            return $arr;
         }
 
-        $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
-        $audienceRating = $res['vote_average'];
-        //$tvRating = $this->getTvRating($res['release_dates']['results']);
+        $topResult = $res[0];
+
+        $tvMeta = $this->getTvMeta($topResult['id']);
+
+        $imageLocation = 'https://image.tmdb.org/t/p/original'.$topResult['poster_path'];
+        $audienceRating = $topResult['vote_average'];
+        $tvRating = $this->getTvRating($tvMeta['content_ratings']['results']);
 
         return [
             'success' => $success,
             'message' => $message,
-            'title' => $res['title'],
+            'title' => $topResult['name'],
             'image' => $imageLocation,
-            //'tv_rating' => $tvRating,
+            'mpaa_rating' => $tvRating,
+            'trailer_id' => '',
             'audience_rating' => $audienceRating,
-            'runtime' => $res['runtime']
+            'runtime' => isset($tvMeta['episode_run_time'][0]) ? $tvMeta['episode_run_time'][0] : null
         ];
+    }
+
+    private function getTvMeta($tvId)
+    {
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+        ])->get('https://api.themoviedb.org/3/tv/'.$tvId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=content_ratings');
+
+        return $response->json();
     }
 
     private function getMoveRating($releaseDates)
@@ -207,6 +231,15 @@ trait PosterProcess
         foreach ($releaseDates as $releaseDate) {
             if ($releaseDate['iso_3166_1'] === 'US') {
                 return $releaseDate['release_dates'][0]['certification'];
+            }
+        }
+    }
+
+    private function getTvRating($contentRatings)
+    {
+        foreach ($contentRatings as $contentRating) {
+            if ($contentRating['iso_3166_1'] === 'US') {
+                return $contentRating['rating'];
             }
         }
     }

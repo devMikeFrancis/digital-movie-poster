@@ -46,21 +46,23 @@ class PosterService
         $data = $request->validated();
 
         if ($data['imdb_id']) {
-            $tmdb = $this->posterMeta($data['imdb_id']);
-            $data['name'] = $tmdb['title'];
-            $data['audience_rating'] = $tmdb['audience_rating'];
-            $data['mpaa_rating'] = $tmdb['mpaa_rating'];
-            $data['trailer_path'] = $tmdb['trailer_id'];
-            $data['runtime'] = $tmdb['runtime'];
-            $image = $tmdb['image'];
+            $tmdb = $this->posterMeta($data['imdb_id'], $data['media_type']);
+            if ($tmdb['success']) {
+                $data['name'] = $tmdb['title'];
+                $data['audience_rating'] = $tmdb['audience_rating'];
+                $data['mpaa_rating'] = $tmdb['mpaa_rating'];
+                $data['trailer_path'] = $tmdb['trailer_id'];
+                $data['runtime'] = $tmdb['runtime'];
+                $image = $tmdb['image'];
+            }
         }
 
         if ($image) {
-            $savedImage = $this->saveImage($data['name'], $image);
+            $savedImage = $this->saveImage($data['name'], $image, $data['media_type']);
             $data['file_name'] = $savedImage['file_name'];
         }
 
-        if ($data['music']) {
+        if (isset($data['music'])) {
             $data['theme_music_path'] = $this->saveMusic($request);
         }
 
@@ -74,17 +76,19 @@ class PosterService
         $data = $request->validated();
 
         if ($data['imdb_id']) {
-            $tmdb = $this->posterMeta($data['imdb_id']);
-            $data['name'] = $tmdb['title'];
-            $data['audience_rating'] = $tmdb['audience_rating'];
-            $data['mpaa_rating'] = $tmdb['mpaa_rating'];
-            $data['trailer_path'] = $tmdb['trailer_id'];
-            $data['runtime'] = $tmdb['runtime'];
-            $image = $tmdb['image'];
+            $tmdb = $this->posterMeta($data['imdb_id'], $data['media_type']);
+            if ($tmdb['success']) {
+                $data['name'] = $tmdb['title'];
+                $data['audience_rating'] = $tmdb['audience_rating'];
+                $data['mpaa_rating'] = $tmdb['mpaa_rating'];
+                $data['trailer_path'] = $tmdb['trailer_id'];
+                $data['runtime'] = $tmdb['runtime'];
+                $image = $tmdb['image'];
+            }
         }
 
         if ($image) {
-            $savedImage = $this->saveImage($data['name'], $image);
+            $savedImage = $this->saveImage($data['name'], $image, $data['media_type']);
             $data['file_name'] = $savedImage['file_name'];
         }
 

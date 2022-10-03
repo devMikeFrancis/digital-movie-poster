@@ -100,7 +100,7 @@ class PosterController extends Controller
      *
      * @return array
      */
-    public function sort(PosterRequest $request, PosterService $service)
+    public function sort(Request $request, PosterService $service)
     {
         $service->sort($request);
         return response()->json(['success' => true]);
