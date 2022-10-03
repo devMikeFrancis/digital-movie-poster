@@ -109,17 +109,51 @@ trait PosterProcess
         return $queryResult;
     }
 
-    public function posterMeta($imdbId)
+    /**
+     * Get movie or tv meta data
+     *
+     * @param string $mediaId imdbid|tv name
+     * @param string $type movie|tv
+     *
+     * @return array
+     */
+    public function posterMeta($mediaId, $type = 'movie'): array
     {
-        $success = true;
-        $message = '';
-        $trailerId = '';
+        if ($type === 'movie') {
+            $res = $this->movieEndpoint($mediaId);
+            return $this->getTvData($res);
+        }
 
+        if ($type === 'movie') {
+            $res = $this->tvEndpoint($mediaId);
+            return $this->getMovieData($res);
+        }
+    }
+
+    private function movieEndpoint($imdbId)
+    {
         $response = Http::withHeaders([
             'Accept' => 'application/json',
         ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
 
-        $res = $response->json();
+        return $response->json();
+    }
+
+    private function tvEndpoint($query)
+    {
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+        ])->get('https://api.themoviedb.org/3/movie/'.$query.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
+
+        $items = $response->json();
+
+        return $items[0];
+    }
+
+    private function getMovieData($res): array
+    {
+        $success = true;
+        $message = '';
 
         if (isset($res['success']) && !$res['success']) {
             $success = false;
@@ -128,32 +162,64 @@ trait PosterProcess
 
         $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
         $audienceRating = $res['vote_average'];
-
-        foreach ($res['release_dates']['results'] as $country) {
-            if ($country['iso_3166_1'] === 'US') {
-                $mpaaRating = $country['release_dates'][0]['certification'];
-            }
-        }
-
-        foreach ($res['videos']['results'] as $video) {
-            if (
-                $video['type'] === 'Trailer' &&
-                $video['official'] === true &&
-                $video['site'] === 'YouTube') {
-                $trailerId = $video['key'];
-                break;
-            }
-        }
+        $movieRating = $this->getMovieRating($res['release_dates']['results']);
+        $trailerId = $this->getMovieTrailerId($res['videos']['results']);
 
         return [
             'success' => $success,
             'message' => $message,
             'title' => $res['title'],
             'image' => $imageLocation,
-            'mpaa_rating' => $mpaaRating,
+            'mpaa_rating' => $movieRating,
             'audience_rating' => $audienceRating,
             'trailer_id' => $trailerId,
             'runtime' => $res['runtime']
         ];
+    }
+
+    private function getTvData($res)
+    {
+        $success = true;
+        $message = '';
+
+        if (isset($res['success']) && !$res['success']) {
+            $success = false;
+            $message = 'Tv show not found';
+        }
+
+        $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
+        $audienceRating = $res['vote_average'];
+        //$tvRating = $this->getTvRating($res['release_dates']['results']);
+
+        return [
+            'success' => $success,
+            'message' => $message,
+            'title' => $res['title'],
+            'image' => $imageLocation,
+            //'tv_rating' => $tvRating,
+            'audience_rating' => $audienceRating,
+            'runtime' => $res['runtime']
+        ];
+    }
+
+    private function getMoveRating($releaseDates)
+    {
+        foreach ($releaseDates as $releaseDate) {
+            if ($releaseDate['iso_3166_1'] === 'US') {
+                return $releaseDate['release_dates'][0]['certification'];
+            }
+        }
+    }
+
+    private function getMovieTrailerId($videos)
+    {
+        foreach ($videos as $video) {
+            if (
+                $video['type'] === 'Trailer' &&
+                $video['official'] === true &&
+                $video['site'] === 'YouTube') {
+                return $video['key'];
+            }
+        }
     }
 }
