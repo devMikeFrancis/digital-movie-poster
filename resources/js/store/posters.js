@@ -53,11 +53,22 @@ export const usePostersStore = defineStore('posters', {
         pg13Limits: ['G', 'PG', 'PG-13'],
         rLimits: ['G', 'PG', 'PG-13', 'R'],
         nc17Limits: ['G', 'PG', 'PG-13', 'R', 'NC-17'],
+        tvMaLimits: ['TV-Y', 'TV-Y7', 'TV-Y7 FV', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'],
+        tv14Limits: ['TV-Y', 'TV-Y7', 'TV-Y7 FV', 'TV-G', 'TV-PG', 'TV-14'],
+        tvPgLimits: ['TV-Y', 'TV-Y7', 'TV-Y7 FV', 'TV-G', 'TV-PG'],
+        tvGLimits: ['TV-Y', 'TV-Y7', 'TV-Y7 FV', 'TV-G'],
+        tvY7fvLimits: ['TV-Y', 'TV-Y7', 'TV-Y7 FV'],
+        tvY7Limits: ['TV-Y', 'TV-Y7'],
     }),
     getters: {
         mediaPosters() {
             return this.moviePosters.filter((poster) => {
-                return this.withinMpaaLimit(poster.mpaa_rating);
+                if (poster.media_type === 'movie') {
+                    return this.withinMpaaLimit(poster.mpaa_rating);
+                }
+                if (poster.media_type === 'tv') {
+                    return this.withinTvLimit(poster.mpaa_rating);
+                }
             });
         },
     },
@@ -237,6 +248,34 @@ export const usePostersStore = defineStore('posters', {
             }
             if (mpaaLimit === 'NC-17') {
                 return this.nc17Limits.includes(rating);
+            }
+            return false;
+        },
+        withinTvLimit(rating) {
+            let mpaaLimit = this.settings.tv_limit;
+            if (!mpaaLimit) {
+                return true;
+            }
+            if (mpaaLimit === 'TV-Y') {
+                return poster.mpaa_rating === 'TV-Y';
+            }
+            if (mpaaLimit === 'TV-Y7') {
+                return this.tvY7Limits.includes(rating);
+            }
+            if (mpaaLimit === 'TV-Y7 FV') {
+                return this.tvY7fvLimits.includes(rating);
+            }
+            if (mpaaLimit === 'TV-G') {
+                return this.tvGLimits.includes(rating);
+            }
+            if (mpaaLimit === 'TV-PG') {
+                return this.tvPgLimits.includes(rating);
+            }
+            if (mpaaLimit === 'TV-14') {
+                return this.tv14Limits.includes(rating);
+            }
+            if (mpaaLimit === 'TV-MA') {
+                return this.tvMaLimits.includes(rating);
             }
             return false;
         },

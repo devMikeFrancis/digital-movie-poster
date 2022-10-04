@@ -25,6 +25,8 @@ class SettingsRequest extends FormRequest
     {
         return [
             'plex_service' => 'required|boolean',
+            'plex_sync_movies' => 'required|boolean',
+            'plex_sync_tv' => 'required|boolean',
             'random_order' => 'required|boolean',
             'plex_ip_address' => 'required_if:plex_service,true|nullable|string',
             'plex_token' => 'required_if:plex_service,true|nullable|string',
@@ -72,7 +74,10 @@ class SettingsRequest extends FormRequest
             'poster_bg_color' => 'nullable|string',
             'validate_movie_titles' => 'required|boolean',
             'remove_black_bars' => 'required|boolean',
-            'mpaa_limit' => 'nullable|string'
+            'mpaa_limit' => 'nullable|string',
+            'tv_limit' => 'nullable|string',
+            'plex_movie_sections' => 'nullable',
+            'plex_tv_sections' => 'nullable'
         ];
     }
 
@@ -100,7 +105,8 @@ class SettingsRequest extends FormRequest
             'show_header_border' => $this->boolean('show_header_border'),
             'validate_movie_titles' => $this->boolean('validate_movie_titles'),
             'remove_black_bars' => $this->boolean('remove_black_bars'),
-            'random_order' => $this->boolean('random_order'),
+            'plex_sync_movies' => $this->boolean('plex_sync_movies'),
+            'plex_sync_tv' => $this->boolean('plex_sync_tv'),
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsRequest;
 use Symfony\Component\Process\Process;
+use App\Services\PlexService;
 use App\Models\Setting;
 
 class SettingController extends Controller
@@ -41,5 +42,14 @@ class SettingController extends Controller
         $output = $process->getOutput();
 
         return response()->json(['success' => $success, 'output' => $output]);
+    }
+
+    public function getServiceSections(PlexService $plexService, $service)
+    {
+        if ($service === 'plex') {
+            $sections = $plexService->getSections();
+        }
+
+        return $sections;
     }
 }

@@ -12,15 +12,6 @@ trait PosterProcess
     public $settings;
     public $originalName;
     public $fileName;
-    public $validMpaaRatings = [
-        'G',
-        'PG',
-        'PG-13',
-        'R',
-        'NC-17',
-        'Not Rated',
-        'NR'
-    ];
 
     /**
      * Saves poster image
@@ -91,19 +82,22 @@ trait PosterProcess
     {
         $whereUpdate = ['object_id' => $params['id'] ];
 
+        $mediaType = isset($params['media_type']) ? strtolower($params['media_type']) : 'movie';
+
         $update = [
             'name' => $params['name'],
             'file_name' => $params['file_name'],
             'can_delete' => false,
             'created_at' => now(),
             'updated_at' => now(),
-            'mpaa_rating' => strtoupper($params['rating']),
-            'audience_rating' => $params['audience_rating'],
-            'runtime' => $params['runtime'],
-            'media_type' => strtolower($params['media_type'])
+            'mpaa_rating' => isset($params['rating']) ? strtoupper($params['rating']) : null,
+            'audience_rating' => isset($params['audience_rating']) ? $params['audience_rating'] : null,
+            'runtime' => isset($params['runtime']) ? $params['runtime'] : null,
+            'media_type' => $mediaType,
+            'show_trailer' => false,
         ];
 
-        if ($this->settings->validate_movie_titles && strtolower($params['media_type']) === 'movie') {
+        if ($this->settings->validate_movie_titles && $mediaType === 'movie') {
             $whereUpdate['name'] = $params['name'];
             unset($update['name']);
         }

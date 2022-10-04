@@ -185,10 +185,10 @@
                                             aria-describedby="mpaa-ratingHelp"
                                             v-model="settings.show_mpaa_rating"
                                         />
-                                        <span class="ml-2">Show MPAA Rating</span>
+                                        <span class="ml-2">Show Media Rating</span>
                                     </label>
                                     <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
-                                        Shows the MPAA rating when a movie is playing.
+                                        Shows the movie or TV rating.
                                     </div>
                                 </div>
 
@@ -254,7 +254,7 @@
                                         for="mpaa-limit"
                                         class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >
-                                        MPAA Display Limit
+                                        Movie Rating Display Limit
                                     </label>
                                     <select
                                         class="text-black mb-2"
@@ -275,6 +275,35 @@
                                         class="text-gray-400 text-sm"
                                     >
                                         Hide any media that is higher than the selected MPAA limit.
+                                        Media that is not rated will not be shown.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="tv-limit"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        TV Rating Display Limit
+                                    </label>
+                                    <select
+                                        class="text-black mb-2"
+                                        id="tv-limit"
+                                        aria-describedby="processing-tvlimitHelp"
+                                        v-model="settings.tv_limit"
+                                    >
+                                        <option value="">None</option>
+                                        <option value="TV-Y">TV-Y</option>
+                                        <option value="TV-Y7">TV-Y7</option>
+                                        <option value="TV-Y7 FV">TV-Y7 FV</option>
+                                        <option value="TV-G">TV-G</option>
+                                        <option value="TV-PG">TV-PG</option>
+                                        <option value="TV-14">TV-14</option>
+                                        <option value="TV-MA">TV-MA</option>
+                                    </select>
+
+                                    <div id="processing-tvlimitHelp" class="text-gray-400 text-sm">
+                                        Hide any media that is higher than the selected TV limit.
                                         Media that is not rated will not be shown.
                                     </div>
                                 </div>
@@ -709,6 +738,204 @@
                                         >.
                                     </div>
                                 </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="sync-plex-movies"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="sync-plex-movies"
+                                            aria-describedby="syncplexmoviesHelp"
+                                            v-model="settings.plex_sync_movies"
+                                        />
+                                        <span class="ml-2">Sync Plex Movies</span>
+                                    </label>
+                                    <div
+                                        id="syncplexmoviesHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="sync-plex-tv"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="sync-plex-tv"
+                                            aria-describedby="syncplextvHelp"
+                                            v-model="settings.plex_sync_tv"
+                                        />
+                                        <span class="ml-2">Sync Plex TV Shows</span>
+                                    </label>
+                                    <div id="syncplextvHelp" class="text-gray-400 text-sm"></div>
+                                </div>
+
+                                <div v-if="settings.plex_service">
+                                    <button
+                                        class="btn mb-4 hover:text-white"
+                                        @click.prevent="getServiceSections('plex')"
+                                    >
+                                        Refresh Plex Media Libraries
+                                        <small>(Save Plex Credentials first)</small>
+                                    </button>
+
+                                    <div class="mb-5" v-if="settings.plex_sync_movies">
+                                        <label
+                                            for="plex-movie-sections"
+                                            class="
+                                                text-gray-300
+                                                block
+                                                mb-2
+                                                font-bold
+                                                flex
+                                                items-center
+                                            "
+                                            >Plex Movie Libraries</label
+                                        >
+                                        <select id="plex-movie-sections" v-model="plexMovieSection">
+                                            <option value=""></option>
+                                            <option
+                                                v-for="(movieSection, mIndex) in plexMovieSections"
+                                                :value="movieSection.key"
+                                                :key="'msection-' + mIndex"
+                                            >
+                                                {{ movieSection.title }}
+                                            </option>
+                                        </select>
+                                        <button
+                                            class="
+                                                text-black text-sm
+                                                bg-white
+                                                border-2 border-gray-500
+                                                px-3
+                                                py-2
+                                                ml-3
+                                                rounded-none
+                                                hover:bg-gray-700
+                                                hover:text-white
+                                            "
+                                            @click.prevent="addMovieSyncLibrary('plex')"
+                                        >
+                                            &plus; Sync Library
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-5" v-if="settings.plex_sync_movies">
+                                        <ul
+                                            class="bg-gray-700 px-3 py-2 flex"
+                                            v-if="settings.plex_movie_sections"
+                                        >
+                                            <li v-if="settings.plex_movie_sections.length === 0">
+                                                <span class="text-white"
+                                                    >No Movie libraries added yet.</span
+                                                >
+                                            </li>
+                                            <li
+                                                class="mr-3 bg-white px-2"
+                                                v-for="(
+                                                    pmSection, pmIndex
+                                                ) in settings.plex_movie_sections"
+                                                :key="'pmindex-' + pmIndex"
+                                            >
+                                                <span class="text-black">{{
+                                                    getMovieLibraryName('plex', pmSection)
+                                                }}</span>
+                                                <a
+                                                    href="#"
+                                                    role="button"
+                                                    @click.prevent="
+                                                        removeMovieSyncLibrary('plex', pmSection)
+                                                    "
+                                                    ><span class="ml-2 text-xl text-red-700"
+                                                        >&times;</span
+                                                    ></a
+                                                >
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="mb-5" v-if="settings.plex_sync_tv">
+                                        <label
+                                            for="plex-tv-sections"
+                                            class="
+                                                text-gray-300
+                                                block
+                                                mb-2
+                                                font-bold
+                                                flex
+                                                items-center
+                                            "
+                                            >Plex TV Libraries</label
+                                        >
+                                        <select id="plex-tv-sections" v-model="plexTvSection">
+                                            <option value=""></option>
+                                            <option
+                                                v-for="(tvSection, tIndex) in plexTvSections"
+                                                :value="tvSection.key"
+                                                :key="'tsection-' + tIndex"
+                                            >
+                                                {{ tvSection.title }}
+                                            </option>
+                                        </select>
+                                        <button
+                                            class="
+                                                text-black text-sm
+                                                bg-white
+                                                border-2 border-gray-500
+                                                px-3
+                                                py-2
+                                                ml-3
+                                                rounded-none
+                                                hover:bg-gray-700
+                                                hover:text-white
+                                            "
+                                            @click.prevent="addTvSyncLibrary('plex')"
+                                        >
+                                            &plus; Sync Library
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-5" v-if="settings.plex_sync_tv">
+                                        <ul
+                                            class="bg-gray-700 px-3 py-2 flex"
+                                            v-if="settings.plex_tv_sections"
+                                        >
+                                            <li v-if="settings.plex_tv_sections.length === 0">
+                                                <span class="text-white"
+                                                    >No TV libraries added yet.</span
+                                                >
+                                            </li>
+                                            <li
+                                                class="mr-3 bg-white px-2"
+                                                v-for="(
+                                                    tvSection, tvIndex
+                                                ) in settings.plex_tv_sections"
+                                                :key="'pmindex-' + tvIndex"
+                                            >
+                                                <span class="text-black">{{
+                                                    getTvLibraryName('plex', tvSection)
+                                                }}</span>
+                                                <a
+                                                    href="#"
+                                                    role="button"
+                                                    @click.prevent="
+                                                        removeTvSyncLibrary('plex', tvSection)
+                                                    "
+                                                    ><span class="ml-2 text-xl text-red-700"
+                                                        >&times;</span
+                                                    ></a
+                                                >
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
@@ -869,6 +1096,9 @@
                             v-cloak
                         >
                             {{ settingsMessage }}
+                            <div v-for="(err, eIndex) in errors" :key="'err-' + eIndex">
+                                {{ err }}
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-12">
@@ -922,6 +1152,7 @@ export default {
         return {
             loading: false,
             settingsMessage: '',
+            errors: [],
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
@@ -929,6 +1160,9 @@ export default {
                 jellyfin_ip_address: '',
                 transition_type: 'fade',
             },
+            plexSections: [],
+            plexTvSection: '',
+            plexMovieSection: '',
             updateBtn: 'Update DMP',
             updateOutput: '',
             socket: '',
@@ -936,7 +1170,18 @@ export default {
     },
     components: { MainNav },
     watch: {},
-    computed: {},
+    computed: {
+        plexTvSections() {
+            return this.plexSections.filter((item) => {
+                return item.type === 'show';
+            });
+        },
+        plexMovieSections() {
+            return this.plexSections.filter((item) => {
+                return item.type === 'movie';
+            });
+        },
+    },
     methods: {
         setTab(event) {
             let tab = event.target.getAttribute('href');
@@ -960,6 +1205,9 @@ export default {
                 .get('/api/settings')
                 .then((response) => {
                     this.settings = response.data;
+                    if (this.settings.plex_service) {
+                        this.getServiceSections('plex');
+                    }
                 })
                 .catch((e) => {
                     console.log(e.message);
@@ -967,6 +1215,7 @@ export default {
         },
         saveSettings() {
             this.settingsMessage = '';
+            this.errors = [];
             this.settings._method = 'put';
 
             axios
@@ -979,7 +1228,73 @@ export default {
                 })
                 .catch((e) => {
                     this.settingsMessage = e.message;
+                    let errors = e.response.data.errors;
+                    if (Object.keys(errors).length !== 0) {
+                        for (var prop in errors) {
+                            if (errors[prop] instanceof Array) {
+                                errors[prop].forEach((err) => {
+                                    this.errors.push(err);
+                                });
+                            }
+                        }
+                    }
                 });
+        },
+        getMovieLibraryName(service, key) {
+            if (service === 'plex') {
+                let obj = this.plexMovieSections.find((item) => {
+                    return item.key === key;
+                });
+                return obj ? obj.title : '';
+            }
+        },
+        getTvLibraryName(service, key) {
+            if (service === 'plex') {
+                let obj = this.plexTvSections.find((item) => {
+                    return item.key === key;
+                });
+                return obj ? obj.title : '';
+            }
+        },
+        addMovieSyncLibrary(service) {
+            if (service === 'plex') {
+                if (this.plexMovieSection) {
+                    if (!this.settings.plex_movie_sections) {
+                        this.settings.plex_movie_sections = [];
+                    }
+                    if (!this.settings.plex_movie_sections.includes(this.plexMovieSection)) {
+                        this.settings.plex_movie_sections.push(this.plexMovieSection);
+                    }
+                }
+            }
+        },
+        addTvSyncLibrary(service) {
+            if (service === 'plex') {
+                if (this.plexTvSection) {
+                    if (!this.settings.plex_tv_sections) {
+                        this.settings.plex_tv_sections = [];
+                    }
+                    if (!this.settings.plex_tv_sections.includes(this.plexTvSection)) {
+                        this.settings.plex_tv_sections.push(this.plexTvSection);
+                    }
+                }
+            }
+        },
+        removeMovieSyncLibrary(service, item) {
+            if (service === 'plex') {
+                this.settings.plex_movie_sections.splice(
+                    this.settings.plex_movie_sections.indexOf(item),
+                    1
+                );
+            }
+        },
+        removeTvSyncLibrary(service, item) {
+            if (service === 'plex') {
+                this.settings.plex_tv_sections.splice(
+                    this.settings.plex_tv_sections.indexOf(item),
+                    1
+                );
+            }
         },
         updateApplication() {
             this.updateOutput = '';
@@ -993,6 +1308,16 @@ export default {
                 .catch((e) => {
                     console.log(e.message);
                     this.updateBtn = 'Update DMP';
+                });
+        },
+        getServiceSections(service) {
+            axios
+                .get('/api/service-sections/' + service)
+                .then((response) => {
+                    this.plexSections = response.data;
+                })
+                .catch((e) => {
+                    console.log(e.message);
                 });
         },
     },

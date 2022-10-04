@@ -61,10 +61,39 @@ class Setting extends Model
         'poster_bg_color',
         'validate_movie_titles',
         'remove_black_bars',
-        'mpaa_limit'
+        'mpaa_limit',
+        'tv_limit',
+        'plex_movie_sections',
+        'plex_tv_sections',
+        'plex_sync_movies',
+        'plex_sync_tv'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'plex_movie_sections' => 'array',
+        'plex_tv_sections' => 'array',
     ];
 
     protected function plexService(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function plexSyncMovies(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function plexSyncTv(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,

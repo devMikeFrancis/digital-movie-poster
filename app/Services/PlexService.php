@@ -44,31 +44,83 @@ class PlexService implements MovieSyncInterface
         return $response->json();
     }
 
-    public function syncMovies()
+    public function getSections()
     {
-        $json = $this->apiCall('/library/sections/1/all');
-        $movies = $json['MediaContainer']['Metadata'];
-        $this->processMovies($movies);
+        $sections = [];
+        $json = $this->apiCall('/library/sections/all');
+        $plexSections = $json['MediaContainer']['Directory'];
+
+        foreach ($plexSections as $plexSection) {
+            $sections[] = [
+                'key' => $plexSection['key'],
+                'title' => $plexSection['title'],
+                'type' => $plexSection['type']
+            ];
+        }
+
+        return $sections;
     }
 
-    public function processMovies($movies)
+    public function syncMedia()
     {
-        foreach ($movies as $movie) {
-            if ($movie['type'] === 'movie') {
-                $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$movie['thumb'].'?X-Plex-Token='.$this->plexToken;
+        if ($this->settings->plex_sync_movies) {
+            $this->syncMovies($this->settings->plex_movie_sections);
+        }
+        if ($this->settings->plex_sync_tv) {
+            $this->syncTv($this->settings->plex_tv_sections);
+        }
+    }
 
-                $savedImage = $this->saveImage($movie['title'], $imageUrl);
+    private function syncMovies($sections)
+    {
+        foreach ($sections as $section) {
+            $json = $this->apiCall('/library/sections/'.$section.'/all');
+            $medias = $json['MediaContainer']['Metadata'];
 
-                $params = [
-                    'name' => $movie['title'],
-                    'file_name' => $savedImage['file_name'],
-                    'id' => $movie['key'],
-                    'mpaa_rating' => isset($movie['contentRating']) ? $movie['contentRating'] : null,
-                    'audience_rating' => isset($movie['audienceRating']) ? $movie['audienceRating'] : 0,
-                    'runtime' => is_numeric($movie['duration']) ? $movie['duration']/1000/60 : null
-                ];
+            foreach ($medias as $media) {
+                if ($media['type'] === 'movie') {
+                    $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$media['thumb'].'?X-Plex-Token='.$this->plexToken;
 
-                $this->savePoster($params);
+                    $savedImage = $this->saveImage($media['title'], $imageUrl);
+
+                    $params = [
+                        'media_type' => 'movie',
+                        'name' => $media['title'],
+                        'file_name' => $savedImage['file_name'],
+                        'id' => $media['key'],
+                        'rating' => isset($media['contentRating']) ? $media['contentRating'] : null,
+                        'audience_rating' => isset($media['audienceRating']) ? $media['audienceRating'] : 0,
+                        'runtime' => is_numeric($media['duration']) ? $media['duration']/1000/60 : null
+                    ];
+
+                    $this->savePoster($params);
+                }
+            }
+        }
+    }
+
+    private function syncTv($sections)
+    {
+        foreach ($sections as $section) {
+            $json = $this->apiCall('/library/sections/'.$section.'/all');
+            $shows = $json['MediaContainer']['Metadata'];
+            foreach ($shows as $media) {
+                if ($media['type'] === 'show') {
+                    $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$media['thumb'].'?X-Plex-Token='.$this->plexToken;
+
+                    $savedImage = $this->saveImage($media['title'], $imageUrl);
+
+                    $params = [
+                        'media_type' => 'tv',
+                        'name' => $media['title'],
+                        'file_name' => $savedImage['file_name'],
+                        'id' => $media['key'],
+                        'rating' => isset($media['contentRating']) ? $media['contentRating'] : null,
+                        'audience_rating' => isset($media['audienceRating']) ? $media['audienceRating'] : 0,
+                    ];
+
+                    $this->savePoster($params);
+                }
             }
         }
     }

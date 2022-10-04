@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="movie-posters" :class="{ rotated: rotated }">
+        <div class="movie-posters">
             <div class="loading-overlay" v-if="loading">
                 <div class="p-6" @click="gotoPosters()" v-html="loadingMessage"></div>
             </div>
@@ -143,9 +143,6 @@ export default {
             'socket',
         ]),
         ...mapGetters(usePostersStore, ['mediaPosters']),
-        rotated() {
-            return window.navigator.userAgent === 'chrome-movieposter' ? true : false;
-        },
     },
     methods: {
         ...mapActions(usePostersStore, [

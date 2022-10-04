@@ -45,7 +45,7 @@ class JellyfinService implements MovieSyncInterface
         return $response->json();
     }
 
-    public function syncMovies()
+    public function syncMedia()
     {
         $json = $this->apiCall('/Items');
         $movies = $json['Items'];

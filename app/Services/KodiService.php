@@ -41,7 +41,7 @@ class KodiService implements MovieSyncInterface
         return $response->json();
     }
 
-    public function syncMovies($page = 0)
+    public function syncMedia($page = 0)
     {
         $limit = 20;
         $start = $page * $limit;

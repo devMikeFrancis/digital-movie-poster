@@ -149,10 +149,11 @@
                                         <option value="">Not Rated</option>
                                         <option value="TV-Y">TV-Y</option>
                                         <option value="TV-Y7">TV-Y7</option>
+                                        <option value="TV-Y7 FV">TV-Y7 FV</option>
                                         <option value="TV-G">TV-G</option>
                                         <option value="TV-PG">TV-PG</option>
                                         <option value="TV-14">TV-14</option>
-                                        <option value="TV-14">TV-MA</option>
+                                        <option value="TV-MA">TV-MA</option>
                                     </select>
                                 </div>
 

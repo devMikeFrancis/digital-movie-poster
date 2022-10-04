@@ -23,17 +23,17 @@ class PosterService
     {
         if ($this->settings->plex_service) {
             $plexService = new PlexService();
-            $plexService->syncMovies();
+            $plexService->syncMedia();
         }
 
         if ($this->settings->jellyfin_service) {
             $jellyfinService = new JellyfinService();
-            $jellyfinService->syncMovies();
+            $jellyfinService->syncMedia();
         }
 
         if ($this->settings->kodi_service) {
             $kodiService = new KodiService();
-            $kodiService->syncMovies();
+            $kodiService->syncMedia();
         }
 
         return ['success' => true];
