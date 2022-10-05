@@ -47,4 +47,11 @@ class SettingController extends Controller
 
         return response()->json(['success' => $success, 'output' => $output]);
     }
+
+    public function checkUpdate()
+    {
+        $file = file_get_contents('https://raw.githubusercontent.com/newelement/digital-movie-poster/main/public/version.json');
+
+        return json_decode($file);
+    }
 }

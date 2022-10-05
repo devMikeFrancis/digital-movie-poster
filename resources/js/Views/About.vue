@@ -103,9 +103,7 @@ export default {
                     this.localVersion = response.data.latest;
 
                     axios
-                        .get(
-                            'https://raw.githubusercontent.com/newelement/digital-movie-poster/main/public/version.json'
-                        )
+                        .get('/api/check-update')
                         .then((response) => {
                             this.remoteVersion = response.data.latest;
                             this.processVersion(response);
