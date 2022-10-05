@@ -137,7 +137,7 @@ export default {
         },
         processVersion() {
             let currentVersion = parseInt(this.localVersion.replace('.', ''));
-            let remoteVersion = 16900; //parseInt(this.remoteVersion.replace('.', ''));
+            let remoteVersion = parseInt(this.remoteVersion.replace('.', ''));
 
             if (remoteVersion > currentVersion) {
                 this.updateAvailable = true;
