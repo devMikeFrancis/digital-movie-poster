@@ -741,6 +741,46 @@
 
                                 <div class="mb-5">
                                     <label
+                                        for="plex-show-movie-now-playing"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="plex-show-movie-now-playings"
+                                            aria-describedby="plex-show-movie-now-playingsHelp"
+                                            v-model="settings.plex_show_movie_now_playing"
+                                        />
+                                        <span class="ml-2">Allow Movie Now Playing</span>
+                                    </label>
+                                    <div
+                                        id="plex-show-movie-now-playingHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
+                                        for="plex-show-tv-now-playing"
+                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="plex-show-movie-now-playings"
+                                            aria-describedby="plex-show-movie-now-playingsHelp"
+                                            v-model="settings.plex_show_tv_now_playing"
+                                        />
+                                        <span class="ml-2">Allow TV Now Playing</span>
+                                    </label>
+                                    <div
+                                        id="plex-show-tv-now-playingHelp"
+                                        class="text-gray-400 text-sm"
+                                    ></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label
                                         for="sync-plex-movies"
                                         class="text-gray-300 block mb-2 font-bold flex items-center"
                                     >

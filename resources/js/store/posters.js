@@ -561,7 +561,12 @@ export const usePostersStore = defineStore('posters', {
                                 if (size > 0) {
                                     let data = response.data.MediaContainer.Metadata[0];
                                     this.checkedPlexMediaType = true;
-                                    if (data.type === 'movie') {
+                                    if (
+                                        (data.type === 'movie' &&
+                                            this.settings.plex_show_movie_now_playing) ||
+                                        (data.type === 'show' &&
+                                            this.settings.plex_show_tv_now_playing)
+                                    ) {
                                         this.servicePlaying = 'plex';
                                         this.controlPlayerState(state);
                                     }

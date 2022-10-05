@@ -27,6 +27,8 @@ class SettingsRequest extends FormRequest
             'plex_service' => 'required|boolean',
             'plex_sync_movies' => 'required|boolean',
             'plex_sync_tv' => 'required|boolean',
+            'plex_show_movie_now_playing' => 'required|boolean',
+            'plex_show_tv_now_playing' => 'required|boolean',
             'random_order' => 'required|boolean',
             'plex_ip_address' => 'required_if:plex_service,true|nullable|string',
             'plex_token' => 'required_if:plex_service,true|nullable|string',
@@ -107,6 +109,8 @@ class SettingsRequest extends FormRequest
             'remove_black_bars' => $this->boolean('remove_black_bars'),
             'plex_sync_movies' => $this->boolean('plex_sync_movies'),
             'plex_sync_tv' => $this->boolean('plex_sync_tv'),
+            'plex_show_movie_now_playing' => $this->boolean('plex_show_movie_now_playing'),
+            'plex_show_tv_now_playing' => $this->boolean('plex_show_tv_now_playing'),
         ]);
     }
 }
