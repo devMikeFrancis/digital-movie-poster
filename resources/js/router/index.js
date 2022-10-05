@@ -4,6 +4,7 @@ import Settings from '../Views/Settings.vue';
 import Posters from '../Views/Posters.vue';
 import PostersEdit from '../Views/PostersEdit.vue';
 import Voting from '../Views/Voting.vue';
+import About from '../Views/About.vue';
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
         path: '/voting',
         name: 'Voting',
         component: Voting,
+    },
+    {
+        path: '/about',
+        name: 'About',
+        component: About,
     },
 ];
 

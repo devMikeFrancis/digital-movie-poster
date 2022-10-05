@@ -37,19 +37,21 @@ class SettingController extends Controller
 
         if (!$process->isSuccessful()) {
             $success = false;
+            \Log::info(' -- Could not run update script. -- ');
+            \Log::info(' -- ');
         }
 
         $output = $process->getOutput();
 
+        \Log::info($output);
+
         return response()->json(['success' => $success, 'output' => $output]);
     }
 
-    public function getServiceSections(PlexService $plexService, $service)
+    public function checkUpdate()
     {
-        if ($service === 'plex') {
-            $sections = $plexService->getSections();
-        }
+        $file = file_get_contents('https://raw.githubusercontent.com/newelement/digital-movie-poster/main/public/version.json');
 
-        return $sections;
+        return json_decode($file);
     }
 }
