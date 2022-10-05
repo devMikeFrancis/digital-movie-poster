@@ -33,6 +33,10 @@ Route::get('/settings', function () {
     return view('app');
 })->where('any', '.*');
 
+Route::get('/about', function () {
+    return view('app');
+})->where('any', '.*');
+
 Route::get('/voting', function () {
     return view('app');
 })->where('any', '.*');

@@ -46,8 +46,11 @@
                 <li class="py-2 px-4 mb-3">
                     <router-link class="hover:text-gray-500" to="/voting">Voting</router-link>
                 </li>
-                <li class="py-2 px-4 mb-5">
+                <li class="py-2 px-4 mb-3">
                     <router-link class="hover:text-gray-500" to="/settings">Settings</router-link>
+                </li>
+                <li class="py-2 px-4 mb-5">
+                    <router-link class="hover:text-gray-500" to="/about">About</router-link>
                 </li>
                 <li class="pt-4" style="background-color: #000">
                     <refresh-button></refresh-button>

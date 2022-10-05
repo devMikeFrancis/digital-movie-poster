@@ -37,19 +37,14 @@ class SettingController extends Controller
 
         if (!$process->isSuccessful()) {
             $success = false;
+            \Log::info(' -- Could not run update script. -- ');
+            \Log::info(' -- ');
         }
 
         $output = $process->getOutput();
 
+        \Log::info($output);
+
         return response()->json(['success' => $success, 'output' => $output]);
-    }
-
-    public function getServiceSections(PlexService $plexService, $service)
-    {
-        if ($service === 'plex') {
-            $sections = $plexService->getSections();
-        }
-
-        return $sections;
     }
 }

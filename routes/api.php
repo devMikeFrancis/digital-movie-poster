@@ -20,5 +20,5 @@ Route::put('/posters/{poster}', [PosterController::class, 'update']);
 Route::put('/posters/{id}/{column}', [PosterController::class, 'updateSetting']);
 Route::delete('/posters/{id}', [PosterController::class, 'delete']);
 Route::get('/update-application', [SettingController::class, 'updateApplication']);
-Route::get('/service-sections/{service}', [SettingController::class, 'getServiceSections']);
+Route::get('/service-sections/{service}', [PosterController::class, 'getServiceSections']);
 Route::get('/kodi-now-playing', [ApiController::class, 'kodiNowPlaying']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
 use App\Services\PosterService;
+use App\Services\PlexService;
 use App\Http\Resources\PostersCollection;
 use App\Http\Resources\PosterResource;
 use App\Models\Poster;
@@ -126,5 +127,14 @@ class PosterController extends Controller
     {
         $service->delete($id);
         return response()->json(['success' => true]);
+    }
+
+    public function getServiceSections(PlexService $plexService, $service)
+    {
+        if ($service === 'plex') {
+            $sections = $plexService->getSections();
+        }
+
+        return $sections;
     }
 }

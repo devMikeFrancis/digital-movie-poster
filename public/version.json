@@ -1,0 +1,8 @@
+{
+    "latest": "1.6.830",
+    "changelog": "Added version checking and About page",
+    "past_updates": [
+        { "version": "1.6.820", "changelog": "Added Plex now playing options." },
+        { "version": "1.6.800", "changelog": "Added MPAA limits and bug fixes." }
+    ]
+}

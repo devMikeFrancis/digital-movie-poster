@@ -1203,8 +1203,6 @@ export default {
             plexSections: [],
             plexTvSection: '',
             plexMovieSection: '',
-            updateBtn: 'Update DMP',
-            updateOutput: '',
             socket: '',
         };
     },
@@ -1335,20 +1333,6 @@ export default {
                     1
                 );
             }
-        },
-        updateApplication() {
-            this.updateOutput = '';
-            this.updateBtn = 'Updating ...';
-            axios
-                .get('/api/update-application')
-                .then((response) => {
-                    this.updateOutput = response.data.output;
-                    this.updateBtn = 'Update DMP';
-                })
-                .catch((e) => {
-                    console.log(e.message);
-                    this.updateBtn = 'Update DMP';
-                });
         },
         getServiceSections(service) {
             axios
