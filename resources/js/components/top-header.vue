@@ -22,15 +22,22 @@
         >
             {{ headerText }}
         </h1>
+        <SpeakerConfig
+            v-if="settings.speaker_config_location === 'top-right' && settings.show_speaker_config"
+        />
     </header>
 </template>
 <script>
 import { mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
+import SpeakerConfig from '@/components/speaker-config.vue';
 
 export default {
     data: function () {
         return {};
+    },
+    components: {
+        SpeakerConfig,
     },
     computed: {
         ...mapState(usePostersStore, ['settings', 'nowPlaying', 'runtime', 'nowPlayingRuntime']),

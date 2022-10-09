@@ -289,15 +289,22 @@
                 </g>
             </svg>
         </div>
+        <SpeakerConfig
+            v-if="settings.speaker_config_location === 'bottom' && settings.show_speaker_config"
+        />
     </div>
 </template>
 <script>
 import { mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
+import SpeakerConfig from '@/components/speaker-config.vue';
 
 export default {
     data: function () {
         return {};
+    },
+    components: {
+        SpeakerConfig,
     },
     computed: {
         ...mapState(usePostersStore, [

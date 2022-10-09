@@ -207,7 +207,7 @@
                                         <span class="ml-2">Show Audience Rating</span></label
                                     >
                                     <div id="audience-ratingHelp" class="text-gray-400 text-sm">
-                                        Shows the audience rating when a movie is playing.
+                                        Shows the audience rating.
                                     </div>
                                 </div>
 
@@ -357,13 +357,80 @@
                                         <span class="ml-2">Show IMAX Enhanced</span></label
                                     >
                                     <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
+                                        class="text-gray-300 block mb-5 font-bold flex items-center"
                                         ><input
                                             class="text-black"
                                             type="checkbox"
                                             v-model="settings.show_auro_3d"
                                         />
                                         <span class="ml-2">Show Auro 3D Logo</span></label
+                                    >
+
+                                    <div class="mb-2">
+                                        <label
+                                            for="speaker-config"
+                                            class="
+                                                text-gray-300
+                                                block
+                                                mb-2
+                                                font-bold
+                                                flex
+                                                items-center
+                                            "
+                                            >Speaker Config</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="text-black mb-2"
+                                            id="speaker-config"
+                                            aria-describedby="speaker-configHelp"
+                                            v-model="settings.speaker_config"
+                                            @input="formatSpeakerConfig"
+                                            maxlength="12"
+                                        />
+
+                                        <div id="speaker-configHelp" class="text-gray-400 text-sm">
+                                            Speaker config such as 5.1, 7.1.2, 9.4.6
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label
+                                            for="speaker-config-location"
+                                            class="
+                                                text-gray-300
+                                                block
+                                                mb-2
+                                                font-bold
+                                                flex
+                                                items-center
+                                            "
+                                            >Speaker Config Location</label
+                                        >
+                                        <select
+                                            class="text-black mb-2"
+                                            id="speaker-config-location"
+                                            aria-describedby="speaker-config-locationHelp"
+                                            v-model="settings.speaker_config_location"
+                                        >
+                                            <option value="bottom">Bottom</option>
+                                            <option value="top-right">Top Right</option>
+                                        </select>
+
+                                        <div
+                                            id="speaker-config-locationHelp"
+                                            class="text-gray-400 text-sm"
+                                        ></div>
+                                    </div>
+
+                                    <label
+                                        class="text-gray-300 block mb-5 font-bold flex items-center"
+                                        ><input
+                                            class="text-black"
+                                            type="checkbox"
+                                            v-model="settings.show_speaker_config"
+                                        />
+                                        <span class="ml-2">Show Speaker Config</span></label
                                     >
                                 </div>
 
@@ -1160,21 +1227,7 @@
                                     Save Settings
                                 </button>
                             </div>
-                            <div class="col-span-6 text-right">
-                                <a
-                                    href="#"
-                                    role="button"
-                                    class="text-white"
-                                    @click.prevent="updateApplication"
-                                    >{{ updateBtn }}</a
-                                >
-                            </div>
                         </div>
-                        <div
-                            class="update-output text-white p-5"
-                            style="white-space: pre"
-                            v-html="updateOutput"
-                        ></div>
                     </div>
                 </div>
             </div>
@@ -1183,8 +1236,6 @@
 </template>
 
 <script>
-import { mapState } from 'pinia';
-import { usePostersStore } from '@/store/posters';
 import MainNav from '@/partials/MainNav.vue';
 
 export default {
@@ -1258,7 +1309,7 @@ export default {
 
             axios
                 .post('/api/settings', this.settings)
-                .then((response) => {
+                .then(() => {
                     this.settingsMessage = 'Settings saved.';
                     setTimeout(() => {
                         this.settingsMessage = null;
@@ -1343,6 +1394,9 @@ export default {
                 .catch((e) => {
                     console.log(e.message);
                 });
+        },
+        formatSpeakerConfig(input) {
+            this.settings.speaker_config = input.target.value.replace(/[^1-9.]/g, '');
         },
     },
     created() {},
