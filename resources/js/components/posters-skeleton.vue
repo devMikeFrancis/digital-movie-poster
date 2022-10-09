@@ -23,7 +23,7 @@ export default {
     components: {},
     data: function () {
         return {
-            fakePosters: [1, 2, 3, 4],
+            fakePosters: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         };
     },
     watch: {},

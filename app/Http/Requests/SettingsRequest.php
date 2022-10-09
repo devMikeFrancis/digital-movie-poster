@@ -34,8 +34,8 @@ class SettingsRequest extends FormRequest
             'plex_token' => 'required_if:plex_service,true|nullable|string',
             'poster_display_speed' => 'required|integer|min:2000',
             'poster_display_limit' => 'nullable',
-            'coming_soon_text' => 'nullable|string',
-            'now_playing_text' => 'nullable|string',
+            'coming_soon_text' => 'nullable|string|max:30',
+            'now_playing_text' => 'nullable|string|max:30',
             'show_mpaa_rating' => 'required|boolean',
             'show_audience_rating' => 'required|boolean',
             'show_processing_logos' => 'required|boolean',
@@ -79,7 +79,10 @@ class SettingsRequest extends FormRequest
             'mpaa_limit' => 'nullable|string',
             'tv_limit' => 'nullable|string',
             'plex_movie_sections' => 'nullable',
-            'plex_tv_sections' => 'nullable'
+            'plex_tv_sections' => 'nullable',
+            'speaker_config' => 'nullable|string|max:20',
+            'speaker_config_location' => 'nullable|string',
+            'show_speaker_config' => 'required|boolean',
         ];
     }
 
@@ -111,6 +114,7 @@ class SettingsRequest extends FormRequest
             'plex_sync_tv' => $this->boolean('plex_sync_tv'),
             'plex_show_movie_now_playing' => $this->boolean('plex_show_movie_now_playing'),
             'plex_show_tv_now_playing' => $this->boolean('plex_show_tv_now_playing'),
+            'show_speaker_config' => $this->boolean('show_speaker_config'),
         ]);
     }
 }

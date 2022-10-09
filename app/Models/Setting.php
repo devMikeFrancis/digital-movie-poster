@@ -68,7 +68,10 @@ class Setting extends Model
         'plex_sync_movies',
         'plex_sync_tv',
         'plex_show_movie_now_playing',
-        'plex_show_tv_now_playing'
+        'plex_show_tv_now_playing',
+        'speaker_config',
+        'speaker_config_location',
+        'show_speaker_config',
     ];
 
     /**
@@ -271,6 +274,13 @@ class Setting extends Model
     }
 
     protected function removeBlackBars(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? true : false,
+        );
+    }
+
+    protected function showSpeakerConfig(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $value ? true : false,
