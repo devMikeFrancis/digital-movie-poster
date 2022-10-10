@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Current user: $USER"
+
 echo -e "\n\nUpdating Apt Packages and upgrading latest patches\n"
 apt update -y && apt upgrade -y
 
@@ -50,7 +52,7 @@ echo -e "\n\nRestarting Apache\n"
 service apache2 restart
 
 echo -e "\n\nLAMP Installation Completed\n"
-
+echo "Current user: $USER"
 echo -e "\n\nConfiguring PHP and Apache"
 
 if [ ! -f /etc/php/8.1/apache2/php.ini.orig ]; then
@@ -165,6 +167,8 @@ cd "/var/www/html" && pwd
 
 cp .env.example .env
 
+echo "Current user: $USER"
+
 chown -R $USER:www-data /var/www/html
 chmod -R 770 /var/www/html
 
@@ -218,6 +222,8 @@ echo "setxkbmap -option terminate:ctrl_alt_bksp" >> /etc/xdg/openbox/autostart
 echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'" >> /etc/xdg/openbox/autostart
 echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> /etc/xdg/openbox/autostart
 echo $autostart >> /etc/xdg/openbox/autostart
+
+echo "Current user: $USER"
 
 touch /home/$USER/.bash_profile
 chown $USER /home/$USER/.bash_profile
