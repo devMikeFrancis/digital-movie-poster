@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Current user: $USER"
+echo "Current user: $1"
 
 echo -e "\n\nUpdating Apt Packages and upgrading latest patches\n"
 apt update -y && apt upgrade -y
@@ -23,7 +23,7 @@ echo "autostart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "autorestart=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "stopasgroup=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "killasgroup=true" >> /etc/supervisor/conf.d/laravel-worker.conf
-echo "user=$USER" >> /etc/supervisor/conf.d/laravel-worker.conf
+echo "user=$1" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "numprocs=4" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "redirect_stderr=true" >> /etc/supervisor/conf.d/laravel-worker.conf
 echo "stdout_logfile=/var/www/html/worker.log" >> /etc/supervisor/conf.d/laravel-worker.conf
@@ -38,7 +38,7 @@ apt-get install mariadb-server mariadb-client -y
 
 echo -e "\n\nPermissions for /var/www"
 chown -R www-data:www-data /var/www
-chown -R $USER:www-data /var/www/html
+chown -R $1:www-data /var/www/html
 chmod -R 770 /var/www/html
 echo -e "\nPermissions have been set\n"
 
@@ -52,7 +52,7 @@ echo -e "\n\nRestarting Apache\n"
 service apache2 restart
 
 echo -e "\n\nLAMP Installation Completed\n"
-echo "Current user: $USER"
+echo "Current user: $1"
 echo -e "\n\nConfiguring PHP and Apache"
 
 if [ ! -f /etc/php/8.1/apache2/php.ini.orig ]; then
@@ -159,7 +159,7 @@ npm install
 cd "/var/www/html/socketserver" && pwd
 npm install
 pm2 startup
-env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER
+env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $1 --hp /home/$1
 pm2 start server.js
 pm2 save
 
@@ -167,9 +167,9 @@ cd "/var/www/html" && pwd
 
 cp .env.example .env
 
-echo "Current user: $USER"
+echo "Current user: $1"
 
-chown -R $USER:www-data /var/www/html
+chown -R $1:www-data /var/www/html
 chmod -R 770 /var/www/html
 
 php artisan key:generate
@@ -194,7 +194,7 @@ echo -e "\n\nInstalling HDMI CEC Control\n"
 
 apt-get install cec-utils -y
 line="@reboot python3 /var/www/html/hdmi-control.py"
-(crontab -u $USER -l; echo "$line" ) | crontab -u $USER -
+(crontab -u $1 -l; echo "$line" ) | crontab -u $1 -
 chmod 777 /dev/vchiq
 
 echo -e "\n\nHDMI CEC control finished\n"
@@ -210,7 +210,7 @@ raspi-config nonint do_boot_behaviour B2
 
 #https://itnext.io/raspberry-pi-read-only-kiosk-mode-the-complete-tutorial-for-2021-58a860474215
 
-cd /home/$USER && pwd
+cd /home/$1 && pwd
 
 autostart="
 chromium-browser --user-agent=chrome-movieposter --ignore-gpu-blocklist --enable-accelerated-video-decode --enable-gpu-rasterization --window-size=1920,1080 --window-position=0,0 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null  --password-store=basic --disable-pinch --overscroll-history-navigation=disabled --disable-features=TouchpadOverscrollHistoryNavigation --autoplay-policy=no-user-gesture-required  'http://localhost?rotate=true'
@@ -223,15 +223,15 @@ echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chr
 echo "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; s/\"exit_type\":\"[^\"]\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences" >> /etc/xdg/openbox/autostart
 echo $autostart >> /etc/xdg/openbox/autostart
 
-echo "Current user: $USER"
+echo "Current user: $1"
 
-touch /home/$USER/.bash_profile
-chown $USER /home/$USER/.bash_profile
+touch /home/$1/.bash_profile
+chown $1 /home/$1/.bash_profile
 newline="[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && startx -- -nocursor"
-echo $newline >> /home/$USER/.bash_profile
+echo $newline >> /home/$1/.bash_profile
 echo -e "\nKiosk setup finished\n"
 
-usermod -a -G video $USER
+usermod -a -G video $1
 
 echo -e "\nAll done! Rebooting now.\n"
 
