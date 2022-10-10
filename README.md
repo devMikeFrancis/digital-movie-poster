@@ -55,7 +55,7 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 3. In the Pi console enter the following commands:
     - `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
     - `chmod u+x install.sh`
-    - `sudo ./install.sh`
+    - `sudo ./install.sh $USER`
 
 The install will take several minutes. Once it is finished the Raspberry Pi will reboot. If all goes well it will boot into the DMP interface.
 
