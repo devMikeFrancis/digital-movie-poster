@@ -105,7 +105,7 @@ You can send poster data to certain endpoints to tigger a `now-playing` or `stop
 | Method | Endpoint           | Data                   | Description                               |
 | :----- | :----------------- | :--------------------- | ----------------------------------------- |
 | `POST` | `/api/now-playing` | See data payload below | This will put DMP into `now-playing` mode |
-| `POST` | `api/stopped`      | N/A                    | This will end the `now-playing` mode      |
+| `POST` | `/api/stopped`     | N/A                    | This will end the `now-playing` mode      |
 
 ### now-playing Data Payload
 
