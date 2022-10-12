@@ -6,7 +6,7 @@ echo -e "\n\nUpdating Apt Packages and upgrading latest patches\n"
 apt update -y && apt upgrade -y
 
 echo -e "\n\nInstalling Apache2 Web server\n"
-apt-get install apache2 apache2-doc apache2-utils libexpat1 ssl-cert sed -y
+apt-get install apache2 apache2-doc apache2-utils libexpat1 ssl-cert redis-server sed -y
 
 echo -e "\n\nInstalling PHP & Requirements\n"
 wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
@@ -168,6 +168,8 @@ cd "/var/www/html" && pwd
 cp .env.example .env
 
 echo "Current user: $1"
+
+systemctl start redis.service
 
 chown -R $1:www-data /var/www/html
 chmod -R 770 /var/www/html

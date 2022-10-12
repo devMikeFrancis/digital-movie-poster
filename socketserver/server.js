@@ -1,6 +1,8 @@
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+var Redis = require('ioredis');
+let redis = new Redis();
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -80,6 +82,14 @@ function startTimer() {
         timer--;
     }
 }
+
+redis.psubscribe('*', function (err, count) {});
+redis.subscribe('dmp-event', function (err, count) {});
+redis.on('pmessage', function (pattern, channel, message) {
+    message = JSON.parse(message);
+    let eventName = message.event.replace(/\\/g, '');
+    io.emit(eventName, message.data.data);
+});
 
 io.on('connection', (socket) => {
     socket.emit('users', { users: users });

@@ -249,7 +249,7 @@ export const usePostersStore = defineStore('posters', {
             if (mpaaLimit === 'NC-17') {
                 return this.nc17Limits.includes(rating);
             }
-            return false;
+            return true;
         },
         withinTvLimit(rating) {
             let mpaaLimit = this.settings.tv_limit;
@@ -277,7 +277,7 @@ export const usePostersStore = defineStore('posters', {
             if (mpaaLimit === 'TV-MA') {
                 return this.tvMaLimits.includes(rating);
             }
-            return false;
+            return true;
         },
         getNowPlaying() {
             console.log('GET NOW PLAYING');
@@ -367,7 +367,8 @@ export const usePostersStore = defineStore('posters', {
         },
         setNowPlaying(data) {
             let withinMpaaLimit = this.withinMpaaLimit(data.contentRating);
-            if (withinMpaaLimit) {
+            let withinTvLimit = this.withinTvLimit(data.contentRating);
+            if (withinMpaaLimit && withinTvLimit) {
                 console.log('SET NOW PLAYING');
                 this.nowPlayingPoster = data.poster;
                 this.contentRating = data.contentRating;
@@ -719,7 +720,9 @@ export const usePostersStore = defineStore('posters', {
             this.loading = true;
             this.stopTransitionImages();
             clearInterval(this.recentlyAddedInterval);
+            this.stopSettingsInterval();
             this.stopMusic();
+            this.socket = null;
             this.videoPlaying = false;
             this.nowPlaying = false;
             this.isPlaying = false;
@@ -730,9 +733,18 @@ export const usePostersStore = defineStore('posters', {
         setLoading(value) {
             this.loading = value;
         },
+        processApiEvent(data) {
+            if (data.event === 'now-playing') {
+                console.log('-- NOW PLAYING EVENT --', data);
+            }
+        },
         setSocket() {
             this.socket = io('http://' + location.hostname + ':3000');
-            // location.host || ' + import.meta.env.VITE_BASE_URL + '
+
+            this.socket.on('AppEventsDmpEvent', (data) => {
+                this.processApiEvent(data);
+            });
+
             this.socket.on('receive:command', (data) => {
                 switch (data.command) {
                     case 'reload':

@@ -19,6 +19,7 @@
         "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.5",
         "opcodesio/log-viewer": "^1.4",
+        "predis/predis": "^1.1",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {

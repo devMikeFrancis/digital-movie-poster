@@ -220,7 +220,7 @@ trait PosterProcess
         return $response->json();
     }
 
-    private function getMoveRating($releaseDates)
+    private function getMovieRating($releaseDates)
     {
         foreach ($releaseDates as $releaseDate) {
             if ($releaseDate['iso_3166_1'] === 'US') {
