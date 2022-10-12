@@ -96,9 +96,28 @@ Enter your TMDB api key in the DMP settings.
 
 ## Updating
 
-In the settings view there is a `Update DMP` link next to the `Save Settings` button. Clicking Update DMP will update the application.
+Visit the `About` page to check for updates.
 
-After the application updates you will need to refresh the browser, or if using the Pi in kiosk mode, restart the Pi.
+## Now Playing API
+
+You can send poster data to certain endpoints to tigger a `now-playing` or `stopped` event.
+
+| Method | Endpoint           | Data                   | Description                               |
+| :----- | :----------------- | :--------------------- | ----------------------------------------- |
+| `POST` | `/api/now-playing` | See data payload below | This will put DMP into `now-playing` mode |
+| `POST` | `api/stopped`      | N/A                    | This will end the `now-playing` mode      |
+
+### now-playing Data Payload
+
+```javascript
+{
+    "mediaType": string, // **Required** movie or tv
+    "poster": string, // **Required** URL to poster image. https://www...jpg
+    "contentRating": string, // **Optional** MPAA/TV Rating - G, PG, PG-13...etc, TV-Y, TV-7, TV-MA...etc
+    "audienceRating": integer, // **Optional** Number 1-10. Decimal allowed i.e. 8.5
+    "duration": integer // **Optional** Number in minutes i.e. 112
+}
+```
 
 ## Screenshots
 

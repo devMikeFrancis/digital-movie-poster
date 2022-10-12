@@ -24,3 +24,4 @@ Route::get('/check-update', [SettingController::class, 'checkUpdate']);
 Route::get('/service-sections/{service}', [PosterController::class, 'getServiceSections']);
 Route::get('/kodi-now-playing', [ApiController::class, 'kodiNowPlaying']);
 Route::post('/now-playing', [ApiController::class, 'dmpBroadcast']);
+Route::post('/stopped', [ApiController::class, 'dmpBroadcast']);

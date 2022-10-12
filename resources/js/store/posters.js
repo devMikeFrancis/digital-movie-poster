@@ -383,6 +383,7 @@ export const usePostersStore = defineStore('posters', {
                 this.isPlaying = true;
             } else {
                 this.isPlaying = false;
+                this.contentRating = 0;
             }
         },
         setIsPlaying(state) {
@@ -650,6 +651,7 @@ export const usePostersStore = defineStore('posters', {
                     console.log('-- STOPPED NOW PLAYING');
                     this.nowPlaying = false;
                     this.isPlaying = false;
+                    this.contentRating = 0;
                     break;
             }
         },
@@ -736,6 +738,14 @@ export const usePostersStore = defineStore('posters', {
         processApiEvent(data) {
             if (data.event === 'now-playing') {
                 console.log('-- NOW PLAYING EVENT --', data);
+                this.servicePlaying = data.mediaSource;
+                this.controlPlayerState('playing');
+                this.setNowPlaying(data);
+            }
+            if (data.event === 'stopped') {
+                console.log('-- STOPPED EVENT --', data);
+                this.controlPlayerState('stopped');
+                this.servicePlaying = null;
             }
         },
         setSocket() {
