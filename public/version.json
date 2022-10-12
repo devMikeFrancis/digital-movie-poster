@@ -1,7 +1,8 @@
 {
-    "latest": "1.6.845",
-    "changelog": "Fixed user permissons for install script",
+    "latest": "1.7.100",
+    "changelog": "Fixed bugs and added new API calls",
     "past_updates": [
+        { "version": "1.6.845", "changelog": "Fixed user permissons for install script" },
         { "version": "1.6.840", "changelog": "Added speaker config" },
         { "version": "1.6.831", "changelog": "Added version checking and About page" },
         { "version": "1.6.820", "changelog": "Added Plex now playing options." },
