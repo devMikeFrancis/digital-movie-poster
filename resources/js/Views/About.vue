@@ -136,9 +136,9 @@ export default {
                 });
         },
         processVersion() {
-            let currentVersion = parseInt(this.localVersion.replace('.', ''));
-            let remoteVersion = parseInt(this.remoteVersion.replace('.', ''));
-
+            let currentVersion = parseInt(this.localVersion.replaceAll('.', ''));
+            let remoteVersion = parseInt(this.remoteVersion.replaceAll('.', ''));
+            console.log(remoteVersion, currentVersion);
             if (remoteVersion > currentVersion) {
                 this.updateAvailable = true;
             }
