@@ -4,6 +4,7 @@ echo "Deploy script started"
 #cd /var/www/html
 cd `dirname $0` && pwd
 php artisan down
+git reset --hard
 git pull origin main --no-commit && git commit -m "Merge"
 composer install --no-interaction
 php artisan migrate --force
