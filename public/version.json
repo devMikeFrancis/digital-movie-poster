@@ -1,7 +1,8 @@
 {
-    "latest": "1.7.140",
-    "changelog": "Fixed version check",
+    "latest": "1.7.150",
+    "changelog": "Fixed Plex tv now playing",
     "past_updates": [
+        { "version": "1.7.140", "changelog": "Fixed version check" },
         { "version": "1.7.120", "changelog": "Documentation for API calls" },
         { "version": "1.7.100", "changelog": "Fixed bugs and added new API calls" },
         { "version": "1.6.845", "changelog": "Fixed user permissons for install script" },

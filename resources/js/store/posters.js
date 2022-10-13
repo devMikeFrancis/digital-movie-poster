@@ -304,11 +304,16 @@ export const usePostersStore = defineStore('posters', {
                             poster: '',
                         };
 
+                        let poster =
+                            data.type === 'show' || data.type === 'episode'
+                                ? response.data.MediaContainer.Metadata[0].grandparentThumb
+                                : response.data.MediaContainer.Metadata[0].thumb;
+
                         playing.poster =
                             'http://' +
                             this.settings.plex_ip_address +
                             ':32400' +
-                            response.data.MediaContainer.Metadata[0].thumb +
+                            poster +
                             '?X-Plex-Token=' +
                             this.settings.plex_token;
 
@@ -559,6 +564,7 @@ export const usePostersStore = defineStore('posters', {
                         console.log('PLEX CHECK SESSION TYPE');
                         Api.apiCallPlex('/status/sessions/')
                             .then((response) => {
+                                console.log(response);
                                 const size = response.data.MediaContainer.size;
                                 if (size > 0) {
                                     let data = response.data.MediaContainer.Metadata[0];
@@ -566,7 +572,7 @@ export const usePostersStore = defineStore('posters', {
                                     if (
                                         (data.type === 'movie' &&
                                             this.settings.plex_show_movie_now_playing) ||
-                                        (data.type === 'show' &&
+                                        ((data.type === 'show' || data.type === 'episode') &&
                                             this.settings.plex_show_tv_now_playing)
                                     ) {
                                         this.servicePlaying = 'plex';

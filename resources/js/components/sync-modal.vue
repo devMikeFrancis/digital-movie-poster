@@ -9,7 +9,7 @@
                 <div class="modal-body p-4">
                     <p class="mb-5 text-white">
                         Feel free to close this and go about your business. The posters will sync in
-                        the background.
+                        the background and load in batches. Refresh this page later.
                     </p>
                     <p class="text-white mb-5">
                         This process may take a while if you have 1000s of movies. Once the sync
