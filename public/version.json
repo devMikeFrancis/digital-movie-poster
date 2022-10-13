@@ -1,7 +1,8 @@
 {
-    "latest": "1.7.120",
-    "changelog": "Documentation for API calls",
+    "latest": "1.7.130",
+    "changelog": "Fixed Plex API service",
     "past_updates": [
+        { "version": "1.7.120", "changelog": "Documentation for API calls" },
         { "version": "1.7.100", "changelog": "Fixed bugs and added new API calls" },
         { "version": "1.6.845", "changelog": "Fixed user permissons for install script" },
         { "version": "1.6.840", "changelog": "Added speaker config" },

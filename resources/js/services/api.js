@@ -1,4 +1,5 @@
 import { Service } from './service';
+import { usePostersStore } from '@/store/posters';
 
 class Api extends Service {
     constructor() {
@@ -11,8 +12,9 @@ class Api extends Service {
      * @param {object} params - Data passed to the resource, { name: 'Bob' }
      */
     apiCallPlex(route = '/', params = {}) {
-        const baseUrl = 'http://' + localStorage.getItem('plexIpAddress') + ':32400';
-        route += '?X-Plex-Token=' + localStorage.getItem('plexToken');
+        const posterStore = usePostersStore();
+        const baseUrl = 'http://' + posterStore.settings.plex_ip_address + ':32400';
+        route += '?X-Plex-Token=' + posterStore.settings.plex_token;
         return axios({ url: route, baseURL: baseUrl });
     }
 }
