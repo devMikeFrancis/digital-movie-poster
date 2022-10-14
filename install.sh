@@ -36,6 +36,8 @@ apt-get install php8.1-common php8.1-cli libapache2-mod-php8.1 php8.1-curl php8.
 echo -e "\n\nInstalling MySQL\n"
 apt-get install mariadb-server mariadb-client -y
 
+exec newgrp www-data
+
 echo -e "\n\nPermissions for /var/www"
 chown -R www-data:www-data /var/www
 #chown -R $1:www-data /var/www/html
@@ -172,8 +174,12 @@ echo "Current user: $1"
 
 systemctl start redis.service
 
-#chown -R $1:www-data /var/www/html
+apt update -y
+
+chown -R www-data:www-data /var/www
 chmod -R 775 /var/www
+chgrp -R www-data storage bootstrap/cache
+sudo chmod -R ug+rwx storage bootstrap/cache
 
 php artisan key:generate
 php artisan storage:link
