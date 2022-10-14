@@ -39,8 +39,8 @@ apt-get install mariadb-server mariadb-client -y
 echo -e "\n\nPermissions for /var/www"
 chown -R www-data:www-data /var/www
 #chown -R $1:www-data /var/www/html
-chmod -R 775 /var/www/html
-usermod -a -G www-data $1
+chmod -R 775 /var/www
+sudo usermod -a -G www-data $1
 echo -e "\nPermissions have been set\n"
 
 echo -e "\n\nEnabling Modules\n"
@@ -173,7 +173,7 @@ echo "Current user: $1"
 systemctl start redis.service
 
 #chown -R $1:www-data /var/www/html
-#chmod -R 770 /var/www/html
+chmod -R 775 /var/www
 
 php artisan key:generate
 php artisan storage:link
