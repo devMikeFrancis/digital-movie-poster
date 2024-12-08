@@ -151,7 +151,7 @@ echo -e "\n\nInstalling and Configuring DMP app\n"
 cd "/var/www/html" && pwd
 rm index.html
 
-git clone https://github.com/newelement/digital-movie-poster.git .
+git clone https://github.com/devMikeFrancis/digital-movie-poster.git .
 
 composer install --no-interaction
 npm install
