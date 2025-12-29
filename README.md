@@ -53,7 +53,7 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
     - If the terminal asks to accept the ssh connection type Y or yes.
     - Once you are in the console `go to step 3`.
 3. In the Pi console enter the following commands:
-    - `wget -O install.sh https://raw.githubusercontent.com/newelement/digital-movie-poster/main/install.sh`
+    - `wget -O install.sh https://raw.githubusercontent.com/devMikeFrancis/digital-movie-poster/main/install.sh`
     - `chmod u+x install.sh`
     - `sudo ./install.sh $USER`
 
