@@ -119,14 +119,6 @@ You can send poster data to certain endpoints to tigger a `now-playing` or `stop
 }
 ```
 
-## Screenshots
-
-Below are some screenshots taken from a local dev environment. IRL screenshots coming soon.
-
-![Basic poster view!](https://newelementdesigns.com/assets/images/screen1.png)
-
-![Poster view with trailer!](https://newelementdesigns.com/assets/images/screen2.png)
-
 ## License
 
 DMP open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
