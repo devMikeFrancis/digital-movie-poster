@@ -3,26 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsRequest;
-use Symfony\Component\Process\Process;
+use App\Http\Resources\PublicSettingResource;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
 
 class SettingController extends Controller
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
+    /**
+     * Settings for the kiosk display. Unauthenticated, so credentials are
+     * stripped - see PublicSettingResource.
+     */
     public function index()
     {
-        $settings = Setting::first();
-        return response()->json($settings);
+        return new PublicSettingResource(Setting::firstOrFail());
+    }
+
+    /**
+     * The complete settings row for the admin UI, including credentials.
+     * Gated by the same opt-in token as every other privileged endpoint.
+     */
+    public function full()
+    {
+        return response()->json(Setting::firstOrFail());
     }
 
     public function update(SettingsRequest $request)
     {
-        $updated = Setting::where('id', 1)->update($request->validated());
+        $settings = Setting::firstOrFail();
+        $settings->fill($request->validated())->save();
 
-        return response()->json(['saved' => $updated]);
+        return response()->json(['saved' => 1]);
     }
 
     public function updateApplication()
@@ -32,23 +46,35 @@ class SettingController extends Controller
         $process->setTimeout(3600);
         $process->run();
 
-        if (!$process->isSuccessful()) {
+        if (! $process->isSuccessful()) {
             $success = false;
-            \Log::info(' -- Could not run update script. -- ');
-            \Log::info(' -- ');
+            Log::info(' -- Could not run update script. -- ');
+            Log::info(' -- ');
         }
 
         $output = $process->getOutput();
 
-        \Log::info($output);
+        Log::info($output);
 
         return response()->json(['success' => $success, 'output' => $output]);
     }
 
     public function checkUpdate()
     {
-        $file = file_get_contents('https://raw.githubusercontent.com/newelement/digital-movie-poster/main/public/version.json');
+        $url = sprintf(
+            'https://raw.githubusercontent.com/%s/%s/public/version.json',
+            config('dmp.update.repository'),
+            config('dmp.update.branch')
+        );
 
-        return json_decode($file);
+        $response = Http::timeout(10)->get($url);
+
+        if (! $response->successful()) {
+            Log::warning('Update check failed ('.$response->status().'): '.$url);
+
+            return response()->json(['message' => 'Could not reach the update server.'], 503);
+        }
+
+        return response()->json($response->json());
     }
 }

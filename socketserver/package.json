@@ -1,17 +1,14 @@
 {
-    "name": "socketserver",
-    "version": "1.0.0",
-    "description": "",
+    "name": "dmp-socketserver",
+    "version": "2.0.0",
+    "private": true,
+    "description": "Relays DMP broadcast events from Redis to connected browsers over socket.io",
     "main": "server.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "node server.js"
     },
-    "author": "",
-    "license": "ISC",
     "dependencies": {
-        "cors": "^2.8.5",
-        "http": "^0.0.1-security",
-        "ioredis": "^5.2.3",
-        "socket.io": "^4.2.0"
+        "ioredis": "^5.9.0",
+        "socket.io": "^4.8.3"
     }
 }

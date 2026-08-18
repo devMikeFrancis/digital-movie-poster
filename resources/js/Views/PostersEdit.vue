@@ -382,6 +382,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import MainNav from '../partials/MainNav.vue';
 
 export default {

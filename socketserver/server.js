@@ -1,22 +1,30 @@
 const { createServer } = require('http');
 const { Server } = require('socket.io');
-const cors = require('cors');
-var Redis = require('ioredis');
-let redis = new Redis();
+const Redis = require('ioredis');
+
+const PORT = Number(process.env.SOCKET_PORT || 3000);
+
+// The previous build hardcoded a handful of hostnames, so reaching the Pi by
+// its LAN IP was rejected by CORS. Default to allowing any origin (this server
+// listens on the local network and holds no secrets) and let an operator pin
+// it down with SOCKET_ALLOWED_ORIGINS if they want to.
+const allowedOrigins = (process.env.SOCKET_ALLOWED_ORIGINS || '*')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const redis = new Redis({
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: Number(process.env.REDIS_PORT || 6379),
+    password: process.env.REDIS_PASSWORD || undefined,
+});
+
+redis.on('error', (err) => console.error('[dmp] redis error:', err.message));
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origins: [
-            'http://localhost',
-            'http://localhost:*',
-            'http://127.0.0.1:*',
-            'http://movieposter.local',
-            'http://digital-movie-poster.test',
-            'http://digital-movie-poster.test:3000',
-            'https://digital-movie-poster.test',
-            'http://raspberrypi.local',
-        ],
+        origin: allowedOrigins.includes('*') ? true : allowedOrigins,
         methods: ['GET', 'POST'],
     },
 });
@@ -31,8 +39,6 @@ let lastWinner = {};
 let status = 'none';
 
 function calcWinner() {
-    posters.forEach((v, i) => {});
-
     const maxVotes = Math.max.apply(
         Math,
         posters.map(function (o) {
@@ -83,11 +89,16 @@ function startTimer() {
     }
 }
 
-redis.psubscribe('*', function (err, count) {});
-redis.subscribe('dmp-event', function (err, count) {});
+redis.psubscribe('*');
 redis.on('pmessage', function (pattern, channel, message) {
-    message = JSON.parse(message);
-    let eventName = message.event.replace(/\\/g, '');
+    try {
+        message = JSON.parse(message);
+    } catch (err) {
+        console.error('[dmp] ignoring unparseable message on', channel);
+        return;
+    }
+
+    const eventName = message.event.replace(/\\/g, '');
     io.emit(eventName, message.data.data);
 });
 
@@ -184,4 +195,6 @@ io.on('connection', (socket) => {
     });
 });
 
-httpServer.listen(3000);
+httpServer.listen(PORT, () => {
+    console.log('[dmp] socket server listening on port ' + PORT);
+});

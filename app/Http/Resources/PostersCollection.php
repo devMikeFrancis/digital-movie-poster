@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PostersCollection extends ResourceCollection
@@ -11,8 +13,8 @@ class PostersCollection extends ResourceCollection
     /**
      * Transform the resource collection into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  Request  $request
+     * @return array|Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
@@ -23,6 +25,7 @@ class PostersCollection extends ResourceCollection
             $item['music'] = null;
             $item['show_dolby_51'] = $item['show_dolby_51'] ? true : false;
             $item['show_auro_3d'] = $item['show_auro_3d'] ? true : false;
+
             return $item;
         });
     }

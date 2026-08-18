@@ -1236,6 +1236,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import MainNav from '@/partials/MainNav.vue';
 
 export default {
@@ -1291,7 +1293,7 @@ export default {
         },
         getSettings() {
             axios
-                .get('/api/settings')
+                .get('/api/settings/full')
                 .then((response) => {
                     this.settings = response.data;
                     if (this.settings.plex_service) {

@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 import Dashboard from '../Views/Dashboard.vue';
 import Settings from '../Views/Settings.vue';
 import Posters from '../Views/Posters.vue';
 import PostersEdit from '../Views/PostersEdit.vue';
 import Voting from '../Views/Voting.vue';
 import About from '../Views/About.vue';
+import Login from '../Views/Login.vue';
 
 const routes = [
     {
+        // The kiosk display. Deliberately public: the Pi's browser boots
+        // straight into this and has no way to sign in.
         path: '/',
         name: 'Dashboard',
         component: Dashboard,
@@ -16,29 +20,39 @@ const routes = [
         },
     },
     {
+        path: '/login',
+        name: 'Login',
+        component: Login,
+    },
+    {
         path: '/settings',
         name: 'Settings',
         component: Settings,
+        meta: { requiresAuth: true },
     },
     {
         path: '/posters',
         name: 'Posters',
         component: Posters,
+        meta: { requiresAuth: true },
     },
     {
         path: '/posters/:id',
         name: 'PostersEdit',
         component: PostersEdit,
+        meta: { requiresAuth: true },
     },
     {
         path: '/voting',
         name: 'Voting',
         component: Voting,
+        meta: { requiresAuth: true },
     },
     {
         path: '/about',
         name: 'About',
         component: About,
+        meta: { requiresAuth: true },
     },
 ];
 
@@ -48,7 +62,7 @@ let router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     if (from.path === '/' && from.name !== null) {
         clearInterval(window.transitionImagesInterval);
         if (window.audio) {
@@ -56,7 +70,19 @@ router.beforeEach((to, from, next) => {
             window.audio = null;
         }
     }
-    next();
+
+    if (!to.meta.requiresAuth) {
+        return next();
+    }
+
+    const auth = useAuthStore();
+    await auth.loadStatus();
+
+    if (!auth.required || auth.authenticated) {
+        return next();
+    }
+
+    return next({ name: 'Login', query: { redirect: to.fullPath } });
 });
 
 export default router;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\EncryptedCredential;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -79,9 +80,35 @@ class Setting extends Model
      *
      * @var array
      */
+    /**
+     * Credentials are encrypted at rest so that a copied database file does not
+     * hand over working media-server access. They are still returned in the
+     * clear to the admin UI via /api/settings/full, and are never included in
+     * the public settings payload - see PublicSettingResource.
+     */
     protected $casts = [
         'plex_movie_sections' => 'array',
         'plex_tv_sections' => 'array',
+        'plex_token' => EncryptedCredential::class,
+        'jellyfin_token' => EncryptedCredential::class,
+        'kodi_username' => EncryptedCredential::class,
+        'kodi_password' => EncryptedCredential::class,
+        'tmdb_api_key_v3' => EncryptedCredential::class,
+        'tmdb_api_key_v4' => EncryptedCredential::class,
+    ];
+
+    /**
+     * Columns held as ciphertext. Used by the encrypting migration.
+     *
+     * @var list<string>
+     */
+    public const ENCRYPTED_CREDENTIALS = [
+        'plex_token',
+        'jellyfin_token',
+        'kodi_username',
+        'kodi_password',
+        'tmdb_api_key_v3',
+        'tmdb_api_key_v4',
     ];
 
     protected function plexService(): Attribute

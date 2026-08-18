@@ -2,61 +2,87 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
-use Illuminate\Support\Facades\Http;
 use App\Models\Poster;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\Laravel\Facades\Image;
 
 trait PosterProcess
 {
     public $settings;
+
     public $originalName;
+
     public $fileName;
 
     /**
      * Saves poster image
      *
-     * @param string $mediaTitle The media title
-     * @param string $imageLocation URL or path to the image
-     * @param string $mediaType movie|tv
-     *
-     * @return array
+     * @param  string  $mediaTitle  The media title
+     * @param  string  $imageLocation  URL or path to the image
+     * @param  string  $mediaType  movie|tv
      */
     public function saveImage($mediaTitle, $imageLocation, $mediaType = 'movie'): array
     {
         $message = 'Image saved';
         $success = true;
 
-        if (!is_dir(storage_path("app/public/posters"))) {
-            mkdir(storage_path("app/public/posters"), 0775, true);
-        }
+        $directory = storage_path('app/public/posters');
+        File::ensureDirectoryExists($directory, 0775);
 
-        $orginalName = Str::slug($mediaTitle);
-        $fileName = $orginalName.'.webp';
+        $originalName = Str::slug($mediaTitle);
+        $fileName = $originalName.'.webp';
         if (strtolower($mediaType) === 'tv') {
             $fileName = 'tv_'.$fileName;
         }
 
         try {
-            $image = Image::make($imageLocation);
-            $image->resize(1400, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-            $image->save(storage_path('app/public/posters/').$fileName, 70, 'webp');
-            $image->resize(200, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-            $image->save(storage_path('app/public/posters/_tn_').$fileName, 70, 'webp');
-        } catch (\Exception $e) {
+            $image = Image::decode($this->readImageSource($imageLocation));
+            $encoder = new WebpEncoder(quality: 70);
+
+            $image->scale(width: 1400);
+            $image->encode($encoder)->save($directory.'/'.$fileName);
+
+            $image->scale(width: 200);
+            $image->encode($encoder)->save($directory.'/_tn_'.$fileName);
+        } catch (\Throwable $e) {
             $success = false;
             $message = $e->getMessage();
+            Log::warning('Could not save poster image for "'.$mediaTitle.'": '.$message);
         }
 
         return [
             'success' => $success,
             'file_name' => $fileName,
-            'message' => $message
+            'message' => $message,
         ];
+    }
+
+    /**
+     * Resolve an image source into something Intervention Image v4 can decode.
+     *
+     * Version 2 accepted remote URLs directly; version 4 does not, so remote
+     * sources are fetched here and handed over as raw bytes instead.
+     *
+     * @param  mixed  $imageLocation  URL, local path, or uploaded file
+     * @return mixed
+     */
+    private function readImageSource($imageLocation)
+    {
+        if (is_string($imageLocation) && Str::startsWith($imageLocation, ['http://', 'https://'])) {
+            $response = Http::timeout(30)->get($imageLocation);
+
+            if (! $response->successful()) {
+                throw new \RuntimeException('Could not download image ('.$response->status().'): '.$imageLocation);
+            }
+
+            return $response->body();
+        }
+
+        return $imageLocation;
     }
 
     /**
@@ -74,13 +100,12 @@ trait PosterProcess
      *    'media_type' => string movie|tv
      * ];
      *
-     * @param array $params
-     *
+     * @param  array  $params
      * @return mixed
      */
     public function savePoster($params)
     {
-        $whereUpdate = ['object_id' => $params['id'] ];
+        $whereUpdate = ['object_id' => $params['id']];
 
         $mediaType = isset($params['media_type']) ? strtolower($params['media_type']) : 'movie';
 
@@ -113,20 +138,20 @@ trait PosterProcess
     /**
      * Get movie or tv meta data
      *
-     * @param string $mediaId imdbid|tv name
-     * @param string $type movie|tv
-     *
-     * @return array
+     * @param  string  $mediaId  imdbid|tv name
+     * @param  string  $type  movie|tv
      */
     public function posterMeta($mediaId, $type = 'movie'): array
     {
         if ($type === 'movie') {
             $res = $this->movieEndpoint($mediaId);
+
             return $this->getMovieData($res);
         }
 
         if ($type === 'tv') {
             $res = $this->tvEndpoint($mediaId);
+
             return $this->getTvData($res);
         }
     }
@@ -156,9 +181,10 @@ trait PosterProcess
         $success = true;
         $message = '';
 
-        if (isset($res['success']) && !$res['success']) {
+        if (isset($res['success']) && ! $res['success']) {
             $arr['success'] = false;
             $arr['message'] = 'Movie not found';
+
             return $arr;
         }
 
@@ -175,7 +201,7 @@ trait PosterProcess
             'mpaa_rating' => $movieRating,
             'audience_rating' => $audienceRating,
             'trailer_id' => $trailerId,
-            'runtime' => $res['runtime']
+            'runtime' => $res['runtime'],
         ];
     }
 
@@ -188,6 +214,7 @@ trait PosterProcess
         if (count($res) === 0) {
             $arr['success'] = false;
             $arr['message'] = 'Tv show not found';
+
             return $arr;
         }
 
@@ -207,7 +234,7 @@ trait PosterProcess
             'mpaa_rating' => $tvRating,
             'trailer_id' => '',
             'audience_rating' => $audienceRating,
-            'runtime' => isset($tvMeta['episode_run_time'][0]) ? $tvMeta['episode_run_time'][0] : null
+            'runtime' => isset($tvMeta['episode_run_time'][0]) ? $tvMeta['episode_run_time'][0] : null,
         ];
     }
 

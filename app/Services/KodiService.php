@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Setting;
-use Illuminate\Support\Facades\Http;
 use App\Interfaces\MovieSyncInterface;
+use App\Models\Setting;
 use App\Traits\PosterProcess;
+use Illuminate\Support\Facades\Http;
 
 class KodiService implements MovieSyncInterface
 {
@@ -24,8 +24,7 @@ class KodiService implements MovieSyncInterface
     /**
      * Make Kodi API calls to media server
      *
-     * @param string $request
-     *
+     * @param  string  $request
      * @return json
      */
     public function apiCall($jsonRpc, $method = 'GET', $params = [])
@@ -45,7 +44,7 @@ class KodiService implements MovieSyncInterface
     {
         $limit = 20;
         $start = $page * $limit;
-        $end = $limit * ($page+1);
+        $end = $limit * ($page + 1);
 
         $jsonRpc = '{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"limits": { "start" : '.$start.', "end": '.$end.' }, "properties" : ["art", "rating", "mpaa", "runtime"], "sort": { "order": "ascending", "method": "label", "ignorearticle": true } }, "id": "libMovies"}';
 
@@ -57,7 +56,7 @@ class KodiService implements MovieSyncInterface
                 $this->processMovies($movies);
 
                 if ($end < $json['result']['limits']['total']) {
-                    $page = $page+1;
+                    $page = $page + 1;
                     $this->syncMovies($page);
                 }
             }
@@ -68,8 +67,8 @@ class KodiService implements MovieSyncInterface
 
     public function processMovies($movies)
     {
-        if (!is_dir(storage_path("app/public/posters"))) {
-            mkdir(storage_path("app/public/posters"), 0775, true);
+        if (! is_dir(storage_path('app/public/posters'))) {
+            mkdir(storage_path('app/public/posters'), 0775, true);
         }
 
         foreach ($movies as $movie) {
@@ -84,7 +83,7 @@ class KodiService implements MovieSyncInterface
                     'id' => 'kodi-'.$movie['movieid'],
                     'mpaa_rating' => isset($movie['mpaa']) ? str_replace('Rated ', '', $movie['mpaa']) : null,
                     'audience_rating' => isset($movie['rating']) ? $movie['rating'] : 0,
-                    'runtime' => is_numeric($movie['runtime']) ? $movie['runtime']/60 : null
+                    'runtime' => is_numeric($movie['runtime']) ? $movie['runtime'] / 60 : null,
                 ];
 
                 $this->savePoster($params);

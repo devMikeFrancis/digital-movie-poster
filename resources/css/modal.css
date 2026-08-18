@@ -1,0 +1,21 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+}
+
+.modal-overlay {
+    position: fixed;
+    background-color: rgb(0 0 0 / 0.55);
+    inset: 0;
+    z-index: 401;
+}
+
+.modal-content {
+    background-color: #222;
+    position: relative;
+    z-index: 402;
+}
