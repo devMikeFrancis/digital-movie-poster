@@ -53,13 +53,16 @@
                                 </div>
 
                                 <p class="text-white">
-                                    This project is maintained by Don Jones at
+                                    This project is maintained by Mike Francis at
                                     <a
                                         class="text-gray-400 hover:text-white"
                                         href="https://github.com/devMikeFrancis/digital-movie-poster"
                                         target="_blank"
                                         >https://github.com/devMikeFrancis/digital-movie-poster</a
                                     >
+                                </p>
+                                <p class="text-gray-400 text-sm mt-2">
+                                    Originally created by Don Jones.
                                 </p>
 
                                 <div class="pt-12">

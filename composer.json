@@ -12,6 +12,16 @@
         "raspberry-pi"
     ],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Don Jones",
+            "role": "Creator"
+        },
+        {
+            "name": "Mike Francis",
+            "role": "Maintainer"
+        }
+    ],
     "require": {
         "guzzlehttp/guzzle": "^7.9",
         "intervention/image": "^4.2",
