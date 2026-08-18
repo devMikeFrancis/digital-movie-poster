@@ -319,4 +319,4 @@ Originally created by Don Jones. Maintained by
 
 ## License
 
-DMP open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+DMP is open-sourced software licensed under the [MIT license](LICENSE).
