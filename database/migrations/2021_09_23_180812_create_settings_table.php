@@ -33,7 +33,7 @@ class CreateSettingsTable extends Migration
             $table->string('end_power_time', 10)->default('23:00:00');
         });
 
-        app('db')->insert("insert into settings (coming_soon_text, now_playing_text) values (?, ?)", [
+        app('db')->insert('insert into settings (coming_soon_text, now_playing_text) values (?, ?)', [
             'Coming Soon',
             'Now Playing',
         ]);

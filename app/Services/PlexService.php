@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Setting;
-use Illuminate\Support\Facades\Http;
 use App\Interfaces\MovieSyncInterface;
+use App\Models\Setting;
 use App\Traits\PosterProcess;
+use Illuminate\Support\Facades\Http;
 
 class PlexService implements MovieSyncInterface
 {
     use PosterProcess;
 
     private $plexIpAddress = '';
+
     private $plexToken = '';
 
     public function __construct()
@@ -29,10 +30,9 @@ class PlexService implements MovieSyncInterface
     /**
      * Make Plex API calls to media server
      *
-     * @param string $path /path/resource
-     * @param string $method get|post
-     * @param array $params
-     *
+     * @param  string  $path  /path/resource
+     * @param  string  $method  get|post
+     * @param  array  $params
      * @return json
      */
     public function apiCall($path, $method = 'GET', $params = [])
@@ -54,7 +54,7 @@ class PlexService implements MovieSyncInterface
             $sections[] = [
                 'key' => $plexSection['key'],
                 'title' => $plexSection['title'],
-                'type' => $plexSection['type']
+                'type' => $plexSection['type'],
             ];
         }
 
@@ -90,7 +90,7 @@ class PlexService implements MovieSyncInterface
                         'id' => $media['key'],
                         'rating' => isset($media['contentRating']) ? $media['contentRating'] : null,
                         'audience_rating' => isset($media['audienceRating']) ? $media['audienceRating'] : 0,
-                        'runtime' => is_numeric($media['duration']) ? $media['duration']/1000/60 : null
+                        'runtime' => is_numeric($media['duration']) ? $media['duration'] / 1000 / 60 : null,
                     ];
 
                     $this->savePoster($params);

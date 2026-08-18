@@ -41,4 +41,4 @@ Route::get('/voting', function () {
     return view('app');
 })->where('any', '.*');
 
-//require __DIR__.'/auth.php';
+// require __DIR__.'/auth.php';

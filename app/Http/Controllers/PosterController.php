@@ -2,26 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\PosterRequest;
-use App\Services\PosterService;
-use App\Services\PlexService;
-use App\Http\Resources\PostersCollection;
 use App\Http\Resources\PosterResource;
+use App\Http\Resources\PostersCollection;
 use App\Models\Poster;
+use App\Services\PlexService;
+use App\Services\PosterService;
+use Illuminate\Http\Request;
 
-//use App\Models\Setting;
+// use App\Models\Setting;
 
 class PosterController extends Controller
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Get posters
      *
-     * @param Request $request
      *
      * @return array
      */
@@ -31,7 +28,7 @@ class PosterController extends Controller
         Poster::where('show_in_rotation', true) :
         Poster::orderBy('ordinal');
 
-        //$settings = Setting::first();
+        // $settings = Setting::first();
 
         return new PostersCollection(
             $posters->orderBy('ordinal')->orderBy('name')->get()
@@ -41,7 +38,6 @@ class PosterController extends Controller
     /**
      * Get poster
      *
-     * @param Poster $poster
      *
      * @return array
      */
@@ -53,8 +49,6 @@ class PosterController extends Controller
     /**
      * Saves poster
      *
-     * @param PosterRequest $request
-     * @param PosterService $service
      *
      * @return array
      */
@@ -66,9 +60,6 @@ class PosterController extends Controller
     /**
      * Updates poster
      *
-     * @param PosterRequest $request
-     * @param PosterService $service
-     * @param Poster $poster
      *
      * @return array
      */
@@ -80,30 +71,27 @@ class PosterController extends Controller
     /**
      * Updates specific boolean on poster
      *
-     * @param PosterRequest $request
-     * @param PosterService $service
-     * @param int $id poster id
-     * @param string $column column to update
-     *
+     * @param  int  $id  poster id
+     * @param  string  $column  column to update
      * @return array
      */
     public function updateSetting(PosterRequest $request, PosterService $service, $id, $column)
     {
         $service->updateSetting($id, $column, $request->boolean('value'));
+
         return response()->json(['success' => true]);
     }
 
     /**
      * Sorts posters via drag and drop
      *
-     * @param PosterRequest $request
-     * @param PosterService $service
-     *
+     * @param  PosterRequest  $request
      * @return array
      */
     public function sort(Request $request, PosterService $service)
     {
         $service->sort($request);
+
         return response()->json(['success' => true]);
     }
 
@@ -118,14 +106,13 @@ class PosterController extends Controller
     /**
      * Delete poster
      *
-     * @param PosterService $service
-     * @param int $id
-     *
+     * @param  int  $id
      * @return array
      */
     public function delete(PosterService $service, $id)
     {
         $service->delete($id);
+
         return response()->json(['success' => true]);
     }
 

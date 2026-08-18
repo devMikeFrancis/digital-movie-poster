@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsRequest;
-use Symfony\Component\Process\Process;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Process;
 
 class SettingController extends Controller
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function index()
     {
         $settings = Setting::first();
+
         return response()->json($settings);
     }
 
@@ -32,15 +32,15 @@ class SettingController extends Controller
         $process->setTimeout(3600);
         $process->run();
 
-        if (!$process->isSuccessful()) {
+        if (! $process->isSuccessful()) {
             $success = false;
-            \Log::info(' -- Could not run update script. -- ');
-            \Log::info(' -- ');
+            Log::info(' -- Could not run update script. -- ');
+            Log::info(' -- ');
         }
 
         $output = $process->getOutput();
 
-        \Log::info($output);
+        Log::info($output);
 
         return response()->json(['success' => $success, 'output' => $output]);
     }

@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\SettingController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/posters', [PosterController::class, 'index']);
 Route::post('/show-in-rotation', [PosterController::class, 'showInRotation']);
