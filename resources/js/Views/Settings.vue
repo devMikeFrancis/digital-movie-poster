@@ -1293,7 +1293,7 @@ export default {
         },
         getSettings() {
             axios
-                .get('/api/settings')
+                .get('/api/settings/full')
                 .then((response) => {
                     this.settings = response.data;
                     if (this.settings.plex_service) {

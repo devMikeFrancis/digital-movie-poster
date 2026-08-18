@@ -17,6 +17,8 @@ needs its own decision.
                      └──────────────────────────────┘
 
   Browser (kiosk)  ──── GET /api/posters, /api/settings (polled) ────▶ Laravel
+       │             ──── GET /api/now-playing/{service} ────────────▶    │
+       │                    (proxied; credentials stay server side)       │
        ▲                                                                  │
        │                                                          DmpEvent│
        │           socket.io :3000        Redis pub/sub                   ▼
@@ -34,36 +36,41 @@ The Vue SPA serves two very different roles from one bundle: the **display**
 
 ## Recommendations
 
-### 1. The display holds media-server credentials in the browser
+### 1. Media-server credentials in the browser — fixed
 
-`GET /api/settings` returns all 64 columns of the settings row, including
-`plex_token`, `jellyfin_token`, `kodi_password` and `tmdb_api_key_v3`. That
-endpoint is unauthenticated, so anything that can reach the device can read
-those credentials:
+**Status: resolved.** Recorded here because the shape of the fix matters.
 
-```
-curl http://<pi>/api/settings | jq '.plex_token, .tmdb_api_key_v3'
-```
+`GET /api/settings` returned all 64 settings columns, unauthenticated,
+including `plex_token`, `jellyfin_token`, `kodi_password` and the TMDB keys.
+Filtering the response alone would not have worked: the display genuinely used
+those tokens client side, calling Plex and Jellyfin directly to drive "now
+playing".
 
-This is not simply an over-sharing bug that can be patched by filtering the
-response. The display genuinely uses those tokens client-side: the store talks
-to Plex and Jellyfin directly from the browser to drive "now playing"
-(`store/posters.js` around lines 320, 551 and 622, plus `services/api.js`).
-Redacting the fields would break now-playing outright, which is why the refresh
-left this alone.
+What changed:
 
-**Suggested path**, in order:
+- `NowPlayingController` proxies the lookups. `GET /api/now-playing/{service}`
+  returns a normalised payload — `playing`, `mediaType`, `contentRating`,
+  `audienceRating`, `duration`, `poster` — built server side from the stored
+  credentials.
+- Artwork is proxied too, via `GET /api/now-playing/{service}/poster?key=…`,
+  so poster URLs no longer embed `X-Plex-Token`. The host always comes from
+  settings, never the request, and the key is pattern-checked against the Plex
+  library namespace / a Jellyfin item id, so it cannot be used as an open proxy.
+- The browser's three direct connections are gone: the Plex websocket (which
+  carried the token in its URL), the Kodi websocket, and the direct Jellyfin
+  `/Sessions` poll. All three are replaced by one poll of our own API every 5s.
+- `PublicSettingResource` filters the public settings payload — credentials and
+  media-server hosts removed, 64 fields down to 49. `GET /api/settings/full`
+  serves the admin UI the complete row, behind the same `dmp.token` gate as the
+  other privileged endpoints.
 
-1. Add backend proxy endpoints — `GET /api/now-playing/plex`,
-   `.../jellyfin` — that call the media server from PHP using the stored
-   credentials. The services to do this largely exist already.
-2. Repoint the store at those endpoints and delete `apiCallPlex`.
-3. Split the settings response: a public projection for the display (display
-   and theme options only) and a full one behind `dmp.token` for the admin UI.
-4. Move the secrets out of the settings table into `.env`, or encrypt them with
-   `encrypted` casts so they are not readable straight out of the SQLite file.
+The trade-off: Plex now-playing used to be event-driven and is now polled, so
+it reacts within ~5s rather than instantly. Pushing these events over the Redis
+/ socket.io channel the app already runs would restore that — see #5.
 
-Step 1 alone removes the exposure; the rest is cleanup.
+Still worth doing: the credentials sit in plain text in the SQLite file.
+`encrypted` casts on those columns, or moving them to `.env`, would mean a
+stolen database file is not also a set of working media-server tokens.
 
 ### 2. There is no login
 
@@ -155,8 +162,6 @@ for load/save/dirty-tracking, would make it navigable. `Voting.vue` (726) and
 
 ### 9. Smaller things
 
-- **`api.js` is a class with one method and no state.** It is imported for a
-  single Plex call. Once that call moves server-side (#1), delete the file.
 - **The bundle is one 637 kB chunk.** The display loads the entire admin UI on
   boot. Route-level `defineAsyncComponent` would let the kiosk load only the
   dashboard.

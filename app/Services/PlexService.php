@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Interfaces\MovieSyncInterface;
 use App\Models\Setting;
 use App\Traits\PosterProcess;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use InvalidArgumentException;
 
 class PlexService implements MovieSyncInterface
 {
@@ -42,6 +44,61 @@ class PlexService implements MovieSyncInterface
         ])->get('http://'.$this->plexIpAddress.':32400'.$path.'?X-Plex-Token='.$this->plexToken);
 
         return $response->json();
+    }
+
+    /**
+     * Current Plex session, normalised for the display.
+     *
+     * This used to be called from the browser with the Plex token in the query
+     * string. It runs here now so the token never leaves the server; "poster"
+     * points at our own proxy rather than at Plex directly.
+     *
+     * @return array<string, mixed>
+     */
+    public function nowPlaying(): array
+    {
+        $json = $this->apiCall('/status/sessions/');
+
+        if ((int) ($json['MediaContainer']['size'] ?? 0) < 1) {
+            return ['playing' => false];
+        }
+
+        $item = $json['MediaContainer']['Metadata'][0];
+        $type = $item['type'] ?? 'movie';
+
+        $thumb = in_array($type, ['show', 'episode'], true)
+            ? ($item['grandparentThumb'] ?? $item['thumb'] ?? null)
+            : ($item['thumb'] ?? null);
+
+        return [
+            'playing' => ($item['Player']['state'] ?? 'playing') !== 'stopped',
+            'mediaType' => $type,
+            'title' => $item['title'] ?? null,
+            'contentRating' => $item['contentRating'] ?? null,
+            'audienceRating' => $item['audienceRating'] ?? null,
+            'duration' => isset($item['duration']) && is_numeric($item['duration'])
+                ? (int) round($item['duration'] / 1000 / 60)
+                : null,
+            'posterKey' => $thumb,
+        ];
+    }
+
+    /**
+     * Fetch artwork from Plex so the browser never sees the token.
+     *
+     * The host comes from settings, never from the request, so this cannot be
+     * pointed at another server. The key is still constrained to the Plex
+     * library namespace to keep it from walking the rest of the API.
+     */
+    public function fetchPoster(string $key): Response
+    {
+        if (! preg_match('#^/library/[A-Za-z0-9/_.-]+$#', $key) || str_contains($key, '..')) {
+            throw new InvalidArgumentException('Unsupported Plex artwork path.');
+        }
+
+        return Http::timeout(15)->get(
+            'http://'.$this->plexIpAddress.':32400'.$key.'?X-Plex-Token='.$this->plexToken
+        );
     }
 
     public function getSections()

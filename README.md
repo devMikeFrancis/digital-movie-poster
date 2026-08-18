@@ -161,6 +161,14 @@ DMP is built as a LAN appliance and **has no login screen**. Anything that can
 reach the device can change settings and delete posters. Do not expose it to
 the internet.
 
+Media-server credentials stay on the server. The display asks DMP what is
+playing (`/api/now-playing/{service}`) instead of calling Plex or Jellyfin
+itself, and artwork is proxied through
+`/api/now-playing/{service}/poster`, so no token is ever sent to a browser.
+`GET /api/settings` is filtered to display options only; the admin UI reads the
+full row, credentials included, from `GET /api/settings/full`, which is gated
+by the token below.
+
 For installs you drive over the API, you can require a token on every write and
 on the two endpoints that shell out on the host:
 
@@ -181,6 +189,31 @@ UI out of its own write endpoints. See
 You can send poster data to certain endpoints to trigger a `now-playing` or `stopped` event.
 
 These endpoints require a bearer token when `DMP_API_REQUIRE_TOKEN=true`.
+
+### Reading now playing
+
+`GET /api/now-playing/{service}` — where `service` is `plex`, `jellyfin` or
+`kodi` — reports what the configured media server is playing. This is what the
+display polls; it needs no credentials because DMP holds them.
+
+```javascript
+{
+    "playing": true,
+    "mediaType": "movie",
+    "title": "Blade Runner",
+    "contentRating": "R",
+    "audienceRating": 8.6,
+    "duration": 112,                                  // minutes
+    "poster": "http://.../api/now-playing/plex/poster?key=..."
+}
+```
+
+`playing` is `false` when nothing is playing, the service is switched off
+(`enabled: false`), or the media server is unreachable (`reachable: false`).
+
+Plex now-playing is polled every 5 seconds rather than pushed. Earlier versions
+opened a websocket to Plex from the browser, which required putting
+`X-Plex-Token` in the URL.
 
 | Method | Endpoint           | Data                   | Description                               |
 | :----- | :----------------- | :--------------------- | ----------------------------------------- |

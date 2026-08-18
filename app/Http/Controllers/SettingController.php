@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsRequest;
+use App\Http\Resources\PublicSettingResource;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -12,18 +13,30 @@ class SettingController extends Controller
 {
     public function __construct() {}
 
+    /**
+     * Settings for the kiosk display. Unauthenticated, so credentials are
+     * stripped - see PublicSettingResource.
+     */
     public function index()
     {
-        $settings = Setting::first();
+        return new PublicSettingResource(Setting::firstOrFail());
+    }
 
-        return response()->json($settings);
+    /**
+     * The complete settings row for the admin UI, including credentials.
+     * Gated by the same opt-in token as every other privileged endpoint.
+     */
+    public function full()
+    {
+        return response()->json(Setting::firstOrFail());
     }
 
     public function update(SettingsRequest $request)
     {
-        $updated = Setting::where('id', 1)->update($request->validated());
+        $settings = Setting::firstOrFail();
+        $settings->fill($request->validated())->save();
 
-        return response()->json(['saved' => $updated]);
+        return response()->json(['saved' => 1]);
     }
 
     public function updateApplication()

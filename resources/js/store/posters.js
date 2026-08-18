@@ -1,4 +1,3 @@
-import Api from '@/services/api';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { defineStore } from 'pinia';
@@ -23,6 +22,7 @@ export const usePostersStore = defineStore('posters', {
 
         recentlyAddedInterval: null,
         nowPlayingInterval: null,
+        nowPlayingIntervalTime: 5000,
         jellyfinDevicePlaying: null,
         servicePlaying: null,
         canRefreshTransitionTime: false,
@@ -281,96 +281,53 @@ export const usePostersStore = defineStore('posters', {
             }
             return true;
         },
+        enabledMediaServices() {
+            return ['plex', 'jellyfin', 'kodi'].filter(
+                (service) => this.settings[service + '_service']
+            );
+        },
         getNowPlaying() {
-            console.log('GET NOW PLAYING');
-            if (this.settings.plex_service && this.servicePlaying === 'plex') {
-                this.plexNowPlaying();
-            }
-            if (this.settings.jellyfin_service && this.servicePlaying === 'jellyfin') {
-                this.jellyfinNowPlaying();
-            }
-            if (this.settings.kodi_service && this.servicePlaying === 'kodi') {
-                this.kodiNowPlaying();
+            if (this.servicePlaying) {
+                this.fetchNowPlaying(this.servicePlaying);
             }
         },
-        plexNowPlaying() {
-            Api.apiCallPlex('/status/sessions/')
-                .then((response) => {
-                    const size = response.data.MediaContainer.size;
-                    if (size > 0) {
-                        let data = response.data.MediaContainer.Metadata[0];
-                        let playing = {
-                            contentRating: 0,
-                            rating: 0,
-                            duration: null,
-                            poster: '',
-                        };
-
-                        let poster =
-                            data.type === 'show' || data.type === 'episode'
-                                ? response.data.MediaContainer.Metadata[0].grandparentThumb
-                                : response.data.MediaContainer.Metadata[0].thumb;
-
-                        playing.poster =
-                            'http://' +
-                            this.settings.plex_ip_address +
-                            ':32400' +
-                            poster +
-                            '?X-Plex-Token=' +
-                            this.settings.plex_token;
-
-                        playing.contentRating = data.contentRating;
-
-                        if (data.audienceRating) {
-                            playing.audienceRating = data.audienceRating;
+        /**
+         * Ask our own backend what a media server is playing.
+         *
+         * The response is already normalised, and `poster` points at the
+         * artwork proxy on this server rather than at the media server, so no
+         * token is needed in the browser.
+         */
+        fetchNowPlaying(service) {
+            return axios
+                .get('/api/now-playing/' + service)
+                .then(({ data }) => {
+                    if (!data.playing) {
+                        if (this.servicePlaying === service) {
+                            this.servicePlaying = null;
+                            this.controlPlayerState('stopped');
                         }
-
-                        if (data.duration) {
-                            playing.duration = data.duration / 1000 / 60;
-                        }
-
-                        this.setNowPlaying(playing);
+                        return;
                     }
-                })
-                .catch((e) => {
-                    console.log(e.message);
-                });
-        },
-        jellyfinNowPlaying() {
-            if (this.jellyfinDevicePlaying) {
-                let playing = {
-                    contentRating: this.jellyfinDevicePlaying.NowPlayingItem.OfficialRating,
-                    audienceRating: this.jellyfinDevicePlaying.NowPlayingItem.CommunityRating,
-                    duration:
-                        this.jellyfinDevicePlaying.NowPlayingItem.RunTimeTicks / 10000 / 1000 / 60,
-                    poster:
-                        'http://' +
-                        this.settings.jellyfin_ip_address +
-                        ':8096/Items/' +
-                        this.jellyfinDevicePlaying.NowPlayingItem.Id +
-                        '/Images/Primary',
-                };
 
-                this.setNowPlaying(playing);
-            }
-        },
-        kodiNowPlaying() {
-            axios
-                .get('/api/kodi-now-playing')
-                .then((response) => {
-                    let playing = {
-                        poster: decodeURIComponent(
-                            response.data[1].result.item.art.poster
-                                .replace('image://', '')
-                                .slice(0, -1)
-                        ),
-                        contentRating: response.data[0].result.item.mpaa.replace('Rated ', ''),
-                        audienceRating: response.data[0].result.item.rating,
-                        duration: response.data[0].result.item.runtime / 60,
-                    };
-                    this.setNowPlaying(playing);
+                    if (service === 'plex' && !this.plexMediaTypeAllowed(data.mediaType)) {
+                        return;
+                    }
+
+                    this.servicePlaying = service;
+                    this.controlPlayerState('playing');
+                    this.setNowPlaying(data);
                 })
                 .catch(() => {});
+        },
+        plexMediaTypeAllowed(mediaType) {
+            if (mediaType === 'movie') {
+                return this.settings.plex_show_movie_now_playing;
+            }
+            if (mediaType === 'show' || mediaType === 'episode') {
+                return this.settings.plex_show_tv_now_playing;
+            }
+            return true;
         },
         setNowPlaying(data) {
             let withinMpaaLimit = this.withinMpaaLimit(data.contentRating);
@@ -530,123 +487,37 @@ export const usePostersStore = defineStore('posters', {
                 .then((response) => {})
                 .catch((e) => {});
         },
+        /**
+         * Watch the media servers for playback.
+         *
+         * Plex and Kodi were previously watched over websockets opened straight
+         * from the browser, and the Plex socket carried plex_token in its URL.
+         * Jellyfin was polled directly with api_key in the query string. All
+         * three now go through /api/now-playing/<service>, so the credentials
+         * stay on the server.
+         */
         startSockets() {
-            console.log('STARTING SOCKETS');
-            if (this.settings.plex_service) {
-                this.plexSocket();
-            }
-            if (this.settings.jellyfin_service) {
-                this.jellyfinSocket();
-            }
-            if (this.settings.kodi_service) {
-                this.kodiSocket();
-            }
+            this.startNowPlayingPolling();
         },
-        plexSocket() {
-            const socket = new WebSocket(
-                'ws://' +
-                    this.settings.plex_ip_address +
-                    ':32400/:/websockets/notifications' +
-                    '?X-Plex-Token=' +
-                    this.settings.plex_token
-            );
+        startNowPlayingPolling() {
+            const services = this.enabledMediaServices();
 
-            socket.addEventListener('open', () => {});
+            if (services.length === 0) {
+                return;
+            }
 
-            socket.addEventListener('message', (event) => {
-                const data = JSON.parse(event.data);
-                const action = data.NotificationContainer.type;
-                let state;
-                console.log('PLEX ACTION: ', action);
-                if (action === 'playing') {
-                    state = data.NotificationContainer.PlaySessionStateNotification[0].state;
-                    console.log('PLEX STATE: ', state);
-                    // Make status session call to check if its a movie
-                    if (!this.checkedPlexMediaType) {
-                        console.log('PLEX CHECK SESSION TYPE');
-                        Api.apiCallPlex('/status/sessions/')
-                            .then((response) => {
-                                console.log(response);
-                                const size = response.data.MediaContainer.size;
-                                if (size > 0) {
-                                    let data = response.data.MediaContainer.Metadata[0];
-                                    this.checkedPlexMediaType = true;
-                                    if (
-                                        (data.type === 'movie' &&
-                                            this.settings.plex_show_movie_now_playing) ||
-                                        ((data.type === 'show' || data.type === 'episode') &&
-                                            this.settings.plex_show_tv_now_playing)
-                                    ) {
-                                        this.servicePlaying = 'plex';
-                                        this.controlPlayerState(state);
-                                    }
-                                }
-                            })
-                            .catch(() => {});
-                    }
-                }
+            console.log('POLLING NOW PLAYING:', services.join(', '));
+            this.stopNowPlayingPolling();
 
-                if (state === 'stopped' && this.servicePlaying === 'plex' && this.nowPlaying) {
-                    this.checkedPlexMediaType = false;
-                    this.controlPlayerState(state);
-                }
-            });
+            this.nowPlayingInterval = setInterval(() => {
+                services.forEach((service) => this.fetchNowPlaying(service));
+            }, this.nowPlayingIntervalTime);
         },
-        kodiSocket() {
-            const socket = new WebSocket('ws://' + this.settings.kodi_url + ':9090');
-
-            socket.addEventListener('open', () => {});
-
-            socket.addEventListener('message', (event) => {
-                const data = JSON.parse(event.data);
-                if (data.method === 'Player.OnPlay' && data.params.data.item.type === 'movie') {
-                    this.servicePlaying = 'kodi';
-                    this.controlPlayerState('playing');
-                }
-
-                if (data.method === 'Player.OnStop' && data.params.data.item.type === 'movie') {
-                    this.servicePlaying = null;
-                    this.controlPlayerState('stopped');
-                }
-            });
-        },
-        jellyfinSocket() {
-            // Jellyfin - we have to poll. Does not have socket for now playing
-            setInterval(() => {
-                if (this.settings.jellyfin_service) {
-                    axios
-                        .get(
-                            'http://' +
-                                this.settings.jellyfin_ip_address +
-                                ':8096/Sessions?api_key=' +
-                                this.settings.jellyfin_token
-                        )
-                        .then((response) => {
-                            let devices = response.data;
-                            this.jellyfinDevicePlaying = devices.find((device) => {
-                                if (
-                                    device.hasOwnProperty('NowPlayingItem') &&
-                                    device.NowPlayingItem.Type === 'Movie'
-                                ) {
-                                    return device;
-                                }
-                            });
-
-                            if (this.jellyfinDevicePlaying) {
-                                this.servicePlaying = 'jellyfin';
-                                this.controlPlayerState('playing');
-                            } else {
-                                this.servicePlaying = null;
-                                this.controlPlayerState('stopped');
-                            }
-                        })
-                        .catch(() => {
-                            this.jellyfinDevicePlaying = null;
-                            this.servicePlaying = null;
-                            this.controlPlayerState('stopped');
-                        });
-                }
-            }, 7000);
+        stopNowPlayingPolling() {
+            if (this.nowPlayingInterval) {
+                clearInterval(this.nowPlayingInterval);
+                this.nowPlayingInterval = null;
+            }
         },
         controlPlayerState(state) {
             switch (state) {

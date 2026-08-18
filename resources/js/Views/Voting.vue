@@ -236,7 +236,6 @@
 <script>
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import Api from '../services/api';
 import EventEmitter from 'eventemitter3';
 
 export default {
