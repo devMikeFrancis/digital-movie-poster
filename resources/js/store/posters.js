@@ -1,4 +1,6 @@
 import Api from '@/services/api';
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import { defineStore } from 'pinia';
 
 export const usePostersStore = defineStore('posters', {

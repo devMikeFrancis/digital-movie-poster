@@ -25,7 +25,7 @@
                 <div class="relative flex justify-center items-center">
                     <input
                         type="text"
-                        class="h-14 w-96 pl-8 pr-10 rounded-lg z-0 focus:shadow focus:outline-none"
+                        class="h-14 w-96 pl-8 pr-10 rounded-lg z-0 focus:shadow-sm focus:outline-none"
                         placeholder="Your name..."
                         v-model="name"
                         autofocus
@@ -108,7 +108,7 @@
                                             px-2
                                             ml-3
                                             rounded-lg
-                                            focus:shadow
+                                            focus:shadow-sm
                                             focus:outline-none
                                         "
                                         v-model="posterLimit"
@@ -129,7 +129,7 @@
                                         w-16
                                         px-2
                                         rounded-lg
-                                        focus:shadow
+                                        focus:shadow-sm
                                         focus:outline-none
                                     "
                                     v-model="timeLimit"
@@ -234,6 +234,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import Api from '../services/api';
 import EventEmitter from 'eventemitter3';
 

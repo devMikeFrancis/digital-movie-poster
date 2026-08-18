@@ -205,6 +205,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import router from '@/router';
 import { mapState, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';

@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import MainNav from '@/partials/MainNav.vue';

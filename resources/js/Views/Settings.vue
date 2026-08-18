@@ -1236,6 +1236,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import MainNav from '@/partials/MainNav.vue';
 
 export default {

@@ -2,6 +2,24 @@ body {
     background: #000;
 }
 
+a {
+    transition: color 0.2s ease;
+}
+
+.active,
+.router-link-active {
+    color: #888;
+}
+
+button {
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.show {
+    display: block;
+}
+
 .loading-overlay {
     display: flex;
     align-items: center;
@@ -13,19 +31,16 @@ body {
     text-transform: uppercase;
     background-color: #000;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 100;
 }
 
 #youtube-player {
     width: 100%;
     height: 100%;
+}
 
-    iframe {
-        width: 100%;
-        height: 100%;
-    }
+#youtube-player iframe {
+    width: 100%;
+    height: 100%;
 }
