@@ -222,9 +222,18 @@ log "Configuring HDMI-CEC display control"
 # Membership in the 'video' group grants access to the CEC device. The old
 # installer used 'chmod 777 /dev/vchiq', which opened it to every account.
 usermod -a -G video "$DMP_USER"
-CRON_LINE="@reboot python3 ${APP_DIR}/hdmi-control.py"
-( crontab -u "$DMP_USER" -l 2>/dev/null | grep -v 'hdmi-control.py' || true; echo "$CRON_LINE" ) \
-    | crontab -u "$DMP_USER" -
+
+# Two cron entries:
+#  - the Laravel scheduler, which applies the display on/off hours every minute
+#    (this used to run in the kiosk browser)
+#  - the optional motion-sensor script, for installs with a PIR sensor on GPIO 21
+SCHEDULER_LINE="* * * * * cd ${APP_DIR} && php artisan schedule:run >> /dev/null 2>&1"
+REBOOT_LINE="@reboot python3 ${APP_DIR}/hdmi-control.py"
+(
+    crontab -u "$DMP_USER" -l 2>/dev/null | grep -v -e 'hdmi-control.py' -e 'artisan schedule:run' || true
+    echo "$SCHEDULER_LINE"
+    echo "$REBOOT_LINE"
+) | crontab -u "$DMP_USER" -
 
 # ---------------------------------------------------------------------------
 # Kiosk
@@ -274,6 +283,9 @@ raspi-config nonint do_boot_behaviour B2 || true
 log "Install complete."
 echo "  Display:  http://localhost?rotate=true"
 echo "  Settings: http://$(hostname).local/posters"
+echo
+echo "  Set APP_TIMEZONE in ${APP_DIR}/.env to your own timezone, otherwise the"
+echo "  display on/off hours are applied in UTC."
 echo
 echo "  The settings screen will ask you to create an administrator account"
 echo "  the first time you open it. To do it from here instead, run:"

@@ -119,7 +119,6 @@ export default {
                     this.stopMusic();
                     this.getNowPlaying();
                     this.stopTransitionImages();
-                    this.controlTV('on');
                 } else {
                     if (!this.loading) {
                         console.log('WATCHER - nowPlaying START TRANSITION IMAGES');
@@ -149,7 +148,6 @@ export default {
             'boot',
             'stopTransitionImages',
             'startTransitionImages',
-            'controlTV',
             'setLoading',
             'setSocket',
             'getNowPlaying',

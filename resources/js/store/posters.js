@@ -80,7 +80,6 @@ export const usePostersStore = defineStore('posters', {
             this.getSettings().then(() => {
                 this.getMoviePosters();
                 this.startSyncPosters();
-                this.controlTV('on');
                 setTimeout(() => {
                     this.canRefreshTransitionTime = true;
                     this.startSettingsInterval();
@@ -534,57 +533,6 @@ export const usePostersStore = defineStore('posters', {
                     break;
             }
         },
-        controlTV(command) {
-            if (this.settings.use_cec_power) {
-                if (!this.isOnTime()) {
-                    if (command === 'on') {
-                        command = 'standby';
-                    }
-                }
-                axios
-                    .get('/api/control-display/' + command)
-                    .then((response) => {
-                        console.log(response.data);
-                    })
-                    .catch((e) => {
-                        console.log(e.message);
-                    });
-            }
-        },
-        isOnTime() {
-            let presentDate = new Date();
-            presentDate = this.changeTimezone(presentDate, 'America/New_York');
-            let date = new Date();
-            date = this.changeTimezone(date, 'America/New_York');
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            const year = date.getFullYear();
-            const date1 = new Date(
-                month + '/' + day + '/' + year + ' ' + this.settings.start_power_time
-            );
-            const date2 = new Date(
-                month + '/' + day + '/' + year + ' ' + this.settings.end_power_time
-            );
-
-            if (
-                presentDate.getTime() > date1.getTime() &&
-                presentDate.getTime() < date2.getTime()
-            ) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-        changeTimezone(date, ianatz) {
-            var invdate = new Date(
-                date.toLocaleString('en-US', {
-                    timeZone: ianatz,
-                })
-            );
-            var diff = date.getTime() - invdate.getTime();
-            return new Date(date.getTime() - diff);
-        },
-
         startTransitionImages() {
             console.log('START TRANSITIONS');
             window.transitionImagesInterval = setInterval(() => {

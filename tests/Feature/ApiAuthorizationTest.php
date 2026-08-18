@@ -28,6 +28,7 @@ class ApiAuthorizationTest extends TestCase
             'update settings' => ['putJson', '/api/settings'],
             'read credentials' => ['getJson', '/api/settings/full'],
             'queue a sync' => ['getJson', '/api/cache-posters'],
+            'drive the display' => ['getJson', '/api/control-display/on'],
             'broadcast now playing' => ['postJson', '/api/now-playing'],
             'update the application' => ['getJson', '/api/update-application'],
         ];
@@ -58,21 +59,9 @@ class ApiAuthorizationTest extends TestCase
         $this->getJson($uri)->assertOk();
     }
 
-    /**
-     * The kiosk drives TV power over HDMI-CEC on a schedule and cannot sign in,
-     * so this one shell-invoking endpoint stays open. It returns 502 here
-     * because cec-client is not installed; what matters is that it is not 401.
-     */
-    public function test_the_display_can_drive_the_tv_without_signing_in(): void
+    public function test_control_display_only_accepts_known_commands(): void
     {
-        $response = $this->getJson('/api/control-display/on');
-
-        $this->assertNotSame(401, $response->getStatusCode());
-    }
-
-    public function test_control_display_still_only_accepts_known_commands(): void
-    {
-        $this->getJson('/api/control-display/rm-rf')->assertStatus(422);
+        $this->actingAsAdmin()->getJson('/api/control-display/rm-rf')->assertStatus(422);
     }
 
     public function test_an_admin_session_is_accepted(): void

@@ -16,7 +16,7 @@ the rough edges are.
 -   Fade in/out or vertical slide transitions
 -   Automatically fill in data using IMDB ID
 -   Control settings such as playing speed, transition speed, etc ...
--   Control display power using HDMI-CEC control
+-   Control display power using HDMI-CEC on a schedule
 -   Show Runtime
 -   Movie trailers
 -   Movie theme music
@@ -115,6 +115,26 @@ After you've added posters and are back on the DMP screen you can always return 
 When using the IMDB ID to manage poster data the application will use [TMDB API](https://developers.themoviedb.org/3/getting-started/introduction) to populate the metadata and poster image.
 
 Enter your TMDB api key in the DMP settings.
+
+## Display on/off schedule
+
+With `Use HDMI CEC Controls` enabled, DMP turns the TV on and off at the hours
+set in Settings. This runs on the device from Laravel's scheduler, so it works
+whether or not a browser is open, and it needs a cron entry — `install.sh` adds
+one:
+
+```bash
+* * * * * cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**Set `APP_TIMEZONE` in `.env` to your own timezone**, or the hours are applied
+in UTC. Windows that cross midnight (on at 20:00, off at 02:00) are fine.
+
+To drive the display by hand:
+
+```bash
+php artisan dmp:display-power standby
+```
 
 ## Updating
 

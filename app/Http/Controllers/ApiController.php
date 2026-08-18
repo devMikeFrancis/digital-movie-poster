@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Events\DmpEvent;
 use App\Jobs\SyncPosters;
+use App\Services\DisplayPowerService;
 use App\Services\KodiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 class ApiController extends Controller
 {
@@ -34,32 +34,32 @@ class ApiController extends Controller
     }
 
     /**
-     * Drive the attached display over HDMI-CEC.
+     * Drive the attached display over HDMI-CEC by hand.
      *
-     * The command is piped to cec-client on stdin rather than through a shell,
-     * so there is no interpolation into a command line at any point.
+     * The on/off schedule runs from the scheduler (dmp:display-power); this is
+     * the manual override, and requires authentication like any other endpoint
+     * that shells out.
      */
-    public function controlDisplay($command)
+    public function controlDisplay(DisplayPowerService $display, $command)
     {
         $command = strtolower($command);
 
-        if (! in_array($command, ['on', 'standby'], true)) {
+        if (! in_array($command, [DisplayPowerService::ON, DisplayPowerService::STANDBY], true)) {
             return response()->json(['message' => 'Invalid command. Use "on" or "standby".'], 422);
         }
 
-        $process = new Process(['cec-client', '-s', '-d', '1']);
-        $process->setInput($command.' 0'.PHP_EOL);
-        $process->setTimeout(30);
-
         try {
-            $process->mustRun();
+            $output = $display->send($command);
         } catch (ProcessFailedException $e) {
             Log::warning('HDMI-CEC command "'.$command.'" failed: '.$e->getMessage());
 
             return response()->json(['message' => 'Could not reach the display over HDMI-CEC.'], 502);
         }
 
-        return response()->json(['message' => $process->getOutput()]);
+        // The schedule would otherwise undo this within the minute.
+        $display->forgetState();
+
+        return response()->json(['message' => $output]);
     }
 
     /**

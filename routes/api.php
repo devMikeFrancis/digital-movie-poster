@@ -40,16 +40,6 @@ Route::get('/now-playing/{service}/poster', [NowPlayingController::class, 'poste
 Route::get('/kodi-now-playing', [ApiController::class, 'kodiNowPlaying']);
 
 /*
- * The kiosk display drives the TV's power over HDMI-CEC on a schedule and has
- * no way to sign in, so this stays open. It shells out, but only ever runs
- * cec-client with a literal "on" or "standby" - the command is checked against
- * that list and piped in on stdin, never interpolated into a shell string.
- * Moving the schedule server side would let this be locked down too; see
- * ARCHITECTURE.md.
- */
-Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
-
-/*
 |--------------------------------------------------------------------------
 | Privileged endpoints
 |--------------------------------------------------------------------------
@@ -78,6 +68,8 @@ Route::middleware('dmp.auth')->group(function () {
     Route::post('/now-playing', [ApiController::class, 'dmpBroadcast']);
     Route::post('/stopped', [ApiController::class, 'dmpBroadcast']);
 
-    // Shells out on the host: git pull + composer install.
+    // Both of these shell out on the host. The on/off schedule runs from the
+    // scheduler (dmp:display-power); this is the manual override.
+    Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
     Route::get('/update-application', [SettingController::class, 'updateApplication']);
 });

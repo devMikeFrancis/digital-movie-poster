@@ -100,22 +100,20 @@ First run offers to create the admin account, since an appliance has no other
 way to bootstrap one; that path closes permanently as soon as a user exists,
 and `DMP_ALLOW_SETUP=false` disables it in favour of `php artisan dmp:user`.
 
-Two deliberate exceptions, both because the kiosk browser cannot log in:
+One deliberate exception, because the kiosk browser cannot log in: the
+endpoints the display polls (`/api/posters`, `/api/settings`,
+`/api/now-playing/*`) stay open. They return no credentials — see #1.
 
-- The endpoints the display polls (`/api/posters`, `/api/settings`,
-  `/api/now-playing/*`) stay open. They return no credentials — see #1.
-- `/api/control-display/{command}` stays open. It shells out, but only ever
-  runs `cec-client` with a literal `on` or `standby`, checked against that list
-  and piped in on stdin rather than interpolated into a shell string. Moving
-  the on/off schedule into the Laravel scheduler would let this be closed too,
-  and is the better long-term shape.
+`/api/control-display/{command}` was a second exception until the display power
+schedule moved server side; it is now behind the same gate as everything else.
+See #10.
 
 Related: `startSyncPosters()` in the display store computes its interval as
 `60000 * 60 * 60 * 1000 * 4`, which is around 456 years rather than the four
 hours the comment claims. It has therefore never fired. Correcting the constant
 as-is would make the display poll `/api/cache-posters`, which is privileged, so
-the fix is to move periodic syncing to the scheduler rather than to patch the
-number.
+the fix is to schedule the sync alongside `dmp:display-power` rather than to
+patch the number.
 
 ### 3. `settings` is a 64-column single-row table
 
@@ -191,7 +189,38 @@ It already renders three tabs. Splitting it per tab, with a shared composable
 for load/save/dirty-tracking, would make it navigable. `Voting.vue` (726) and
 `PostersEdit.vue` (571) are the next candidates.
 
-### 9. Smaller things
+### 9. Display power schedule — fixed
+
+**Status: resolved.**
+
+The on/off hours used to be evaluated in the kiosk browser, which then called
+`/api/control-display`. That had three consequences: the endpoint had to stay
+unauthenticated even though it shells out; the schedule only applied while a
+browser happened to be open on the display; and the comparison ran against a
+hardcoded `America/New_York` clock, so the hours were simply wrong for anyone
+outside US Eastern.
+
+`DisplayPowerService` now owns the decision and `dmp:display-power` applies it
+from the scheduler every minute, so:
+
+- `/api/control-display/{command}` is authenticated, and is only a manual
+  override. Using it clears the cached state so the next scheduled run
+  re-asserts the schedule.
+- The window is evaluated in the application timezone. `config/app.php` had
+  `'timezone' => 'UTC'` hardcoded, ignoring the `APP_TIMEZONE` that
+  `.env.example` has always set; that is wired up now.
+- Windows that cross midnight (on at 20:00, off at 02:00) work, which the
+  original comparison could not express.
+- A command is only sent when the desired state actually changes, so the TV
+  is not pestered every minute.
+
+This needs `* * * * * cd /var/www/html && php artisan schedule:run` in cron;
+`install.sh` adds it. Note that `hdmi-control.py` — the optional PIR motion
+sensor script — also drives CEC directly and is unaware of this schedule. The
+two will fight on installs that use both; folding the motion sensor into the
+same service would settle that.
+
+### 10. Smaller things
 
 - **The bundle is one 637 kB chunk.** The display loads the entire admin UI on
   boot. Route-level `defineAsyncComponent` would let the kiosk load only the
@@ -200,7 +229,8 @@ for load/save/dirty-tracking, would make it navigable. `Voting.vue` (726) and
   boot without internet, self-host Inter alongside the ten fonts already
   vendored in `resources/fonts/`.
 - **`hdmi-control.py` runs from `@reboot` cron** and is unmanaged. A small
-  systemd unit would give it restart-on-failure and logs.
+  systemd unit would give it restart-on-failure and logs, and it should share
+  `DisplayPowerService` rather than shelling out to `cec-client` itself.
 - **The socket server keeps voting state in memory.** A restart loses an
   in-progress vote; it also assumes a single instance.
 - **No test covers the sync services.** They are the most complex code in the

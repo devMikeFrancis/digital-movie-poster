@@ -259,7 +259,6 @@ export default {
     methods: {
         ...mapActions(usePostersStore, [
             'boot',
-            'controlTV',
             'setLoading',
             'updateSetting',
             'setSocket',
