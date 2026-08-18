@@ -18,3 +18,8 @@ yarn-error.log
 /.nova
 .DS_Store
 /worker.log
+
+# macOS AppleDouble files (created when the repo lives on a network/exFAT share)
+._*
+.AppleDouble
+.LSOverride
