@@ -7,50 +7,104 @@
                         <main-nav />
                     </div>
                     <div class="lg:col-span-9 p-4" style="background-color: #121212">
-                        <ul class="tabs">
-                            <li>
-                                <a
-                                    class="active text-sm md:text-md"
-                                    href="#general"
-                                    @click.prevent="setTab($event)"
-                                    >General</a
+                        <div class="settings-bar">
+                            <ul class="tabs">
+                                <li>
+                                    <a
+                                        class="active text-sm md:text-md"
+                                        href="#general"
+                                        @click.prevent="setTab($event)"
+                                        >General</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="#theme"
+                                        class="text-sm md:text-md"
+                                        @click.prevent="setTab($event)"
+                                        >Theme</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="#sources"
+                                        class="text-sm md:text-md"
+                                        @click.prevent="setTab($event)"
+                                        >Poster Sources</a
+                                    >
+                                </li>
+                            </ul>
+
+                            <div class="settings-bar-actions">
+                                <span class="text-sm" :class="statusClass">{{ statusText }}</span>
+                                <button
+                                    type="submit"
+                                    class="btn text-md px-4 py-1 rounded-sm whitespace-nowrap"
+                                    :class="saveButtonClass"
+                                    :disabled="saving || !unsavedChanges"
+                                    @click.prevent="saveSettings"
                                 >
-                            </li>
-                            <li>
-                                <a
-                                    href="#theme"
-                                    class="text-sm md:text-md"
-                                    @click.prevent="setTab($event)"
-                                    >Theme</a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    href="#sources"
-                                    class="text-sm md:text-md"
-                                    @click.prevent="setTab($event)"
-                                    >Poster Sources</a
-                                >
-                            </li>
-                        </ul>
+                                    {{ saving ? 'Saving…' : 'Save settings' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="pendingLeave" class="modal">
+                            <div class="modal-overlay" @click="stayOnPage"></div>
+                            <div class="modal-content max-w-lg rounded-sm overflow-hidden">
+                                <div class="inner p-6">
+                                    <header class="modal-header p-4">
+                                        <h4 class="text-xl font-bold text-white">
+                                            You have unsaved settings
+                                        </h4>
+                                    </header>
+                                    <div class="modal-body px-4 pb-2">
+                                        <p class="text-gray-300">
+                                            Leaving this page now will discard the changes you have
+                                            made.
+                                        </p>
+                                    </div>
+                                    <footer class="modal-footer flex flex-wrap justify-end items-center gap-3 p-4">
+                                        <button
+                                            type="button"
+                                            class="text-gray-300 px-3 py-2 rounded-sm hover:text-white"
+                                            @click.prevent="stayOnPage"
+                                        >
+                                            Keep editing
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-white px-4 py-2 rounded-sm bg-gray-600 hover:bg-gray-500"
+                                            @click.prevent="leaveWithoutSaving"
+                                        >
+                                            Discard changes
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-white px-4 py-2 rounded-sm bg-blue-600 hover:bg-blue-500"
+                                            :disabled="saving"
+                                            @click.prevent="saveThenLeave"
+                                        >
+                                            {{ saving ? 'Saving…' : 'Save and leave' }}
+                                        </button>
+                                    </footer>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="errors.length || saveFailed"
+                            class="bg-red-900 text-white px-4 py-3 rounded relative mb-4"
+                            role="alert"
+                            v-cloak
+                        >
+                            <p class="font-bold mb-1">{{ errorHeading }}</p>
+                            <div v-for="(err, eIndex) in errors" :key="'err-' + eIndex">
+                                {{ err }}
+                            </div>
+                        </div>
                         <div class="tabs-content">
                             <div id="general" class="tab-content active">
-                                <div class="mb-5">
-                                    <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
-                                        >TMDB Api Key v3</label
-                                    >
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="tmdb-v3"
-                                        aria-describedby="tmdb-v3Help"
-                                        v-model="settings.tmdb_api_key_v3"
-                                    />
-                                    <div id="tmdb-v3Help" class="text-gray-400 text-sm"></div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
                                 <div class="mb-5">
                                     <label
                                         for="random"
@@ -746,6 +800,60 @@
                                 </div>
                             </div>
                             <div id="sources" class="tab-content">
+                                <p class="text-gray-400 text-sm mb-7">
+                                    Posters reach the display two ways, and they can be used
+                                    together. Add titles yourself and DMP looks up the artwork and
+                                    details, or point DMP at a media server and let it sync your
+                                    library.
+                                </p>
+
+                                <h3 class="text-white font-bold text-lg mb-1">
+                                    Adding posters yourself
+                                </h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    Used when you add a poster on the Posters screen, either by
+                                    searching for a title or by entering an IMDB ID. No media
+                                    server is needed for this.
+                                </p>
+
+                                <div class="mb-5">
+                                    <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
+                                        >TMDB Api Key v3</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="tmdb-v3"
+                                        aria-describedby="tmdb-v3Help"
+                                        v-model="settings.tmdb_api_key_v3"
+                                    />
+                                    <div id="tmdb-v3Help" class="text-gray-400 text-sm">
+                                        Required to search for titles and to fill in artwork,
+                                        ratings, runtime and trailers. DMP identifies titles by
+                                        their IMDB ID, but IMDB has no public API - TMDB is what
+                                        answers, and it accepts IMDB IDs.
+                                        <a
+                                            class="underline hover:text-white"
+                                            href="https://www.themoviedb.org/settings/api"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Get a free key</a
+                                        >.
+                                    </div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <h3 class="text-white font-bold text-lg mb-1">
+                                    Syncing from a media library
+                                </h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    Optional, and only needed if you want DMP to follow a media
+                                    server. Enabling one does two jobs: it syncs that library into
+                                    your poster list, and it can switch the display to whatever is
+                                    playing right now. Leave these off if you add posters yourself.
+                                </p>
+
                                 <div class="mb-5">
                                     <label
                                         for="plex-service"
@@ -761,7 +869,10 @@
                                         <span class="ml-2">Enable Plex Service</span></label
                                     >
                                     <div id="plex-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Plex media server for posters.
+                                        Syncs the Plex libraries you pick below into your poster
+                                        list, and can switch the display to whatever Plex is
+                                        playing. Choose which of the two you want with the
+                                        checkboxes further down.
                                     </div>
                                 </div>
                                 <div class="mb-5">
@@ -1060,7 +1171,8 @@
                                         <span class="ml-2">Enable Jellyfin Service</span></label
                                     >
                                     <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Jellyfin media server for posters.
+                                        Syncs your Jellyfin movie library into your poster list,
+                                        and switches the display to whatever Jellyfin is playing.
                                     </div>
                                 </div>
 
@@ -1114,7 +1226,8 @@
                                         <span class="ml-2">Enable Kodi Service</span></label
                                     >
                                     <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Kodi media server for posters.
+                                        Syncs your Kodi movie library into your poster list, and
+                                        switches the display to whatever Kodi is playing.
                                     </div>
                                 </div>
 
@@ -1187,47 +1300,6 @@
                         </div>
                         <!-- / .tabs-content -->
 
-                        <div
-                            class="
-                                bg-red-100
-                                border border-red-400
-                                text-red-700
-                                px-4
-                                py-3
-                                rounded
-                                relative
-                                mb-3
-                            "
-                            role="alert"
-                            v-if="settingsMessage"
-                            v-cloak
-                        >
-                            {{ settingsMessage }}
-                            <div v-for="(err, eIndex) in errors" :key="'err-' + eIndex">
-                                {{ err }}
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-12">
-                            <div class="col-span-6">
-                                <button
-                                    type="submit"
-                                    class="
-                                        btn
-                                        text-black
-                                        bg-gray-300
-                                        text-md
-                                        px-3
-                                        py-1
-                                        rounded-sm
-                                        hover:bg-gray-100
-                                    "
-                                    @click.prevent="saveSettings"
-                                >
-                                    Save Settings
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1246,6 +1318,14 @@ export default {
             loading: false,
             settingsMessage: '',
             errors: [],
+            saving: false,
+            saveFailed: false,
+            justSaved: false,
+            // JSON of the settings as last loaded or saved. Anything different
+            // from this is an unsaved change.
+            savedSnapshot: '',
+            // The navigation held back while the unsaved-changes prompt is up.
+            pendingLeave: null,
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
@@ -1262,6 +1342,58 @@ export default {
     components: { MainNav },
     watch: {},
     computed: {
+        /**
+         * Whether the form differs from what is stored.
+         *
+         * The settings page is long enough that the old button at the very
+         * bottom was easy to miss, so the header bar has to say plainly
+         * whether anything is waiting to be saved.
+         */
+        unsavedChanges() {
+            return this.savedSnapshot !== '' && JSON.stringify(this.settings) !== this.savedSnapshot;
+        },
+        statusText() {
+            if (this.saving) {
+                return 'Saving…';
+            }
+            if (this.saveFailed) {
+                return 'Not saved';
+            }
+            if (this.unsavedChanges) {
+                return 'Unsaved changes';
+            }
+            if (this.justSaved) {
+                return 'Saved';
+            }
+            return '';
+        },
+        /**
+         * Laravel's 422 body repeats the first field error in "message", so
+         * showing both put the same sentence on screen twice.
+         */
+        errorHeading() {
+            if (this.errors.length) {
+                return this.errors.length === 1
+                    ? 'That setting could not be saved:'
+                    : 'Those settings could not be saved:';
+            }
+
+            return this.settingsMessage || 'Those settings could not be saved.';
+        },
+        statusClass() {
+            if (this.saveFailed) {
+                return 'text-red-400';
+            }
+            if (this.unsavedChanges) {
+                return 'text-amber-300';
+            }
+            return 'text-green-400';
+        },
+        saveButtonClass() {
+            return this.unsavedChanges && !this.saving
+                ? 'text-white bg-blue-600 hover:bg-blue-500'
+                : 'text-gray-400 bg-gray-700 cursor-default';
+        },
         plexTvSections() {
             return this.plexSections.filter((item) => {
                 return item.type === 'show';
@@ -1296,6 +1428,7 @@ export default {
                 .get('/api/settings/full')
                 .then((response) => {
                     this.settings = response.data;
+                    this.markClean();
                     if (this.settings.plex_service) {
                         this.getServiceSections('plex');
                     }
@@ -1304,31 +1437,89 @@ export default {
                     console.log(e.message);
                 });
         },
+        /**
+         * Held back by beforeRouteLeave when there is something unsaved. The
+         * three buttons resolve it.
+         */
+        stayOnPage() {
+            if (this.pendingLeave) {
+                this.pendingLeave(false);
+                this.pendingLeave = null;
+            }
+        },
+        leaveWithoutSaving() {
+            if (this.pendingLeave) {
+                const proceed = this.pendingLeave;
+                this.pendingLeave = null;
+                this.markClean(); // so the beforeunload handler does not fire too
+                proceed();
+            }
+        },
+        saveThenLeave() {
+            this.saveSettings().then(() => {
+                if (this.saveFailed) {
+                    // Cancel the navigation and step out of the way: the
+                    // reason it failed is in the banner behind this dialog,
+                    // and leaving the dialog up just invites another attempt.
+                    this.stayOnPage();
+
+                    return;
+                }
+
+                this.leaveWithoutSaving();
+            });
+        },
+        /**
+         * Covers leaving the app entirely - reload, tab close, typed URL. The
+         * router guard cannot see those.
+         */
+        warnBeforeUnload(event) {
+            if (!this.unsavedChanges) {
+                return;
+            }
+            event.preventDefault();
+            event.returnValue = '';
+        },
+        markClean() {
+            this.savedSnapshot = JSON.stringify(this.settings);
+        },
         saveSettings() {
+            if (this.saving || !this.unsavedChanges) {
+                return Promise.resolve();
+            }
+
             this.settingsMessage = '';
             this.errors = [];
-            this.settings._method = 'put';
+            this.saveFailed = false;
+            this.justSaved = false;
+            this.saving = true;
 
-            axios
-                .post('/api/settings', this.settings)
+            // Sent alongside rather than written onto this.settings, which
+            // would otherwise register as an unsaved change of its own.
+            return axios
+                .post('/api/settings', { ...this.settings, _method: 'put' })
                 .then(() => {
-                    this.settingsMessage = 'Settings saved.';
+                    this.markClean();
+                    this.justSaved = true;
                     setTimeout(() => {
-                        this.settingsMessage = null;
-                    }, 2500);
+                        this.justSaved = false;
+                    }, 4000);
                 })
                 .catch((e) => {
-                    this.settingsMessage = e.message;
-                    let errors = e.response.data.errors;
-                    if (Object.keys(errors).length !== 0) {
-                        for (var prop in errors) {
-                            if (errors[prop] instanceof Array) {
-                                errors[prop].forEach((err) => {
-                                    this.errors.push(err);
-                                });
-                            }
+                    this.saveFailed = true;
+                    const response = e.response;
+                    this.settingsMessage =
+                        (response && response.data && response.data.message) || e.message;
+
+                    const errors = (response && response.data && response.data.errors) || {};
+                    Object.keys(errors).forEach((field) => {
+                        if (errors[field] instanceof Array) {
+                            errors[field].forEach((err) => this.errors.push(err));
                         }
-                    }
+                    });
+                })
+                .finally(() => {
+                    this.saving = false;
                 });
         },
         getMovieLibraryName(service, key) {
@@ -1407,6 +1598,22 @@ export default {
         if (typeof io !== 'undefined') {
             this.socket = io('http://' + location.hostname + ':3000');
         }
+        window.addEventListener('beforeunload', this.warnBeforeUnload);
+    },
+    beforeUnmount() {
+        window.removeEventListener('beforeunload', this.warnBeforeUnload);
+    },
+    /**
+     * Hold back in-app navigation while there are unsaved settings, and let the
+     * prompt decide. Resolving with false cancels the navigation.
+     */
+    beforeRouteLeave(to, from, next) {
+        if (!this.unsavedChanges) {
+            next();
+            return;
+        }
+
+        this.pendingLeave = (proceed = true) => next(proceed === false ? false : undefined);
     },
 };
 </script>
@@ -1416,6 +1623,36 @@ input[type='text'],
 input[type='number'] {
     height: 42px;
     border-radius: 2px;
+}
+
+/*
+ * Tabs on the left, save on the right, and stuck to the top: the settings form
+ * is long enough that a button at the bottom was easy to miss, and easy to
+ * forget after scrolling back up.
+ */
+.settings-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: #121212;
+    padding: 8px 0;
+    margin-bottom: 4px;
+}
+
+.settings-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 4px;
+}
+
+.settings-bar-actions button:disabled {
+    opacity: 0.75;
 }
 
 .tabs {
