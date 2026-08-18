@@ -7,32 +7,59 @@
                         <main-nav />
                     </div>
                     <div class="lg:col-span-9 p-4" style="background-color: #121212">
-                        <ul class="tabs">
-                            <li>
-                                <a
-                                    class="active text-sm md:text-md"
-                                    href="#general"
-                                    @click.prevent="setTab($event)"
-                                    >General</a
+                        <div class="settings-bar">
+                            <ul class="tabs">
+                                <li>
+                                    <a
+                                        class="active text-sm md:text-md"
+                                        href="#general"
+                                        @click.prevent="setTab($event)"
+                                        >General</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="#theme"
+                                        class="text-sm md:text-md"
+                                        @click.prevent="setTab($event)"
+                                        >Theme</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="#sources"
+                                        class="text-sm md:text-md"
+                                        @click.prevent="setTab($event)"
+                                        >Poster Sources</a
+                                    >
+                                </li>
+                            </ul>
+
+                            <div class="settings-bar-actions">
+                                <span class="text-sm" :class="statusClass">{{ statusText }}</span>
+                                <button
+                                    type="submit"
+                                    class="btn text-md px-4 py-1 rounded-sm whitespace-nowrap"
+                                    :class="saveButtonClass"
+                                    :disabled="saving || !unsavedChanges"
+                                    @click.prevent="saveSettings"
                                 >
-                            </li>
-                            <li>
-                                <a
-                                    href="#theme"
-                                    class="text-sm md:text-md"
-                                    @click.prevent="setTab($event)"
-                                    >Theme</a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    href="#sources"
-                                    class="text-sm md:text-md"
-                                    @click.prevent="setTab($event)"
-                                    >Poster Sources</a
-                                >
-                            </li>
-                        </ul>
+                                    {{ saving ? 'Saving…' : 'Save settings' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="errors.length || saveFailed"
+                            class="bg-red-900 text-white px-4 py-3 rounded relative mb-4"
+                            role="alert"
+                            v-cloak
+                        >
+                            <p class="font-bold mb-1">{{ errorHeading }}</p>
+                            <div v-for="(err, eIndex) in errors" :key="'err-' + eIndex">
+                                {{ err }}
+                            </div>
+                        </div>
                         <div class="tabs-content">
                             <div id="general" class="tab-content active">
                                 <div class="mb-5">
@@ -1230,47 +1257,6 @@
                         </div>
                         <!-- / .tabs-content -->
 
-                        <div
-                            class="
-                                bg-red-100
-                                border border-red-400
-                                text-red-700
-                                px-4
-                                py-3
-                                rounded
-                                relative
-                                mb-3
-                            "
-                            role="alert"
-                            v-if="settingsMessage"
-                            v-cloak
-                        >
-                            {{ settingsMessage }}
-                            <div v-for="(err, eIndex) in errors" :key="'err-' + eIndex">
-                                {{ err }}
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-12">
-                            <div class="col-span-6">
-                                <button
-                                    type="submit"
-                                    class="
-                                        btn
-                                        text-black
-                                        bg-gray-300
-                                        text-md
-                                        px-3
-                                        py-1
-                                        rounded-sm
-                                        hover:bg-gray-100
-                                    "
-                                    @click.prevent="saveSettings"
-                                >
-                                    Save Settings
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1289,6 +1275,12 @@ export default {
             loading: false,
             settingsMessage: '',
             errors: [],
+            saving: false,
+            saveFailed: false,
+            justSaved: false,
+            // JSON of the settings as last loaded or saved. Anything different
+            // from this is an unsaved change.
+            savedSnapshot: '',
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
@@ -1305,6 +1297,58 @@ export default {
     components: { MainNav },
     watch: {},
     computed: {
+        /**
+         * Whether the form differs from what is stored.
+         *
+         * The settings page is long enough that the old button at the very
+         * bottom was easy to miss, so the header bar has to say plainly
+         * whether anything is waiting to be saved.
+         */
+        unsavedChanges() {
+            return this.savedSnapshot !== '' && JSON.stringify(this.settings) !== this.savedSnapshot;
+        },
+        statusText() {
+            if (this.saving) {
+                return 'Saving…';
+            }
+            if (this.saveFailed) {
+                return 'Not saved';
+            }
+            if (this.unsavedChanges) {
+                return 'Unsaved changes';
+            }
+            if (this.justSaved) {
+                return 'Saved';
+            }
+            return '';
+        },
+        /**
+         * Laravel's 422 body repeats the first field error in "message", so
+         * showing both put the same sentence on screen twice.
+         */
+        errorHeading() {
+            if (this.errors.length) {
+                return this.errors.length === 1
+                    ? 'That setting could not be saved:'
+                    : 'Those settings could not be saved:';
+            }
+
+            return this.settingsMessage || 'Those settings could not be saved.';
+        },
+        statusClass() {
+            if (this.saveFailed) {
+                return 'text-red-400';
+            }
+            if (this.unsavedChanges) {
+                return 'text-amber-300';
+            }
+            return 'text-green-400';
+        },
+        saveButtonClass() {
+            return this.unsavedChanges && !this.saving
+                ? 'text-white bg-blue-600 hover:bg-blue-500'
+                : 'text-gray-400 bg-gray-700 cursor-default';
+        },
         plexTvSections() {
             return this.plexSections.filter((item) => {
                 return item.type === 'show';
@@ -1339,6 +1383,7 @@ export default {
                 .get('/api/settings/full')
                 .then((response) => {
                     this.settings = response.data;
+                    this.markClean();
                     if (this.settings.plex_service) {
                         this.getServiceSections('plex');
                     }
@@ -1347,31 +1392,46 @@ export default {
                     console.log(e.message);
                 });
         },
+        markClean() {
+            this.savedSnapshot = JSON.stringify(this.settings);
+        },
         saveSettings() {
+            if (this.saving || !this.unsavedChanges) {
+                return;
+            }
+
             this.settingsMessage = '';
             this.errors = [];
-            this.settings._method = 'put';
+            this.saveFailed = false;
+            this.justSaved = false;
+            this.saving = true;
 
+            // Sent alongside rather than written onto this.settings, which
+            // would otherwise register as an unsaved change of its own.
             axios
-                .post('/api/settings', this.settings)
+                .post('/api/settings', { ...this.settings, _method: 'put' })
                 .then(() => {
-                    this.settingsMessage = 'Settings saved.';
+                    this.markClean();
+                    this.justSaved = true;
                     setTimeout(() => {
-                        this.settingsMessage = null;
-                    }, 2500);
+                        this.justSaved = false;
+                    }, 4000);
                 })
                 .catch((e) => {
-                    this.settingsMessage = e.message;
-                    let errors = e.response.data.errors;
-                    if (Object.keys(errors).length !== 0) {
-                        for (var prop in errors) {
-                            if (errors[prop] instanceof Array) {
-                                errors[prop].forEach((err) => {
-                                    this.errors.push(err);
-                                });
-                            }
+                    this.saveFailed = true;
+                    const response = e.response;
+                    this.settingsMessage =
+                        (response && response.data && response.data.message) || e.message;
+
+                    const errors = (response && response.data && response.data.errors) || {};
+                    Object.keys(errors).forEach((field) => {
+                        if (errors[field] instanceof Array) {
+                            errors[field].forEach((err) => this.errors.push(err));
                         }
-                    }
+                    });
+                })
+                .finally(() => {
+                    this.saving = false;
                 });
         },
         getMovieLibraryName(service, key) {
@@ -1459,6 +1519,36 @@ input[type='text'],
 input[type='number'] {
     height: 42px;
     border-radius: 2px;
+}
+
+/*
+ * Tabs on the left, save on the right, and stuck to the top: the settings form
+ * is long enough that a button at the bottom was easy to miss, and easy to
+ * forget after scrolling back up.
+ */
+.settings-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: #121212;
+    padding: 8px 0;
+    margin-bottom: 4px;
+}
+
+.settings-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 4px;
+}
+
+.settings-bar-actions button:disabled {
+    opacity: 0.75;
 }
 
 .tabs {
