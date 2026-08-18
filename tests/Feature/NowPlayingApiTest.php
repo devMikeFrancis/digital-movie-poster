@@ -11,6 +11,12 @@ class NowPlayingApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAsAdmin();
+    }
+
     public function test_a_valid_now_playing_payload_broadcasts_the_event(): void
     {
         Event::fake([DmpEvent::class]);

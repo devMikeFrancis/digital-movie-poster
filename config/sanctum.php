@@ -18,11 +18,19 @@ return [
     |
     */
 
+    /*
+     * DMP is reached by whatever address the Pi happens to have -
+     * raspberrypi.local, a LAN IP, a custom hostname - so the host cannot be
+     * known ahead of time. currentRequestHost() makes same-origin requests
+     * stateful, which is what the bundled admin UI is. A browser on another
+     * origin still sends its own Origin header and will not match, so this
+     * does not weaken CSRF protection.
+     */
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        '%s%s%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1,',
         Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
+        Sanctum::currentRequestHost(),
     ))),
 
     /*

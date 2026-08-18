@@ -80,19 +80,42 @@ unauthenticated endpoint the display polls.
 The cost is that `APP_KEY` is now load-bearing: rotating it makes the stored
 credentials unreadable. `install.sh` only mints a key when `.env` has none.
 
-### 2. There is no login
+### 2. Admin authentication — fixed
 
-Deleting the broken Breeze scaffolding removed five controllers that did not
-exist, but it did not change the security posture: there has never been a
-working login. Anyone on the network can change settings, delete posters, and
-trigger `/api/update-application`, which runs `git pull` and `composer install`
-on the host.
+**Status: resolved.**
 
-`DMP_API_REQUIRE_TOKEN` (added in this refresh) closes that for API clients,
-but the bundled admin UI cannot authenticate, so turning it on locks the UI out
-of its own write endpoints. The real fix is session auth on the admin routes —
-a single user, seeded at install time — with Sanctum tokens kept for machine
-integrations. Sanctum already supports both against the same `User` model.
+There had never been a working login: `routes/auth.php` referenced five
+controllers that did not exist. Anyone on the network could change settings,
+delete posters, and trigger `/api/update-application`, which runs `git pull`
+and `composer install` on the host.
+
+The admin UI now has a session login, and privileged endpoints accept either
+that session or a Sanctum bearer token — both resolved through the `sanctum`
+guard, which checks the web session first and falls back to a token. One flag,
+`DMP_REQUIRE_LOGIN`, governs it, and it defaults to **on**. (It replaces the
+short-lived `DMP_API_REQUIRE_TOKEN`, which had the awkward property that
+enabling it locked the bundled UI out of its own write endpoints.)
+
+First run offers to create the admin account, since an appliance has no other
+way to bootstrap one; that path closes permanently as soon as a user exists,
+and `DMP_ALLOW_SETUP=false` disables it in favour of `php artisan dmp:user`.
+
+Two deliberate exceptions, both because the kiosk browser cannot log in:
+
+- The endpoints the display polls (`/api/posters`, `/api/settings`,
+  `/api/now-playing/*`) stay open. They return no credentials — see #1.
+- `/api/control-display/{command}` stays open. It shells out, but only ever
+  runs `cec-client` with a literal `on` or `standby`, checked against that list
+  and piped in on stdin rather than interpolated into a shell string. Moving
+  the on/off schedule into the Laravel scheduler would let this be closed too,
+  and is the better long-term shape.
+
+Related: `startSyncPosters()` in the display store computes its interval as
+`60000 * 60 * 60 * 1000 * 4`, which is around 456 years rather than the four
+hours the comment claims. It has therefore never fired. Correcting the constant
+as-is would make the display poll `/api/cache-posters`, which is privileged, so
+the fix is to move periodic syncing to the scheduler rather than to patch the
+number.
 
 ### 3. `settings` is a 64-column single-row table
 

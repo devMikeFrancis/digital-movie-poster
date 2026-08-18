@@ -9,6 +9,8 @@ use App\Models\Poster;
 use App\Services\PlexService;
 use App\Services\PosterService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 // use App\Models\Setting;
 
@@ -122,6 +124,17 @@ class PosterController extends Controller
             return response()->json(['message' => 'Unknown service: '.$service], 404);
         }
 
-        return $plexService->getSections();
+        try {
+            return response()->json($plexService->getSections());
+        } catch (Throwable $e) {
+            // An unreachable or misconfigured Plex server is a normal thing for
+            // an operator to hit while filling in the settings form; it should
+            // read as a message, not a 500.
+            Log::info('Could not list Plex libraries: '.$e->getMessage());
+
+            return response()->json([
+                'message' => 'Could not reach Plex. Check the IP address and token, then save before refreshing libraries.',
+            ], 502);
+        }
     }
 }

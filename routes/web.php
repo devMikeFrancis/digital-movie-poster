@@ -41,4 +41,8 @@ Route::get('/voting', function () {
     return view('app');
 })->where('any', '.*');
 
+Route::get('/login', function () {
+    return view('app');
+})->where('any', '.*');
+
 // require __DIR__.'/auth.php';

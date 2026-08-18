@@ -105,6 +105,11 @@ class PlexService implements MovieSyncInterface
     {
         $sections = [];
         $json = $this->apiCall('/library/sections/all');
+
+        if (! isset($json['MediaContainer']['Directory'])) {
+            throw new \RuntimeException('Plex did not return a library list.');
+        }
+
         $plexSections = $json['MediaContainer']['Directory'];
 
         foreach ($plexSections as $plexSection) {

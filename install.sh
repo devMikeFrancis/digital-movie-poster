@@ -275,5 +275,9 @@ log "Install complete."
 echo "  Display:  http://localhost?rotate=true"
 echo "  Settings: http://$(hostname).local/posters"
 echo
+echo "  The settings screen will ask you to create an administrator account"
+echo "  the first time you open it. To do it from here instead, run:"
+echo "      cd ${APP_DIR} && php artisan dmp:user"
+echo
 read -r -p "Reboot now? [y/N] " REPLY
 [[ "$REPLY" =~ ^[Yy]$ ]] && reboot

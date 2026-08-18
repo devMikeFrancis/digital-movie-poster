@@ -95,7 +95,7 @@ class SettingsSecrecyTest extends TestCase
 
     public function test_the_full_endpoint_still_serves_the_admin_ui(): void
     {
-        $payload = $this->getJson('/api/settings/full')->assertOk()->json();
+        $payload = $this->actingAsAdmin()->getJson('/api/settings/full')->assertOk()->json();
 
         foreach (self::SECRETS as $field => $value) {
             $this->assertSame($value, $payload[$field]);
@@ -106,7 +106,7 @@ class SettingsSecrecyTest extends TestCase
 
     public function test_the_full_endpoint_is_gated_when_protection_is_on(): void
     {
-        config(['dmp.api.require_token' => true]);
+        config(['dmp.auth.required' => true]);
 
         $this->getJson('/api/settings/full')->assertUnauthorized();
 

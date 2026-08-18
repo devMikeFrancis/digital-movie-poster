@@ -157,9 +157,28 @@ affected.
 
 ## Security
 
-DMP is built as a LAN appliance and **has no login screen**. Anything that can
-reach the device can change settings and delete posters. Do not expose it to
-the internet.
+The admin UI requires a login. The first time you open it on a new device it
+offers to create the administrator account; after that the same screen asks you
+to sign in. You can also manage the account from the console:
+
+```bash
+php artisan dmp:user
+```
+
+Privileged endpoints — anything that writes, shells out, or returns credentials
+— accept either that session or a Sanctum bearer token, so integrations keep
+working:
+
+```bash
+php artisan dmp:token "my integration"   # prints the token once
+```
+
+The endpoints the kiosk display polls stay open, because the display has no way
+to sign in. They return no credentials.
+
+Set `DMP_REQUIRE_LOGIN=false` to turn all of this off and go back to an open
+admin UI. Only do that on a network you fully trust. DMP is still a LAN
+appliance: do not expose it to the internet.
 
 Media-server credentials (Plex and Jellyfin tokens, the Kodi login, and both
 TMDB keys) are **encrypted at rest** using `APP_KEY`, so a copied
@@ -180,26 +199,12 @@ itself, and artwork is proxied through
 full row, credentials included, from `GET /api/settings/full`, which is gated
 by the token below.
 
-For installs you drive over the API, you can require a token on every write and
-on the two endpoints that shell out on the host:
-
-```bash
-php artisan dmp:token "my integration"   # prints the token once
-```
-
-Then set `DMP_API_REQUIRE_TOKEN=true` in `.env` and send the token as
-`Authorization: Bearer <token>`. Read-only endpoints stay open so the kiosk
-display keeps working.
-
-Note that the bundled admin UI cannot send a token, so enabling this locks the
-UI out of its own write endpoints. See
-[ARCHITECTURE.md](ARCHITECTURE.md#2-there-is-no-login) for the fuller picture.
-
 ## Now Playing API
 
 You can send poster data to certain endpoints to trigger a `now-playing` or `stopped` event.
 
-These endpoints require a bearer token when `DMP_API_REQUIRE_TOKEN=true`.
+These endpoints require a bearer token (or an admin session) unless
+`DMP_REQUIRE_LOGIN=false`.
 
 ### Reading now playing
 

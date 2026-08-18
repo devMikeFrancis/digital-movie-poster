@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Middleware\RequireApiToken;
+use App\Http\Middleware\RequireAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,8 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Lets the same-origin admin UI authenticate with its session cookie
+        // while integrations keep using Sanctum bearer tokens.
+        $middleware->statefulApi();
+
         $middleware->alias([
-            'dmp.token' => RequireApiToken::class,
+            'dmp.auth' => RequireAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

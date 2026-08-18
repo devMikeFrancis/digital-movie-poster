@@ -4,24 +4,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | API Token Protection
+    | Authentication
     |--------------------------------------------------------------------------
     |
-    | DMP is designed as a LAN appliance and ships with its API open so that
-    | existing installs keep working after an upgrade. Turning this on makes
-    | every mutating endpoint - and the two endpoints that shell out - require
-    | a Sanctum bearer token. Mint one with:
+    | When enabled (the default), the admin UI requires a login and every
+    | endpoint that writes, shells out, queues work or returns credentials
+    | requires either that session or a Sanctum bearer token:
     |
-    |     php artisan dmp:token "my integration"
+    |     php artisan dmp:user            create or reset the admin account
+    |     php artisan dmp:token "my app"  mint a token for an integration
     |
-    | Note: the bundled admin UI has no login screen, so it cannot authenticate
-    | once this is enabled. Enable it for installs driven over the API, or when
-    | the device is reachable from anything you do not trust.
+    | The endpoints the kiosk display polls stay open either way, because the
+    | display has no way to log in.
+    |
+    | Turning this off restores the pre-2026 behaviour where anything that can
+    | reach the device can change settings and delete posters. Only do that on
+    | a network you fully trust.
     |
     */
 
-    'api' => [
-        'require_token' => env('DMP_API_REQUIRE_TOKEN', false),
+    'auth' => [
+        'required' => env('DMP_REQUIRE_LOGIN', true),
+
+        // Allow creating the first admin account through the UI when no user
+        // exists yet. Set false if you would rather only ever use dmp:user.
+        'allow_setup' => env('DMP_ALLOW_SETUP', true),
     ],
 
     /*

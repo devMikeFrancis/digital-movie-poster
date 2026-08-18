@@ -10,6 +10,12 @@ class PosterApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAsAdmin();
+    }
+
     public function test_poster_index_returns_wrapped_collection(): void
     {
         Poster::create(['name' => 'Alien', 'file_name' => 'alien.webp', 'media_type' => 'movie', 'ordinal' => 1]);

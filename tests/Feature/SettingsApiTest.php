@@ -10,6 +10,12 @@ class SettingsApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAsAdmin();
+    }
+
     public function test_settings_are_seeded_by_migration_and_readable(): void
     {
         $this->getJson('/api/settings')

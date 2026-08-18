@@ -52,6 +52,15 @@
                 <li class="py-2 px-4 mb-5">
                     <router-link class="hover:text-gray-500" to="/about">About</router-link>
                 </li>
+                <li v-if="showSignOut" class="py-2 px-4 mb-3">
+                    <button
+                        type="button"
+                        class="hover:text-gray-500 bg-transparent p-0"
+                        @click="signOut"
+                    >
+                        Sign out<span v-if="userName"> ({{ userName }})</span>
+                    </button>
+                </li>
                 <li class="pt-4" style="background-color: #000">
                     <refresh-button></refresh-button>
                 </li>
@@ -61,6 +70,8 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
+import { useAuthStore } from '@/store/auth';
 import RefreshButton from '../components/refresh-button.vue';
 export default {
     name: 'MainNav',
@@ -75,13 +86,23 @@ export default {
         };
     },
     computed: {
+        ...mapState(useAuthStore, ['required', 'authenticated', 'user']),
         menuVisible() {
             return this.windowWidth > this.mdBreakpoint ? true : this.showMenu;
+        },
+        showSignOut() {
+            return this.required && this.authenticated;
+        },
+        userName() {
+            return this.user ? this.user.name : '';
         },
     },
     methods: {
         updateWindowSize() {
             this.windowWidth = window.innerWidth;
+        },
+        signOut() {
+            useAuthStore().logout();
         },
     },
     mounted() {

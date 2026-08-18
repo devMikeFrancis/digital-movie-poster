@@ -107,7 +107,7 @@ class CredentialEncryptionTest extends TestCase
         $this->assertNull(Setting::firstOrFail()->plex_token);
 
         $this->getJson('/api/settings')->assertOk();
-        $this->getJson('/api/settings/full')->assertOk();
+        $this->actingAsAdmin()->getJson('/api/settings/full')->assertOk();
     }
 
     public function test_the_admin_endpoint_returns_decrypted_values(): void
@@ -117,7 +117,8 @@ class CredentialEncryptionTest extends TestCase
             'tmdb_api_key_v3' => 'tmdb-plain',
         ])->save();
 
-        $this->getJson('/api/settings/full')
+        $this->actingAsAdmin()
+            ->getJson('/api/settings/full')
             ->assertOk()
             ->assertJsonPath('plex_token', 'plex-plain')
             ->assertJsonPath('tmdb_api_key_v3', 'tmdb-plain');

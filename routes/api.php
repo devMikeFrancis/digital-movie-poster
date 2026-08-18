@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NowPlayingController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\SettingController;
@@ -19,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/auth/status', [AuthController::class, 'status']);
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
+Route::post('/auth/setup', [AuthController::class, 'setup'])->middleware('throttle:6,1');
+Route::post('/auth/logout', [AuthController::class, 'logout']);
+
 Route::get('/posters', [PosterController::class, 'index']);
 Route::get('/posters/{poster}', [PosterController::class, 'show']);
 Route::get('/settings', [SettingController::class, 'index']);
@@ -34,17 +40,27 @@ Route::get('/now-playing/{service}/poster', [NowPlayingController::class, 'poste
 Route::get('/kodi-now-playing', [ApiController::class, 'kodiNowPlaying']);
 
 /*
+ * The kiosk display drives the TV's power over HDMI-CEC on a schedule and has
+ * no way to sign in, so this stays open. It shells out, but only ever runs
+ * cec-client with a literal "on" or "standby" - the command is checked against
+ * that list and piped in on stdin, never interpolated into a shell string.
+ * Moving the schedule server side would let this be locked down too; see
+ * ARCHITECTURE.md.
+ */
+Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
+
+/*
 |--------------------------------------------------------------------------
 | Privileged endpoints
 |--------------------------------------------------------------------------
 |
 | Everything that writes, shells out, queues work, or returns credentials.
-| Open by default so existing installs keep working; set
-| DMP_API_REQUIRE_TOKEN=true to require a Sanctum bearer token on all of them.
+| Requires either an admin session (the UI) or a Sanctum bearer token (an
+| integration), unless DMP_REQUIRE_LOGIN is turned off.
 |
 */
 
-Route::middleware('dmp.token')->group(function () {
+Route::middleware('dmp.auth')->group(function () {
     // Returns the full settings row, credentials included, for the admin UI.
     Route::get('/settings/full', [SettingController::class, 'full']);
     Route::put('/settings', [SettingController::class, 'update']);
@@ -62,7 +78,6 @@ Route::middleware('dmp.token')->group(function () {
     Route::post('/now-playing', [ApiController::class, 'dmpBroadcast']);
     Route::post('/stopped', [ApiController::class, 'dmpBroadcast']);
 
-    // Both of these shell out on the host.
-    Route::get('/control-display/{command}', [ApiController::class, 'controlDisplay']);
+    // Shells out on the host: git pull + composer install.
     Route::get('/update-application', [SettingController::class, 'updateApplication']);
 });
