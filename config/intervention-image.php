@@ -1,6 +1,7 @@
 <?php
 
-use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 
 return [
 
@@ -18,7 +19,16 @@ return [
     |   - \Intervention\Image\Drivers\Vips\Driver::class
     */
 
-    'driver' => env('IMAGE_DRIVER', 'gd') === 'imagick' ? Driver::class : Intervention\Image\Drivers\Gd\Driver::class,
+    /*
+     * Prefer imagick when it is actually installed - it resizes posters better,
+     * and install.sh puts it on the Pi - but fall back to gd when it is not.
+     * Selecting a driver whose extension is missing makes every poster image
+     * save fail, which is easy to miss: the poster is still created, the
+     * artwork simply never appears.
+     */
+    'driver' => env('IMAGE_DRIVER', 'imagick') === 'imagick' && extension_loaded('imagick')
+        ? ImagickDriver::class
+        : GdDriver::class,
 
     /*
     |--------------------------------------------------------------------------
