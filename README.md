@@ -169,6 +169,25 @@ Unlike previous versions, `update.sh` refuses to run when the working tree has
 local changes rather than discarding them with `git reset --hard`. Commit or
 stash your edits first.
 
+### Upgrading from a pre-Laravel-13 install
+
+Installs made before this release run PHP 8.1, and this release needs 8.3 or
+newer, so `update.sh` cannot upgrade them in place — it checks the PHP version
+first and stops before changing anything.
+
+Re-run the installer instead. It is safe to run again, and it upgrades PHP,
+installs what is missing, and leaves your database and posters alone:
+
+```bash
+wget -O install.sh https://raw.githubusercontent.com/devMikeFrancis/digital-movie-poster/main/install.sh
+chmod u+x install.sh
+sudo ./install.sh $USER
+```
+
+Afterwards the settings screen will ask you to create an administrator account,
+and your media-server credentials get encrypted in place on the first
+`php artisan migrate`.
+
 ### Migrating an existing MariaDB install to SQLite
 
 New installs use SQLite. Existing MariaDB installs keep working — uncomment the
