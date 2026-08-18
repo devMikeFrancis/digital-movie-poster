@@ -36,22 +36,6 @@
                         <div class="tabs-content">
                             <div id="general" class="tab-content active">
                                 <div class="mb-5">
-                                    <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
-                                        >TMDB Api Key v3</label
-                                    >
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="tmdb-v3"
-                                        aria-describedby="tmdb-v3Help"
-                                        v-model="settings.tmdb_api_key_v3"
-                                    />
-                                    <div id="tmdb-v3Help" class="text-gray-400 text-sm"></div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <div class="mb-5">
                                     <label
                                         for="random"
                                         class="text-gray-300 block mb-2 font-bold flex items-center"
@@ -746,6 +730,60 @@
                                 </div>
                             </div>
                             <div id="sources" class="tab-content">
+                                <p class="text-gray-400 text-sm mb-7">
+                                    Posters reach the display two ways, and they can be used
+                                    together. Add titles yourself and DMP looks up the artwork and
+                                    details, or point DMP at a media server and let it sync your
+                                    library.
+                                </p>
+
+                                <h3 class="text-white font-bold text-lg mb-1">
+                                    Adding posters yourself
+                                </h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    Used when you add a poster on the Posters screen, either by
+                                    searching for a title or by entering an IMDB ID. No media
+                                    server is needed for this.
+                                </p>
+
+                                <div class="mb-5">
+                                    <label for="tmdb-v3" class="text-gray-300 block mb-2 font-bold"
+                                        >TMDB Api Key v3</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="tmdb-v3"
+                                        aria-describedby="tmdb-v3Help"
+                                        v-model="settings.tmdb_api_key_v3"
+                                    />
+                                    <div id="tmdb-v3Help" class="text-gray-400 text-sm">
+                                        Required to search for titles and to fill in artwork,
+                                        ratings, runtime and trailers. DMP identifies titles by
+                                        their IMDB ID, but IMDB has no public API - TMDB is what
+                                        answers, and it accepts IMDB IDs.
+                                        <a
+                                            class="underline hover:text-white"
+                                            href="https://www.themoviedb.org/settings/api"
+                                            target="_blank"
+                                            rel="noopener"
+                                            >Get a free key</a
+                                        >.
+                                    </div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <h3 class="text-white font-bold text-lg mb-1">
+                                    Syncing from a media library
+                                </h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    Optional, and only needed if you want DMP to follow a media
+                                    server. Enabling one does two jobs: it syncs that library into
+                                    your poster list, and it can switch the display to whatever is
+                                    playing right now. Leave these off if you add posters yourself.
+                                </p>
+
                                 <div class="mb-5">
                                     <label
                                         for="plex-service"
@@ -761,7 +799,10 @@
                                         <span class="ml-2">Enable Plex Service</span></label
                                     >
                                     <div id="plex-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Plex media server for posters.
+                                        Syncs the Plex libraries you pick below into your poster
+                                        list, and can switch the display to whatever Plex is
+                                        playing. Choose which of the two you want with the
+                                        checkboxes further down.
                                     </div>
                                 </div>
                                 <div class="mb-5">
@@ -1060,7 +1101,8 @@
                                         <span class="ml-2">Enable Jellyfin Service</span></label
                                     >
                                     <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Jellyfin media server for posters.
+                                        Syncs your Jellyfin movie library into your poster list,
+                                        and switches the display to whatever Jellyfin is playing.
                                     </div>
                                 </div>
 
@@ -1114,7 +1156,8 @@
                                         <span class="ml-2">Enable Kodi Service</span></label
                                     >
                                     <div id="kodi-serviceHelp" class="text-gray-400 text-sm">
-                                        Use Kodi media server for posters.
+                                        Syncs your Kodi movie library into your poster list, and
+                                        switches the display to whatever Kodi is playing.
                                     </div>
                                 </div>
 
