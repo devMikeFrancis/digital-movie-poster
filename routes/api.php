@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NowPlayingController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TmdbController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,6 +64,10 @@ Route::middleware('dmp.auth')->group(function () {
     Route::post('/show-in-rotation', [PosterController::class, 'showInRotation']);
 
     Route::get('/service-sections/{service}', [PosterController::class, 'getServiceSections']);
+
+    // Title lookup for the poster editor. Spends the operator's TMDB key.
+    Route::get('/tmdb/search', [TmdbController::class, 'search']);
+    Route::get('/tmdb/title', [TmdbController::class, 'title']);
 
     Route::get('/cache-posters', [ApiController::class, 'cache']);
     Route::post('/now-playing', [ApiController::class, 'dmpBroadcast']);

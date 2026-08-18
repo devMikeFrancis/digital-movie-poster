@@ -18,6 +18,13 @@
                                 />
                             </div>
                             <div class="lg:col-span-8">
+                                <title-lookup
+                                    :media-type="poster.media_type"
+                                    @selected="applyTitle"
+                                ></title-lookup>
+
+                                <hr class="border-grey-500 mb-5" />
+
                                 <div class="mb-5">
                                     <label
                                         for="movie-title"
@@ -25,16 +32,47 @@
                                         >IMDB ID</label
                                     >
 
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="movie-title"
-                                        v-model="poster.imdb_id"
-                                        required
-                                    />
+                                    <div class="flex gap-2">
+                                        <input
+                                            type="text"
+                                            class="text-black w-full"
+                                            id="movie-title"
+                                            v-model="poster.imdb_id"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn text-black bg-gray-300 px-4 rounded-sm hover:bg-gray-100 whitespace-nowrap"
+                                            :disabled="fetching"
+                                            @click.prevent="fetchMedia"
+                                        >
+                                            {{ fetching ? 'Fetching…' : 'Fetch media' }}
+                                        </button>
+                                    </div>
                                     <div id="movie-posterHelp" class="text-gray-400 text-sm">
                                         If used, TMDB API will override movie data for this poster
-                                        except theme music and settings.
+                                        except theme music and settings. "Fetch media" pulls it in
+                                        now so you can check the artwork before saving.
+                                    </div>
+                                    <p
+                                        v-if="fetchMessage"
+                                        class="text-sm mt-2"
+                                        :class="fetchFailed ? 'text-red-400' : 'text-gray-400'"
+                                    >
+                                        {{ fetchMessage }}
+                                    </p>
+
+                                    <div v-if="fetchedArtwork" class="mt-3 flex items-start gap-3">
+                                        <img
+                                            :src="fetchedArtwork"
+                                            alt="Artwork from TMDB"
+                                            width="120"
+                                            class="rounded-sm"
+                                        />
+                                        <div class="text-gray-400 text-sm">
+                                            Artwork found on TMDB. It is downloaded and resized when
+                                            you save.
+                                        </div>
                                     </div>
                                 </div>
 
@@ -384,12 +422,17 @@
 <script>
 import axios from 'axios';
 import MainNav from '../partials/MainNav.vue';
+import TitleLookup from '@/components/title-lookup.vue';
 
 export default {
     data: function () {
         return {
             loading: false,
             saving: false,
+            fetching: false,
+            fetchMessage: '',
+            fetchFailed: false,
+            fetchedArtwork: '',
             errors: [],
             recaching: false,
             debounce: false,
@@ -416,9 +459,72 @@ export default {
             socket: '',
         };
     },
-    components: { MainNav },
+    components: { MainNav, TitleLookup },
     watch: {},
     methods: {
+        /**
+         * Fill the form in from a title the operator picked in the search
+         * results, or fetched by IMDB id.
+         */
+        applyTitle(title) {
+            this.poster.imdb_id = title.imdb_id || this.poster.imdb_id;
+            this.poster.media_type = title.media_type || this.poster.media_type;
+            this.poster.name = title.title || this.poster.name;
+
+            if (title.mpaa_rating) {
+                this.poster.mpaa_rating = title.mpaa_rating;
+            }
+            if (title.audience_rating !== null && title.audience_rating !== undefined) {
+                this.poster.audience_rating = title.audience_rating;
+            }
+            if (title.runtime) {
+                this.poster.runtime = title.runtime;
+            }
+            if (title.trailer_id) {
+                this.poster.trailer_path = title.trailer_id;
+            }
+
+            this.fetchedArtwork = title.preview_url || '';
+            this.fetchFailed = false;
+            this.fetchMessage = title.imdb_id
+                ? 'Filled in from TMDB. Check it over, then save.'
+                : 'Filled in from TMDB, but it has no IMDB ID - the artwork will not re-download on save.';
+        },
+
+        /**
+         * Pull the artwork and metadata for the IMDB ID already in the field,
+         * so it can be checked before saving rather than appearing afterwards.
+         */
+        fetchMedia() {
+            const imdbId = (this.poster.imdb_id || '').trim();
+
+            if (!imdbId) {
+                this.fetchFailed = true;
+                this.fetchMessage = 'Enter an IMDB ID first, or use the search above.';
+                return;
+            }
+
+            this.fetching = true;
+            this.fetchMessage = '';
+            this.fetchFailed = false;
+            this.fetchedArtwork = '';
+
+            axios
+                .get('/api/tmdb/title', {
+                    params: { imdb_id: imdbId, media_type: this.poster.media_type },
+                })
+                .then(({ data }) => this.applyTitle(data.title))
+                .catch((error) => {
+                    const body = error.response && error.response.data;
+                    this.fetchFailed = true;
+                    this.fetchMessage =
+                        (body && body.message) || 'Could not fetch that title. Please try again.';
+                })
+                .finally(() => {
+                    this.fetching = false;
+                });
+        },
+
         getPoster(id) {
             axios
                 .get('/api/posters/' + id)

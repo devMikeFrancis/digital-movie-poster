@@ -33,6 +33,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | TMDB
+    |--------------------------------------------------------------------------
+    |
+    | Where title lookups go. Overridable so the integration can be pointed at
+    | a stub or a caching proxy; the API key itself lives in Settings.
+    |
+    */
+
+    'tmdb' => [
+        'base_url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
+        'image_base_url' => env('TMDB_IMAGE_BASE_URL', 'https://image.tmdb.org/t/p'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Motion Sensor
     |--------------------------------------------------------------------------
     |
