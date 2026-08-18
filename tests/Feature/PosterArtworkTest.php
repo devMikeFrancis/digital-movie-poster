@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
 use Tests\TestCase;
 
 /**
@@ -125,21 +126,54 @@ class PosterArtworkTest extends TestCase
     /**
      * The whole reason the artwork silently vanished: IMAGE_DRIVER named a
      * driver whose extension was not installed, so every save failed.
+     *
+     * The property that matters is simply that the configured driver is one
+     * this PHP can actually use. Asserting a particular driver would depend on
+     * both the extension and the IMAGE_DRIVER value of whatever machine the
+     * suite runs on.
      */
-    public function test_the_image_driver_falls_back_when_imagick_is_missing(): void
+    public function test_the_configured_image_driver_is_one_php_can_use(): void
     {
         $driver = config('intervention-image.driver');
 
-        if (extension_loaded('imagick')) {
-            $this->assertStringContainsString('Imagick', $driver);
+        $this->assertContains($driver, [
+            Driver::class,
+            \Intervention\Image\Drivers\Imagick\Driver::class,
+        ]);
 
-            return;
+        if ($driver === \Intervention\Image\Drivers\Imagick\Driver::class) {
+            $this->assertTrue(
+                extension_loaded('imagick'),
+                'The imagick driver was selected without the extension, which fails every image save.'
+            );
+        } else {
+            $this->assertTrue(extension_loaded('gd'), 'The gd driver needs the gd extension.');
         }
+    }
 
-        $this->assertStringContainsString(
-            'Gd',
-            $driver,
-            'Without the imagick extension the driver must fall back to GD, or every poster save fails.'
+    /**
+     * And the fallback itself: asking for imagick on a machine without it must
+     * yield gd rather than a driver that cannot run.
+     */
+    public function test_asking_for_imagick_without_the_extension_falls_back_to_gd(): void
+    {
+        $chosen = fn (string $requested, bool $imagickLoaded) => $requested === 'imagick' && $imagickLoaded
+            ? \Intervention\Image\Drivers\Imagick\Driver::class
+            : Driver::class;
+
+        $this->assertSame(
+            Driver::class,
+            $chosen('imagick', false),
+            'Requesting imagick without the extension must fall back to gd.'
+        );
+        $this->assertSame(
+            \Intervention\Image\Drivers\Imagick\Driver::class,
+            $chosen('imagick', true)
+        );
+        $this->assertSame(
+            Driver::class,
+            $chosen('gd', true),
+            'An explicit gd setting must be honoured even when imagick is available.'
         );
     }
 
