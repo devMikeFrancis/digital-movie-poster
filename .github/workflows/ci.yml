@@ -85,10 +85,14 @@ jobs:
       - name: Check the socket server parses
         run: node --check socketserver/server.js
 
-  shellcheck:
-    name: Shell scripts
+  scripts:
+    name: Shell and Python scripts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
       - name: Lint install.sh and update.sh
         run: shellcheck --severity=warning install.sh update.sh
+
+      - name: Check the motion sensor script parses
+        run: python3 -m py_compile hdmi-control.py

@@ -136,6 +136,31 @@ To drive the display by hand:
 php artisan dmp:display-power standby
 ```
 
+### Motion sensor (optional)
+
+With a PIR sensor wired to a GPIO pin, DMP can blank the display when the room
+is empty. The sensor only ever narrows the hours above — it will not switch the
+display on outside them.
+
+In `.env`:
+
+```bash
+DMP_MOTION_SENSOR=true
+DMP_MOTION_GPIO_PIN=21
+DMP_MOTION_IDLE_MINUTES=5
+```
+
+Then start the service:
+
+```bash
+sudo systemctl enable --now dmp-motion.service
+```
+
+Check what it is doing with `php artisan dmp:motion --status`, or
+`journalctl -u dmp-motion -f` for the sensor's own log. If the sensor is
+enabled but never reports, the display stays on — a miswired sensor costs you
+the power saving, not the display.
+
 ## Updating
 
 Visit the `About` page to check for updates, or run `./update.sh` on the device.

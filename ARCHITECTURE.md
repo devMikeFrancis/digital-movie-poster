@@ -215,10 +215,24 @@ from the scheduler every minute, so:
   is not pestered every minute.
 
 This needs `* * * * * cd /var/www/html && php artisan schedule:run` in cron;
-`install.sh` adds it. Note that `hdmi-control.py` — the optional PIR motion
-sensor script — also drives CEC directly and is unaware of this schedule. The
-two will fight on installs that use both; folding the motion sensor into the
-same service would settle that.
+`install.sh` adds it.
+
+The optional PIR sensor feeds the same service rather than driving CEC on its
+own. `hdmi-control.py` reports movement with `php artisan dmp:motion`, and
+`DisplayPowerService` treats presence as a second input: the schedule decides
+when the display *may* be on, the sensor decides whether it *should* be right
+now. Motion cannot switch the display on outside the configured hours.
+
+Previously the script called `cec-client` itself while the schedule ran from
+the browser, so on an install using both the sensor would blank the screen and
+the schedule would switch it straight back on. The script also imported
+`RPi.GPIO`, which the installer never installed and which has no Pi 5 support,
+so in practice it exited immediately on a fresh install. It uses `gpiozero`
+now, and runs under systemd (`dmp-motion.service`) rather than an unmanaged
+`@reboot` cron entry, so it restarts on failure and logs to the journal.
+
+A sensor that is enabled but has never reported is treated as "someone is
+there". A miswired sensor should cost the power saving, not the display.
 
 ### 10. Smaller things
 
@@ -228,9 +242,6 @@ same service would settle that.
 - **Fonts load from Google Fonts over the network.** For an appliance that may
   boot without internet, self-host Inter alongside the ten fonts already
   vendored in `resources/fonts/`.
-- **`hdmi-control.py` runs from `@reboot` cron** and is unmanaged. A small
-  systemd unit would give it restart-on-failure and logs, and it should share
-  `DisplayPowerService` rather than shelling out to `cec-client` itself.
 - **The socket server keeps voting state in memory.** A restart loses an
   in-progress vote; it also assumes a single instance.
 - **No test covers the sync services.** They are the most complex code in the

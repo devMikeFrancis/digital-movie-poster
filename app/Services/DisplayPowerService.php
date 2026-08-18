@@ -32,6 +32,11 @@ class DisplayPowerService
     private const STATE_KEY = 'dmp.display.power_state';
 
     /**
+     * When the optional PIR sensor last saw someone.
+     */
+    private const MOTION_KEY = 'dmp.display.last_motion';
+
+    /**
      * Whether the display should be powered on at the given moment.
      *
      * A missing start or end time means "no schedule configured", and the
@@ -45,11 +50,27 @@ class DisplayPowerService
             return self::ON;
         }
 
+        $now = $now ? $now->copy() : Carbon::now();
+
+        if (! $this->withinSchedule($settings, $now)) {
+            return self::STANDBY;
+        }
+
+        // Inside the hours the display may be on; the sensor, if fitted,
+        // decides whether it should be right now.
+        return $this->presenceDetected($now) ? self::ON : self::STANDBY;
+    }
+
+    /**
+     * Whether the configured hours currently allow the display to be on.
+     */
+    public function withinSchedule(Setting $settings, ?CarbonInterface $now = null): bool
+    {
         $start = $this->parseTime($settings->start_power_time);
         $end = $this->parseTime($settings->end_power_time);
 
         if ($start === null || $end === null) {
-            return self::ON;
+            return true;
         }
 
         $now = $now ? $now->copy() : Carbon::now();
@@ -57,11 +78,56 @@ class DisplayPowerService
 
         // An end time earlier than the start time means the window runs past
         // midnight, e.g. on at 20:00 and off at 02:00.
-        $within = $start <= $end
+        return $start <= $end
             ? ($minutes >= $start && $minutes < $end)
             : ($minutes >= $start || $minutes < $end);
+    }
 
-        return $within ? self::ON : self::STANDBY;
+    /**
+     * Whether someone appears to be in the room.
+     *
+     * Always true when no sensor is configured. Also true when a sensor is
+     * configured but has never reported - a sensor that is unplugged or
+     * miswired should cost the power saving, not the display.
+     */
+    public function presenceDetected(?CarbonInterface $now = null): bool
+    {
+        if (! config('dmp.motion.enabled')) {
+            return true;
+        }
+
+        $last = Cache::get(self::MOTION_KEY);
+
+        if (! $last) {
+            return true;
+        }
+
+        $now = $now ? $now->copy() : Carbon::now();
+        $idleMinutes = max(1, (int) config('dmp.motion.idle_minutes', 5));
+
+        return $now->lessThan(Carbon::parse($last)->addMinutes($idleMinutes));
+    }
+
+    /**
+     * Note that the sensor has just seen movement.
+     */
+    public function recordMotion(?CarbonInterface $at = null): void
+    {
+        Cache::put(
+            self::MOTION_KEY,
+            ($at ? $at->copy() : Carbon::now())->toIso8601String(),
+            Carbon::now()->addDay()
+        );
+    }
+
+    /**
+     * When the sensor last saw movement, if ever.
+     */
+    public function lastMotionAt(): ?CarbonInterface
+    {
+        $last = Cache::get(self::MOTION_KEY);
+
+        return $last ? Carbon::parse($last) : null;
     }
 
     /**
@@ -119,6 +185,14 @@ class DisplayPowerService
     public function forgetState(): void
     {
         Cache::forget(self::STATE_KEY);
+    }
+
+    /**
+     * Forget the recorded motion, so presence falls back to "unknown".
+     */
+    public function forgetMotion(): void
+    {
+        Cache::forget(self::MOTION_KEY);
     }
 
     /**

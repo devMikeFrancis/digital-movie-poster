@@ -223,17 +223,55 @@ log "Configuring HDMI-CEC display control"
 # installer used 'chmod 777 /dev/vchiq', which opened it to every account.
 usermod -a -G video "$DMP_USER"
 
-# Two cron entries:
-#  - the Laravel scheduler, which applies the display on/off hours every minute
-#    (this used to run in the kiosk browser)
-#  - the optional motion-sensor script, for installs with a PIR sensor on GPIO 21
+# The Laravel scheduler applies the display on/off hours every minute. This
+# used to run in the kiosk browser.
 SCHEDULER_LINE="* * * * * cd ${APP_DIR} && php artisan schedule:run >> /dev/null 2>&1"
-REBOOT_LINE="@reboot python3 ${APP_DIR}/hdmi-control.py"
 (
-    crontab -u "$DMP_USER" -l 2>/dev/null | grep -v -e 'hdmi-control.py' -e 'artisan schedule:run' || true
+    crontab -u "$DMP_USER" -l 2>/dev/null \
+        | grep -v -e 'hdmi-control.py' -e 'artisan schedule:run' || true
     echo "$SCHEDULER_LINE"
-    echo "$REBOOT_LINE"
 ) | crontab -u "$DMP_USER" -
+
+# ---------------------------------------------------------------------------
+# Optional PIR motion sensor
+# ---------------------------------------------------------------------------
+# Off unless DMP_MOTION_SENSOR=true is set in .env. The sensor reports movement
+# to the application rather than driving cec-client itself, so it and the
+# schedule cannot disagree about the display's power state.
+log "Installing the motion sensor service (inactive unless enabled in .env)"
+apt-get install -y --no-install-recommends python3-gpiozero python3-lgpio
+
+cat > /etc/systemd/system/dmp-motion.service <<EOF
+[Unit]
+Description=Digital Movie Poster motion sensor
+After=network.target
+Documentation=https://github.com/devMikeFrancis/digital-movie-poster
+
+[Service]
+Type=simple
+User=${DMP_USER}
+WorkingDirectory=${APP_DIR}
+Environment=DMP_APP_DIR=${APP_DIR}
+ExecStart=/usr/bin/python3 ${APP_DIR}/hdmi-control.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+
+if grep -qE '^DMP_MOTION_SENSOR=true' "${APP_DIR}/.env" 2>/dev/null; then
+    systemctl enable --now dmp-motion.service
+    echo "Motion sensor service started."
+else
+    systemctl disable --now dmp-motion.service >/dev/null 2>&1 || true
+    echo "Motion sensor not enabled. To use one, set DMP_MOTION_SENSOR=true in"
+    echo ".env and run: sudo systemctl enable --now dmp-motion.service"
+fi
 
 # ---------------------------------------------------------------------------
 # Kiosk

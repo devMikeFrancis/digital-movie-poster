@@ -33,6 +33,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Motion Sensor
+    |--------------------------------------------------------------------------
+    |
+    | Optional PIR sensor for blanking the display when nobody is around. It
+    | only ever narrows the on/off hours: the schedule decides when the display
+    | may be on, and the sensor decides whether it should be right now.
+    |
+    | If the sensor is enabled but never reports, the display is left on. A
+    | miswired sensor should cost you the power saving, not the display.
+    |
+    */
+
+    'motion' => [
+        'enabled' => env('DMP_MOTION_SENSOR', false),
+        'gpio_pin' => env('DMP_MOTION_GPIO_PIN', 21),
+        'idle_minutes' => env('DMP_MOTION_IDLE_MINUTES', 5),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Update Channel
     |--------------------------------------------------------------------------
     |
