@@ -161,6 +161,17 @@ DMP is built as a LAN appliance and **has no login screen**. Anything that can
 reach the device can change settings and delete posters. Do not expose it to
 the internet.
 
+Media-server credentials (Plex and Jellyfin tokens, the Kodi login, and both
+TMDB keys) are **encrypted at rest** using `APP_KEY`, so a copied
+`database.sqlite` is not also a working set of tokens.
+
+> **Do not regenerate `APP_KEY` on a running install.** It is the decryption
+> key for those credentials. `php artisan key:generate` on an existing install
+> makes them unreadable, and you will have to re-enter them in Settings. The
+> installer only mints a key when `.env` does not already have one. To rotate
+> deliberately: clear the credential fields in Settings, run `key:generate`,
+> then re-enter them.
+
 Media-server credentials stay on the server. The display asks DMP what is
 playing (`/api/now-playing/{service}`) instead of calling Plex or Jellyfin
 itself, and artwork is proxied through

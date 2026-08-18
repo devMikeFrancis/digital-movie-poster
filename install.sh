@@ -168,7 +168,14 @@ chmod 664 database/database.sqlite
 chmod 775 database
 
 log "Preparing the application"
-sudo -u "$DMP_USER" php artisan key:generate --force
+# Only mint APP_KEY when there isn't one. Rotating it would make the encrypted
+# media-server credentials in the settings table permanently unreadable, and
+# this script is meant to be safe to re-run.
+if grep -qE '^APP_KEY=.+' .env; then
+    echo "APP_KEY already set, leaving it alone."
+else
+    sudo -u "$DMP_USER" php artisan key:generate --force
+fi
 sudo -u "$DMP_USER" php artisan storage:link
 sudo -u "$DMP_USER" php artisan migrate --force
 sudo -u "$DMP_USER" php artisan optimize

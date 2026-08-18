@@ -68,9 +68,17 @@ The trade-off: Plex now-playing used to be event-driven and is now polled, so
 it reacts within ~5s rather than instantly. Pushing these events over the Redis
 / socket.io channel the app already runs would restore that — see #5.
 
-Still worth doing: the credentials sit in plain text in the SQLite file.
-`encrypted` casts on those columns, or moving them to `.env`, would mean a
-stolen database file is not also a set of working media-server tokens.
+They are also encrypted at rest. `App\Casts\EncryptedCredential` covers the six
+credential columns, so a copied `database.sqlite` yields ciphertext rather than
+working tokens. The cast is deliberately more forgiving than Laravel's built-in
+`encrypted`: values that are not already ciphertext pass through untouched
+(which makes the encrypting migration idempotent), and anything that fails to
+decrypt degrades to `null` with a log line instead of throwing — a lost
+`APP_KEY` should mean "re-enter your Plex token", not a 500 on the
+unauthenticated endpoint the display polls.
+
+The cost is that `APP_KEY` is now load-bearing: rotating it makes the stored
+credentials unreadable. `install.sh` only mints a key when `.env` has none.
 
 ### 2. There is no login
 
