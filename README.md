@@ -1,6 +1,11 @@
 # Digital Movie Poster (DMP)
 
-The web application creates a digital movie poster display for use on LED screens. Intended to run on a Raspberry Pi 4, but will run on any web server with Apache/NGINX, PHP 8.1+, and MySQL/Postgres.
+The web application creates a digital movie poster display for use on LED screens. Intended to run on a Raspberry Pi 4, but will run on any web server with Apache/NGINX and PHP 8.3+.
+
+Built on Laravel 13, Vue 3 and Tailwind 4. Data lives in a SQLite file by
+default, so there is no database server to install or maintain. See
+[ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together and where
+the rough edges are.
 
 ## Features
 
@@ -25,6 +30,7 @@ Any help or contributions would be greatly appreciated. Please submit pull reque
 
 1. Pi 4 with at least 2GB of RAM. 4GB recommended.
 2. 16G or higher SD card
+3. Raspberry Pi OS Bookworm (Debian 12) or newer
 
 ## Self Installation
 
@@ -63,24 +69,40 @@ You can access the settings via any web browser.
 
 `http://raspberrypi.local/posters` or `http://the ip address of the Pi/posters`
 
-## Using Laravel Sail (Docker)
+## Local development with Docker
 
-1. In the project root run `cp .env.example .env`
-2. In the project root folder edit the `.env` file. Set `DB_HOST` to `mariadb`
-3. Then run the following commands:
-    - `./vendor/bin/sail artisan key:generate`
-    - `./vendor/bin/sail artisan storage:link`
-    - `./vendor/bin/sail composer install`
-    - `./vendor/bin/sail artisan migrate`
-    - `./vendor/bin/sail npm install`
-    - `./vendor/bin/sail npm run build`
-    - `chgrp -R www-data storage bootstrap/cache`
-    - `chmod -R ug+rwx storage bootstrap/cache`
-4. In the project root folder run `./vendor/bin/sail up -d`. When you run this command for the very first time it will install the docker containers and start the site.
-5. After the container first boots it may take 30-45 secs for the site to load.
-6. Visit `http://localhost:8074` in your browser.
-7. If you are loading up the site using a remote browser that is connected to a TV add the `rotate` param to the URL like this: `http://localhost:8074?rotate=true`
-8. If you need more help on Laravel Sail, please visit `https://laravel.com/docs/sail`
+1. `cp .env.example .env`
+2. `docker compose build`
+3. `docker compose up -d`
+4. Then, inside the app container:
+    - `docker compose exec app composer install`
+    - `docker compose exec app php artisan key:generate`
+    - `docker compose exec app php artisan migrate`
+    - `docker compose exec app php artisan storage:link`
+    - `docker compose exec app npm install && docker compose exec app npm run build`
+5. Visit `http://localhost:8074`.
+6. If you are loading the site in a browser attached to a TV, add the `rotate`
+   param: `http://localhost:8074?rotate=true`
+
+## Local development without Docker
+
+You need PHP 8.3+ (with `gd` or `imagick`, `sqlite3`, `intl`, `zip`, `mbstring`),
+Node 22+, and Redis if you want the socket features.
+
+```bash
+cp .env.example .env
+composer install
+npm install
+php artisan key:generate
+php artisan migrate
+php artisan storage:link
+npm run build
+php artisan serve          # http://127.0.0.1:8000
+node socketserver/server.js # separate terminal, needs Redis
+```
+
+Run the test suite with `php artisan test`, and check formatting with
+`./vendor/bin/pint`.
 
 ---
 
@@ -96,11 +118,69 @@ Enter your TMDB api key in the DMP settings.
 
 ## Updating
 
-Visit the `About` page to check for updates.
+Visit the `About` page to check for updates, or run `./update.sh` on the device.
+
+Unlike previous versions, `update.sh` refuses to run when the working tree has
+local changes rather than discarding them with `git reset --hard`. Commit or
+stash your edits first.
+
+### Migrating an existing MariaDB install to SQLite
+
+New installs use SQLite. Existing MariaDB installs keep working — uncomment the
+`DB_CONNECTION=mysql` block in your `.env`. To move across:
+
+Leave `DB_HOST`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` in `.env`
+while you do this — the copy step still needs them to read the old database.
+Back up `database/` and take a `mysqldump` first.
+
+```bash
+php artisan down
+# 1. Switch the default connection to SQLite, keeping the mysql credentials
+sed -i 's/^DB_CONNECTION=mysql/DB_CONNECTION=sqlite/' .env
+touch database/database.sqlite
+php artisan migrate --force
+# 2. Copy the two tables that hold your data
+php artisan tinker --execute='
+    $old = DB::connection("mysql");
+    foreach (["settings", "posters"] as $table) {
+        DB::table($table)->delete();
+        foreach ($old->table($table)->get() as $row) {
+            DB::table($table)->insert((array) $row);
+        }
+    }
+'
+php artisan up
+```
+
+Poster images live on disk under `storage/app/public/posters` and are not
+affected.
+
+## Security
+
+DMP is built as a LAN appliance and **has no login screen**. Anything that can
+reach the device can change settings and delete posters. Do not expose it to
+the internet.
+
+For installs you drive over the API, you can require a token on every write and
+on the two endpoints that shell out on the host:
+
+```bash
+php artisan dmp:token "my integration"   # prints the token once
+```
+
+Then set `DMP_API_REQUIRE_TOKEN=true` in `.env` and send the token as
+`Authorization: Bearer <token>`. Read-only endpoints stay open so the kiosk
+display keeps working.
+
+Note that the bundled admin UI cannot send a token, so enabling this locks the
+UI out of its own write endpoints. See
+[ARCHITECTURE.md](ARCHITECTURE.md#2-there-is-no-login) for the fuller picture.
 
 ## Now Playing API
 
-You can send poster data to certain endpoints to tigger a `now-playing` or `stopped` event.
+You can send poster data to certain endpoints to trigger a `now-playing` or `stopped` event.
+
+These endpoints require a bearer token when `DMP_API_REQUIRE_TOKEN=true`.
 
 | Method | Endpoint           | Data                   | Description                               |
 | :----- | :----------------- | :--------------------- | ----------------------------------------- |
