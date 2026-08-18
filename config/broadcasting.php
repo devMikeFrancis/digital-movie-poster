@@ -30,6 +30,17 @@ return [
 
     'connections' => [
 
+        /*
+         * DMP broadcasts to Redis, and the Node socket server in socketserver/
+         * subscribes to it and relays events to connected browsers. Laravel 13
+         * no longer ships this connection in the default config, but the
+         * RedisBroadcaster driver is still part of the framework.
+         */
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('BROADCAST_REDIS_CONNECTION', 'default'),
+        ],
+
         'reverb' => [
             'driver' => 'reverb',
             'key' => env('REVERB_APP_KEY'),
