@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SettingsRequest;
 use App\Http\Resources\PublicSettingResource;
 use App\Models\Setting;
+use App\Services\ApplicationUpdater;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Process\Process;
 
 class SettingController extends Controller
 {
@@ -39,27 +39,12 @@ class SettingController extends Controller
         return response()->json(['saved' => 1]);
     }
 
-    public function updateApplication()
+    public function updateApplication(ApplicationUpdater $updater)
     {
-        // Run it with bash, not sh: the script uses [[ ]] and (( )), which
-        // dash - /bin/sh on Debian - cannot parse.
-        $process = new Process(['bash', base_path().'/update.sh'], base_path());
-        $process->setTimeout(3600);
+        $result = $updater->run();
 
-        // The web server's PATH does not necessarily include the PHP binary
-        // that is serving this request, so hand it over explicitly rather than
-        // letting the script guess.
-        $process->setEnv([
-            'DMP_PHP' => PHP_BINARY,
-            'PATH' => dirname(PHP_BINARY).PATH_SEPARATOR.(getenv('PATH') ?: '/usr/local/bin:/usr/bin:/bin'),
-        ]);
-
-        $process->run();
-
-        $output = trim($process->getOutput()."\n".$process->getErrorOutput());
-
-        if (! $process->isSuccessful()) {
-            Log::warning('Update script failed: '.$output);
+        if (! $result['success']) {
+            Log::warning('Update script failed: '.$result['output']);
 
             // This used to return 200 with success:false, so the About page
             // took the .then() branch and told the operator the update had
@@ -67,13 +52,13 @@ class SettingController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'The update did not run.',
-                'output' => $output,
+                'output' => $result['output'],
             ], 500);
         }
 
-        Log::info($output);
+        Log::info($result['output']);
 
-        return response()->json(['success' => true, 'output' => $output]);
+        return response()->json(['success' => true, 'output' => $result['output']]);
     }
 
     public function checkUpdate()

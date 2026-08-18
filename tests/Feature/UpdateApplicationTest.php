@@ -2,39 +2,68 @@
 
 namespace Tests\Feature;
 
+use App\Services\ApplicationUpdater;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
+/**
+ * The update endpoint.
+ *
+ * ApplicationUpdater is always faked here. Letting the real one run would
+ * execute a deploy against the checkout the tests are running from - it takes
+ * the app down, pulls, and runs 'composer install --no-dev', which removes
+ * PHPUnit while PHPUnit is using it.
+ */
 class UpdateApplicationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * The About page decides between its success and failure branches on the
-     * HTTP status. This endpoint used to answer 200 with success:false when
-     * the script had refused to run, so the operator was told the update had
-     * completed while nothing had happened.
-     */
-    public function test_a_failed_update_reports_a_failure_status_and_the_script_output(): void
+    private function fakeUpdater(bool $success, string $output): void
     {
-        // update.sh stops before touching anything when PHP is too old, which
-        // is what an install predating this release will hit.
-        $response = $this->actingAsAdmin()->getJson('/api/update-application');
+        $this->instance(ApplicationUpdater::class, new class($success, $output) extends ApplicationUpdater
+        {
+            public function __construct(private bool $success, private string $output) {}
 
-        if ($response->getStatusCode() === 200) {
-            $this->assertTrue($response->json('success'), 'A 200 must mean the update actually ran.');
+            public function run(): array
+            {
+                return ['success' => $this->success, 'output' => $this->output];
+            }
+        });
+    }
 
-            return;
-        }
+    /**
+     * The About page picks its success or failure branch from the status code,
+     * so a refused update has to be a failure status. It used to answer 200
+     * with success:false, and the page reported "Update complete".
+     */
+    public function test_a_refused_update_answers_500_with_the_script_output(): void
+    {
+        $this->fakeUpdater(false, "Deploy started\nThis release needs PHP 8.3 or newer");
 
-        $response->assertStatus(500)
+        $this->actingAsAdmin()
+            ->getJson('/api/update-application')
+            ->assertStatus(500)
             ->assertJsonPath('success', false)
-            ->assertJsonStructure(['success', 'message', 'output']);
+            ->assertJsonPath('message', 'The update did not run.')
+            ->assertJsonFragment(['output' => "Deploy started\nThis release needs PHP 8.3 or newer"]);
+    }
+
+    public function test_a_successful_update_answers_200(): void
+    {
+        $this->fakeUpdater(true, 'Deploy finished');
+
+        $this->actingAsAdmin()
+            ->getJson('/api/update-application')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('output', 'Deploy finished');
     }
 
     public function test_the_update_endpoint_requires_authentication(): void
     {
+        // No fake bound: an unauthenticated request must be turned away before
+        // anything is executed.
         $this->getJson('/api/update-application')->assertUnauthorized();
     }
 
@@ -46,9 +75,6 @@ class UpdateApplicationTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $version['latest']);
         $this->assertNotEmpty($version['changelog']);
         $this->assertNotEmpty($version['past_updates']);
-
-        // The previous release has to stay in the history so devices can see
-        // what changed.
         $this->assertSame('1.7.153', $version['past_updates'][0]['version']);
     }
 
