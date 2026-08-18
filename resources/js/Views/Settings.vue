@@ -49,6 +49,49 @@
                             </div>
                         </div>
 
+                        <div v-if="pendingLeave" class="modal">
+                            <div class="modal-overlay" @click="stayOnPage"></div>
+                            <div class="modal-content max-w-lg rounded-sm overflow-hidden">
+                                <div class="inner p-6">
+                                    <header class="modal-header p-4">
+                                        <h4 class="text-xl font-bold text-white">
+                                            You have unsaved settings
+                                        </h4>
+                                    </header>
+                                    <div class="modal-body px-4 pb-2">
+                                        <p class="text-gray-300">
+                                            Leaving this page now will discard the changes you have
+                                            made.
+                                        </p>
+                                    </div>
+                                    <footer class="modal-footer flex flex-wrap justify-end items-center gap-3 p-4">
+                                        <button
+                                            type="button"
+                                            class="text-gray-300 px-3 py-2 rounded-sm hover:text-white"
+                                            @click.prevent="stayOnPage"
+                                        >
+                                            Keep editing
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-white px-4 py-2 rounded-sm bg-gray-600 hover:bg-gray-500"
+                                            @click.prevent="leaveWithoutSaving"
+                                        >
+                                            Discard changes
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="text-white px-4 py-2 rounded-sm bg-blue-600 hover:bg-blue-500"
+                                            :disabled="saving"
+                                            @click.prevent="saveThenLeave"
+                                        >
+                                            {{ saving ? 'Saving…' : 'Save and leave' }}
+                                        </button>
+                                    </footer>
+                                </div>
+                            </div>
+                        </div>
+
                         <div
                             v-if="errors.length || saveFailed"
                             class="bg-red-900 text-white px-4 py-3 rounded relative mb-4"
@@ -1281,6 +1324,8 @@ export default {
             // JSON of the settings as last loaded or saved. Anything different
             // from this is an unsaved change.
             savedSnapshot: '',
+            // The navigation held back while the unsaved-changes prompt is up.
+            pendingLeave: null,
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
@@ -1392,12 +1437,55 @@ export default {
                     console.log(e.message);
                 });
         },
+        /**
+         * Held back by beforeRouteLeave when there is something unsaved. The
+         * three buttons resolve it.
+         */
+        stayOnPage() {
+            if (this.pendingLeave) {
+                this.pendingLeave(false);
+                this.pendingLeave = null;
+            }
+        },
+        leaveWithoutSaving() {
+            if (this.pendingLeave) {
+                const proceed = this.pendingLeave;
+                this.pendingLeave = null;
+                this.markClean(); // so the beforeunload handler does not fire too
+                proceed();
+            }
+        },
+        saveThenLeave() {
+            this.saveSettings().then(() => {
+                if (this.saveFailed) {
+                    // Cancel the navigation and step out of the way: the
+                    // reason it failed is in the banner behind this dialog,
+                    // and leaving the dialog up just invites another attempt.
+                    this.stayOnPage();
+
+                    return;
+                }
+
+                this.leaveWithoutSaving();
+            });
+        },
+        /**
+         * Covers leaving the app entirely - reload, tab close, typed URL. The
+         * router guard cannot see those.
+         */
+        warnBeforeUnload(event) {
+            if (!this.unsavedChanges) {
+                return;
+            }
+            event.preventDefault();
+            event.returnValue = '';
+        },
         markClean() {
             this.savedSnapshot = JSON.stringify(this.settings);
         },
         saveSettings() {
             if (this.saving || !this.unsavedChanges) {
-                return;
+                return Promise.resolve();
             }
 
             this.settingsMessage = '';
@@ -1408,7 +1496,7 @@ export default {
 
             // Sent alongside rather than written onto this.settings, which
             // would otherwise register as an unsaved change of its own.
-            axios
+            return axios
                 .post('/api/settings', { ...this.settings, _method: 'put' })
                 .then(() => {
                     this.markClean();
@@ -1510,6 +1598,22 @@ export default {
         if (typeof io !== 'undefined') {
             this.socket = io('http://' + location.hostname + ':3000');
         }
+        window.addEventListener('beforeunload', this.warnBeforeUnload);
+    },
+    beforeUnmount() {
+        window.removeEventListener('beforeunload', this.warnBeforeUnload);
+    },
+    /**
+     * Hold back in-app navigation while there are unsaved settings, and let the
+     * prompt decide. Resolving with false cancels the navigation.
+     */
+    beforeRouteLeave(to, from, next) {
+        if (!this.unsavedChanges) {
+            next();
+            return;
+        }
+
+        this.pendingLeave = (proceed = true) => next(proceed === false ? false : undefined);
     },
 };
 </script>
