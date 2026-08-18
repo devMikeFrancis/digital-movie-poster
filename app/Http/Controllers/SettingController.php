@@ -41,22 +41,39 @@ class SettingController extends Controller
 
     public function updateApplication()
     {
-        $success = true;
-        $process = new Process(['sh', base_path().'/update.sh']);
+        // Run it with bash, not sh: the script uses [[ ]] and (( )), which
+        // dash - /bin/sh on Debian - cannot parse.
+        $process = new Process(['bash', base_path().'/update.sh'], base_path());
         $process->setTimeout(3600);
+
+        // The web server's PATH does not necessarily include the PHP binary
+        // that is serving this request, so hand it over explicitly rather than
+        // letting the script guess.
+        $process->setEnv([
+            'DMP_PHP' => PHP_BINARY,
+            'PATH' => dirname(PHP_BINARY).PATH_SEPARATOR.(getenv('PATH') ?: '/usr/local/bin:/usr/bin:/bin'),
+        ]);
+
         $process->run();
 
-        if (! $process->isSuccessful()) {
-            $success = false;
-            Log::info(' -- Could not run update script. -- ');
-            Log::info(' -- ');
-        }
+        $output = trim($process->getOutput()."\n".$process->getErrorOutput());
 
-        $output = $process->getOutput();
+        if (! $process->isSuccessful()) {
+            Log::warning('Update script failed: '.$output);
+
+            // This used to return 200 with success:false, so the About page
+            // took the .then() branch and told the operator the update had
+            // completed even when it had refused to run.
+            return response()->json([
+                'success' => false,
+                'message' => 'The update did not run.',
+                'output' => $output,
+            ], 500);
+        }
 
         Log::info($output);
 
-        return response()->json(['success' => $success, 'output' => $output]);
+        return response()->json(['success' => true, 'output' => $output]);
     }
 
     public function checkUpdate()

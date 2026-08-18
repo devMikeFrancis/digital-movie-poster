@@ -1,14 +1,42 @@
 {
-    "latest": "1.7.153",
-    "changelog": "Fixed Plex tv now playing",
+    "latest": "2.0.0",
+    "changelog": "Laravel 13 refresh. Needs PHP 8.3+, so this cannot be installed from this screen - re-run install.sh on the device. The admin screens now ask for a login, and media server credentials are no longer sent to the browser.",
     "past_updates": [
-        { "version": "1.7.140", "changelog": "Fixed version check" },
-        { "version": "1.7.120", "changelog": "Documentation for API calls" },
-        { "version": "1.7.100", "changelog": "Fixed bugs and added new API calls" },
-        { "version": "1.6.845", "changelog": "Fixed user permissons for install script" },
-        { "version": "1.6.840", "changelog": "Added speaker config" },
-        { "version": "1.6.831", "changelog": "Added version checking and About page" },
-        { "version": "1.6.820", "changelog": "Added Plex now playing options." },
-        { "version": "1.6.800", "changelog": "Added MPAA limits and bug fixes." }
+        {
+            "version": "1.7.153",
+            "changelog": "Fixed Plex tv now playing"
+        },
+        {
+            "version": "1.7.140",
+            "changelog": "Fixed version check"
+        },
+        {
+            "version": "1.7.120",
+            "changelog": "Documentation for API calls"
+        },
+        {
+            "version": "1.7.100",
+            "changelog": "Fixed bugs and added new API calls"
+        },
+        {
+            "version": "1.6.845",
+            "changelog": "Fixed user permissons for install script"
+        },
+        {
+            "version": "1.6.840",
+            "changelog": "Added speaker config"
+        },
+        {
+            "version": "1.6.831",
+            "changelog": "Added version checking and About page"
+        },
+        {
+            "version": "1.6.820",
+            "changelog": "Added Plex now playing options."
+        },
+        {
+            "version": "1.6.800",
+            "changelog": "Added MPAA limits and bug fixes."
+        }
     ]
 }
