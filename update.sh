@@ -20,19 +20,23 @@ echo "Deploy started"
 REQUIRED_PHP_MAJOR=8
 REQUIRED_PHP_MINOR=3
 
-if ! command -v php >/dev/null 2>&1; then
-    echo "PHP is not installed or not on PATH." >&2
+# When the About page triggers an update, the controller passes the binary
+# serving the request. Falls back to PATH for a plain terminal run.
+PHP_BIN="${DMP_PHP:-php}"
+
+if ! command -v "$PHP_BIN" >/dev/null 2>&1; then
+    echo "PHP not found (tried '$PHP_BIN'). Set DMP_PHP to its full path." >&2
     exit 1
 fi
 
-PHP_MAJOR="$(php -r 'echo PHP_MAJOR_VERSION;')"
-PHP_MINOR="$(php -r 'echo PHP_MINOR_VERSION;')"
+PHP_MAJOR="$("$PHP_BIN" -r 'echo PHP_MAJOR_VERSION;')"
+PHP_MINOR="$("$PHP_BIN" -r 'echo PHP_MINOR_VERSION;')"
 
 if (( PHP_MAJOR < REQUIRED_PHP_MAJOR )) \
     || { (( PHP_MAJOR == REQUIRED_PHP_MAJOR )) && (( PHP_MINOR < REQUIRED_PHP_MINOR )); }; then
     cat >&2 <<EOF
 
-This release needs PHP ${REQUIRED_PHP_MAJOR}.${REQUIRED_PHP_MINOR} or newer, but this device has PHP $(php -r 'echo PHP_VERSION;').
+This release needs PHP ${REQUIRED_PHP_MAJOR}.${REQUIRED_PHP_MINOR} or newer, but this device has PHP $("$PHP_BIN" -r 'echo PHP_VERSION;').
 
 Nothing has been changed. Upgrading in place needs a newer PHP and some new
 packages, so re-run the installer instead - it is safe to run again and will
@@ -52,21 +56,21 @@ if [[ -n "$(git status --porcelain)" ]]; then
     exit 1
 fi
 
-php artisan down --retry=60 || true
-trap 'php artisan up || true' EXIT
+"$PHP_BIN" artisan down --retry=60 || true
+trap '"$PHP_BIN" artisan up || true' EXIT
 
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 git pull --ff-only origin "$BRANCH"
 
 composer install --no-interaction --no-dev --optimize-autoloader
-php artisan migrate --force
+"$PHP_BIN" artisan migrate --force
 
 npm ci --omit=dev || npm install --omit=dev
 npm run build
 (cd socketserver && { npm ci --omit=dev || npm install --omit=dev; })
 
-php artisan optimize:clear
-php artisan optimize
+"$PHP_BIN" artisan optimize:clear
+"$PHP_BIN" artisan optimize
 
 # Restart the background pieces so they pick up the new code.
 command -v pm2 >/dev/null 2>&1 && pm2 restart dmp-socket || true

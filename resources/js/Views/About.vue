@@ -49,16 +49,16 @@
                                             {{ updateBtnLabel }}
                                         </button>
                                     </p>
-                                    <p class="text-white">{{ updateOutput }}</p>
+                                    <p class="text-white" style="white-space: pre-wrap">{{ updateOutput }}</p>
                                 </div>
 
                                 <p class="text-white">
                                     This project is maintained by Don Jones at
                                     <a
                                         class="text-gray-400 hover:text-white"
-                                        href="https://github.com/newelement/digital-movie-poster"
+                                        href="https://github.com/devMikeFrancis/digital-movie-poster"
                                         target="_blank"
-                                        >https://github.com/newelement/digital-movie-poster</a
+                                        >https://github.com/devMikeFrancis/digital-movie-poster</a
                                     >
                                 </p>
 
@@ -130,19 +130,48 @@ export default {
                         location.reload();
                     }, 5000);
                 })
-                .catch((e) => {
-                    console.log(e.message);
+                .catch((error) => {
+                    // The update script explains why it stopped - for instance
+                    // that this device's PHP is too old and the installer has
+                    // to be re-run. Show that rather than swallowing it.
+                    const data = error.response && error.response.data;
+                    this.updateOutput =
+                        (data && (data.output || data.message)) ||
+                        'The update could not be started.';
                     this.updateBtnLabel = this.origUpdateBtnLabel;
                     e.disabled = false;
                 });
         },
-        processVersion() {
-            let currentVersion = parseInt(this.localVersion.replaceAll('.', ''));
-            let remoteVersion = parseInt(this.remoteVersion.replaceAll('.', ''));
-            console.log(remoteVersion, currentVersion);
-            if (remoteVersion > currentVersion) {
-                this.updateAvailable = true;
+        /**
+         * Compare two dotted version strings.
+         *
+         * The previous implementation stripped the dots and compared the
+         * result as an integer, so "2.0.0" (200) looked older than "1.7.153"
+         * (17153) and no update was ever offered across a major version.
+         *
+         * @returns {number} positive when a is newer than b
+         */
+        compareVersions(a, b) {
+            const parse = (v) =>
+                String(v || '')
+                    .split('.')
+                    .map((part) => parseInt(part, 10) || 0);
+
+            const left = parse(a);
+            const right = parse(b);
+            const length = Math.max(left.length, right.length);
+
+            for (let i = 0; i < length; i++) {
+                const diff = (left[i] || 0) - (right[i] || 0);
+                if (diff !== 0) {
+                    return diff;
+                }
             }
+
+            return 0;
+        },
+        processVersion() {
+            this.updateAvailable = this.compareVersions(this.remoteVersion, this.localVersion) > 0;
         },
     },
     created() {},
