@@ -312,6 +312,11 @@ opened a websocket to Plex from the browser, which required putting
 }
 ```
 
+## Credits
+
+Originally created by Don Jones. Maintained by
+[Mike Francis](https://github.com/devMikeFrancis).
+
 ## License
 
 DMP open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
