@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -19,17 +20,32 @@ class PosterImageTest extends TestCase
 
     private string $posterDir;
 
+    private string $tempStorage;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        // saveImage() writes through storage_path() rather than the Storage
+        // facade, so Storage::fake() would not redirect it. Repoint the whole
+        // storage path at a temp directory instead - otherwise these tests
+        // delete the real poster library.
+        $this->tempStorage = sys_get_temp_dir().'/dmp-test-'.Str::random(12);
+        $this->app->useStoragePath($this->tempStorage);
+
         $this->posterDir = storage_path('app/public/posters');
-        File::deleteDirectory($this->posterDir);
     }
 
     protected function tearDown(): void
     {
-        File::deleteDirectory($this->posterDir);
+        File::deleteDirectory($this->tempStorage);
         parent::tearDown();
+    }
+
+    public function test_the_suite_does_not_touch_the_real_poster_directory(): void
+    {
+        $this->assertStringStartsWith(sys_get_temp_dir(), $this->posterDir);
+        $this->assertStringNotContainsString(base_path(), $this->posterDir);
     }
 
     public function test_it_downloads_a_remote_poster_and_writes_both_sizes(): void
