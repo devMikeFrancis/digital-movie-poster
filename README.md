@@ -112,9 +112,25 @@ After you've added posters and are back on the DMP screen you can always return 
 
 ### IMDB/TMDB Poster Data Auto-population
 
-When using the IMDB ID to manage poster data the application will use [TMDB API](https://developers.themoviedb.org/3/getting-started/introduction) to populate the metadata and poster image.
+Poster metadata and artwork come from the
+[TMDB API](https://developer.themoviedb.org/docs). Enter your TMDB API key in
+Settings first - everything below needs it.
 
-Enter your TMDB api key in the DMP settings.
+DMP identifies titles by their IMDB ID. IMDB itself has no public API, so TMDB
+is what answers; it accepts IMDB IDs as well as its own, and hands the IMDB ID
+back when you search.
+
+**Find a title** - if you do not know the IMDB ID, search by name in the poster
+editor. Results show the artwork, year and whether it is a movie or a TV show,
+so remakes and same-named titles are easy to tell apart. Pick one and confirm,
+and the IMDB ID, title, rating, audience score, runtime and trailer are filled
+in for you.
+
+**Fetch media** - if you already have the IMDB ID, this pulls the same data in
+straight away and shows the artwork, so you can check it before saving. Without
+it the artwork is still downloaded, but not until you save.
+
+The artwork is downloaded, resized and converted to WebP on save.
 
 ## Display on/off schedule
 

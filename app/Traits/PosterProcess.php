@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Poster;
+use App\Services\TmdbService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -136,144 +137,35 @@ trait PosterProcess
     }
 
     /**
-     * Get movie or tv meta data
+     * Get movie or tv meta data from TMDB.
      *
-     * @param  string  $mediaId  imdbid|tv name
+     * The HTTP client, response shaping and rating extraction now live in
+     * TmdbService, so the poster editor's search and "fetch media" actions and
+     * this save-time lookup all agree about what a title looks like.
+     *
+     * @param  string  $mediaId  IMDB id
      * @param  string  $type  movie|tv
+     * @return array<string, mixed>
      */
     public function posterMeta($mediaId, $type = 'movie'): array
     {
-        if ($type === 'movie') {
-            $res = $this->movieEndpoint($mediaId);
+        try {
+            $details = app(TmdbService::class)->detailsByImdbId($mediaId, $type);
+        } catch (\Throwable $e) {
+            Log::info('TMDB lookup failed for "'.$mediaId.'": '.$e->getMessage());
 
-            return $this->getMovieData($res);
+            return ['success' => false, 'message' => $e->getMessage()];
         }
-
-        if ($type === 'tv') {
-            $res = $this->tvEndpoint($mediaId);
-
-            return $this->getTvData($res);
-        }
-    }
-
-    private function movieEndpoint($imdbId)
-    {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/movie/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=videos,images,release_dates');
-
-        return $response->json();
-    }
-
-    private function tvEndpoint($imdbId)
-    {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/find/'.$imdbId.'?api_key='.$this->settings->tmdb_api_key_v3.'&external_source=imdb_id');
-
-        $items = $response->json();
-
-        return $items['tv_results'];
-    }
-
-    private function getMovieData($res): array
-    {
-        $success = true;
-        $message = '';
-
-        if (isset($res['success']) && ! $res['success']) {
-            $arr['success'] = false;
-            $arr['message'] = 'Movie not found';
-
-            return $arr;
-        }
-
-        $imageLocation = 'https://image.tmdb.org/t/p/original'.$res['poster_path'];
-        $audienceRating = $res['vote_average'];
-        $movieRating = $this->getMovieRating($res['release_dates']['results']);
-        $trailerId = $this->getMovieTrailerId($res['videos']['results']);
 
         return [
-            'success' => $success,
-            'message' => $message,
-            'title' => $res['title'],
-            'image' => $imageLocation,
-            'mpaa_rating' => $movieRating,
-            'audience_rating' => $audienceRating,
-            'trailer_id' => $trailerId,
-            'runtime' => $res['runtime'],
+            'success' => true,
+            'message' => '',
+            'title' => $details['title'],
+            'image' => $details['poster_url'],
+            'mpaa_rating' => $details['mpaa_rating'],
+            'audience_rating' => $details['audience_rating'],
+            'trailer_id' => $details['trailer_id'],
+            'runtime' => $details['runtime'],
         ];
-    }
-
-    private function getTvData($res)
-    {
-        $success = true;
-        $message = '';
-        $arr = [];
-
-        if (count($res) === 0) {
-            $arr['success'] = false;
-            $arr['message'] = 'Tv show not found';
-
-            return $arr;
-        }
-
-        $topResult = $res[0];
-
-        $tvMeta = $this->getTvMeta($topResult['id']);
-
-        $imageLocation = 'https://image.tmdb.org/t/p/original'.$topResult['poster_path'];
-        $audienceRating = $topResult['vote_average'];
-        $tvRating = $this->getTvRating($tvMeta['content_ratings']['results']);
-
-        return [
-            'success' => $success,
-            'message' => $message,
-            'title' => $topResult['name'],
-            'image' => $imageLocation,
-            'mpaa_rating' => $tvRating,
-            'trailer_id' => '',
-            'audience_rating' => $audienceRating,
-            'runtime' => isset($tvMeta['episode_run_time'][0]) ? $tvMeta['episode_run_time'][0] : null,
-        ];
-    }
-
-    private function getTvMeta($tvId)
-    {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->get('https://api.themoviedb.org/3/tv/'.$tvId.'?api_key='.$this->settings->tmdb_api_key_v3.'&append_to_response=content_ratings');
-
-        return $response->json();
-    }
-
-    private function getMovieRating($releaseDates)
-    {
-        foreach ($releaseDates as $releaseDate) {
-            if ($releaseDate['iso_3166_1'] === 'US') {
-                return $releaseDate['release_dates'][0]['certification'];
-            }
-        }
-    }
-
-    private function getTvRating($contentRatings)
-    {
-        foreach ($contentRatings as $contentRating) {
-            if ($contentRating['iso_3166_1'] === 'US') {
-                return $contentRating['rating'];
-            }
-        }
-    }
-
-    private function getMovieTrailerId($videos)
-    {
-        foreach ($videos as $video) {
-            if (
-                $video['type'] === 'Trailer' &&
-                $video['official'] === true &&
-                $video['site'] === 'YouTube') {
-                return $video['key'];
-            }
-        }
     }
 }
