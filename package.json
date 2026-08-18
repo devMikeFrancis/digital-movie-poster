@@ -1,4 +1,5 @@
 {
+    "name": "digital-movie-poster",
     "private": true,
     "type": "module",
     "scripts": {
