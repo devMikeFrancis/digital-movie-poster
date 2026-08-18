@@ -1,20 +1,27 @@
 # Architecture notes
 
-Written during the Laravel 9 → 13 refresh. The first section is what the system
-does today; the rest is what I'd change, roughly in priority order. Nothing in
-"Recommendations" has been implemented — each one is a behaviour change that
-needs its own decision.
+Written during the Laravel 9 → 13 refresh and kept current since. The first
+section is what the system does today; the rest is what I'd change, roughly in
+priority order.
+
+Items marked **fixed** have since been done and are kept for the reasoning.
+Everything else is still outstanding — each is a behaviour change that needs
+its own decision.
 
 ## How it fits together
 
 ```
                      ┌──────────────────────────────┐
   Plex / Jellyfin ──▶│ SyncPosters job (queue)      │
-  / Kodi / TMDB      │   └─ PlexService              │──▶ posters table
+  / Kodi             │   └─ PlexService              │──▶ posters table
                      │      JellyfinService          │    storage/app/public/posters
                      │      KodiService              │      <slug>.webp + _tn_<slug>.webp
                      │        (PosterProcess trait)  │
                      └──────────────────────────────┘
+                                    ▲
+  TMDB ─────────────────────────────┘  TmdbService: title search and lookup for
+                                       posters added by hand, and the artwork
+                                       fetched when one is saved
 
   Browser (kiosk)  ──── GET /api/posters, /api/settings (polled) ────▶ Laravel
        │             ──── GET /api/now-playing/{service} ────────────▶    │
@@ -27,7 +34,13 @@ needs its own decision.
 
 Two long-lived processes sit beside Apache: a `queue:work` supervisor program
 for poster syncing, and a Node socket.io server that subscribes to Redis and
-relays `DmpEvent` broadcasts to connected browsers.
+relays `DmpEvent` broadcasts to connected browsers. A cron entry runs
+`schedule:run` every minute for the display power schedule, and an optional
+systemd unit runs the PIR motion sensor.
+
+Posters arrive two ways: added individually, where `TmdbService` supplies the
+metadata and artwork, or synced in bulk from a media server. Media-server
+credentials never leave the server — see #1.
 
 The Vue SPA serves two very different roles from one bundle: the **display**
 (`/`, the kiosk view) and the **admin UI** (`/posters`, `/settings`, `/voting`).
@@ -118,12 +131,16 @@ patch the number.
 ### 3. `settings` is a 64-column single-row table
 
 Every new option means a migration, a column, a validation rule in the
-120-line `SettingsRequest`, and a field in the 1,469-line `Settings.vue`. The
-23 migrations named `add_*_to_settings_table` are the evidence.
+120-line `SettingsRequest`, and a field in the 1,708-line `Settings.vue`. The
+21 migrations named `add_*_to_settings_table` are the evidence.
 
-The controller also writes with `Setting::where('id', 1)->update(...)`, which
-silently does nothing if the seeded row is ever missing, and the request
-requires **every** field on every save, so a partial update is impossible.
+The request also requires **every** field on every save, so a partial update is
+impossible. (The controller's `Setting::where('id', 1)->update(...)`, which
+silently did nothing if the seeded row was missing, is gone — it uses
+`firstOrFail()->fill()->save()` now.)
+
+Because the settings row is where every option lives, it is also where the
+media-server credentials live, which is why they need the encryption in #1.
 
 Consider a typed settings object persisted to a single JSON column (with an
 `AsArrayObject` or custom cast), or a key/value table with a small
@@ -132,10 +149,12 @@ replace the hardcoded id.
 
 ### 4. The Pinia store is a god object holding DOM state
 
-`store/posters.js` is 782 lines and mixes three unrelated jobs: server state
+`store/posters.js` is 601 lines — down from 782 once the display-power logic
+moved server side (#9) — and still mixes three unrelated jobs: server state
 (posters, settings), playback state (which poster is showing, ratings,
-processing logos), and browser resources — it owns 13 timers, an `<audio>`
-element and an iframe handle, and writes them onto `window`:
+processing logos), and browser resources. It owns five intervals and eight
+timeouts, an `<audio>` element and an iframe handle, and writes two of them
+onto `window`:
 
 ```js
 window.audio = new Audio('/storage/music/' + this.theme_music);
@@ -157,16 +176,23 @@ polls Jellyfin on a timer. Redis and socket.io are already wired up and already
 push `DmpEvent`. Broadcasting a `SettingsUpdated` / `PostersChanged` event from
 the backend would let the display drop most of its polling and react instantly.
 
-### 6. `PosterProcess` is a trait doing three jobs
+### 6. `PosterProcess` is a trait doing two jobs — was three
 
-It is mixed into `PosterService` and all three media services, and combines
-image resizing, a TMDB HTTP client, and poster persistence, sharing a mutable
-public `$settings` property with whatever class uses it. Traits used this way
-are inheritance in disguise — the dependency is invisible at the call site.
+**Partly fixed.** The TMDB client came out of the trait when title search was
+added: the HTTP calls, response shaping and rating extraction now live in
+`TmdbService`, and `posterMeta()` delegates to it. That took the trait from
+roughly 280 lines to 171, and means search, the editor's "fetch media" button
+and the save-time lookup cannot disagree about what a title looks like.
 
-Split it into constructor-injected services: `PosterImageWriter` (decode,
-scale, encode, write), `TmdbClient` (metadata lookup), and leave persistence on
-the model or `PosterService`.
+What remains is still two jobs in one trait — image resizing (`saveImage`,
+`readImageSource`) and poster persistence (`savePoster`) — mixed into
+`PosterService` and all three media services, sharing a mutable public
+`$settings` property with whatever class uses it. Traits used this way are
+inheritance in disguise: the dependency is invisible at the call site.
+
+Finish the split: `PosterImageWriter` (decode, scale, encode, write) as a
+constructor-injected service, and leave persistence on the model or
+`PosterService`.
 
 ### 7. Sync services are resolved by hand
 
@@ -183,11 +209,20 @@ service report whether it is enabled. Adding a fourth source then touches one
 class instead of three branches. It also makes them mockable — right now
 `cache()` cannot be tested without real network calls.
 
-### 8. `Settings.vue` is 1,469 lines
+### 8. `Settings.vue` is 1,708 lines — and growing
 
-It already renders three tabs. Splitting it per tab, with a shared composable
-for load/save/dirty-tracking, would make it navigable. `Voting.vue` (726) and
-`PostersEdit.vue` (571) are the next candidates.
+It was 1,469 when this was first written. The save bar, dirty tracking and the
+unsaved-changes prompt added another 240, and the honest reading is that the
+file is absorbing behaviour because there is nowhere else for it to go.
+
+It already renders three tabs. Split it per tab, with a composable owning
+load/save/dirty state — that composable now exists in all but name, as
+`unsavedChanges`, `markClean()` and `saveSettings()` sitting in the component.
+Lifting those out is the natural first move, and it is what would let the tabs
+become three small components.
+
+`Voting.vue` (727) and `PostersEdit.vue` (678, up from 571 with title search)
+are the next candidates.
 
 ### 9. Display power schedule — fixed
 
@@ -236,7 +271,7 @@ there". A miswired sensor should cost the power saving, not the display.
 
 ### 10. Smaller things
 
-- **The bundle is one 637 kB chunk.** The display loads the entire admin UI on
+- **The bundle is one 635 kB chunk.** The display loads the entire admin UI on
   boot. Route-level `defineAsyncComponent` would let the kiosk load only the
   dashboard.
 - **Fonts load from Google Fonts over the network.** For an appliance that may
@@ -244,5 +279,12 @@ there". A miswired sensor should cost the power saving, not the display.
   vendored in `resources/fonts/`.
 - **The socket server keeps voting state in memory.** A restart loses an
   in-progress vote; it also assumes a single instance.
-- **No test covers the sync services.** They are the most complex code in the
-  project and the most likely to break when a media server changes its API.
+- **No test covers the sync services.** `PlexService::syncMedia()` and its
+  Jellyfin and Kodi equivalents are the most complex code in the project and
+  the most likely to break when a media server changes its API, and nothing in
+  the 147-test suite touches them. #7 is a precondition: they cannot be tested
+  cheaply while `cache()` constructs them itself.
+- **`TmdbService` is the model for the others.** It takes its settings by
+  constructor, throws typed errors the controller maps to messages, and has its
+  base URL in config so it can be pointed at a stub — which is why it could be
+  covered end to end. The Plex, Jellyfin and Kodi services predate that shape.
