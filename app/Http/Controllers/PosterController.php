@@ -118,10 +118,10 @@ class PosterController extends Controller
 
     public function getServiceSections(PlexService $plexService, $service)
     {
-        if ($service === 'plex') {
-            $sections = $plexService->getSections();
+        if ($service !== 'plex') {
+            return response()->json(['message' => 'Unknown service: '.$service], 404);
         }
 
-        return $sections;
+        return $plexService->getSections();
     }
 }

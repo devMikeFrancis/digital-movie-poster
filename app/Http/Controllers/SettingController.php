@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SettingsRequest;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
@@ -47,8 +48,20 @@ class SettingController extends Controller
 
     public function checkUpdate()
     {
-        $file = file_get_contents('https://raw.githubusercontent.com/newelement/digital-movie-poster/main/public/version.json');
+        $url = sprintf(
+            'https://raw.githubusercontent.com/%s/%s/public/version.json',
+            config('dmp.update.repository'),
+            config('dmp.update.branch')
+        );
 
-        return json_decode($file);
+        $response = Http::timeout(10)->get($url);
+
+        if (! $response->successful()) {
+            Log::warning('Update check failed ('.$response->status().'): '.$url);
+
+            return response()->json(['message' => 'Could not reach the update server.'], 503);
+        }
+
+        return response()->json($response->json());
     }
 }

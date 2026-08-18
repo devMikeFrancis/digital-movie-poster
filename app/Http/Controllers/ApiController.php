@@ -7,6 +7,9 @@ use App\Jobs\SyncPosters;
 use App\Services\KodiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class ApiController extends Controller
 {
@@ -30,16 +33,33 @@ class ApiController extends Controller
         return response()->json(['message' => 'Hello.']);
     }
 
+    /**
+     * Drive the attached display over HDMI-CEC.
+     *
+     * The command is piped to cec-client on stdin rather than through a shell,
+     * so there is no interpolation into a command line at any point.
+     */
     public function controlDisplay($command)
     {
         $command = strtolower($command);
-        $output = 'Invalid command.';
 
-        if ($command === 'on' || $command === 'standby') {
-            $output = shell_exec('echo '.$command.' 0 | cec-client -s -d 1');
+        if (! in_array($command, ['on', 'standby'], true)) {
+            return response()->json(['message' => 'Invalid command. Use "on" or "standby".'], 422);
         }
 
-        return response()->json(['message' => $output]);
+        $process = new Process(['cec-client', '-s', '-d', '1']);
+        $process->setInput($command.' 0'.PHP_EOL);
+        $process->setTimeout(30);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $e) {
+            Log::warning('HDMI-CEC command "'.$command.'" failed: '.$e->getMessage());
+
+            return response()->json(['message' => 'Could not reach the display over HDMI-CEC.'], 502);
+        }
+
+        return response()->json(['message' => $process->getOutput()]);
     }
 
     /**
