@@ -123,6 +123,7 @@
                                         type="file"
                                         class="text-black w-full"
                                         aria-describedby="movie-posterHelp"
+                                        :key="'artwork-' + formGeneration"
                                         @change="selectFile($event)"
                                     />
                                     <div id="movie-posterHelp" class="text-gray-400 text-sm"></div>
@@ -141,6 +142,7 @@
                                         name="music_file"
                                         id="music-unput"
                                         aria-describedby="musicHelp"
+                                        :key="'music-' + formGeneration"
                                         @change="selectMusicFile($event)"
                                     />
                                     <div id="musicHelp" class="text-gray-400 text-sm">
@@ -387,16 +389,7 @@
                                 </div>
 
                                 <button
-                                    class="
-                                        btn
-                                        text-black
-                                        bg-gray-300
-                                        text-md
-                                        px-3
-                                        py-1
-                                        rounded-sm
-                                        hover:bg-gray-100
-                                    "
+                                    class="btn text-black bg-gray-300 text-md px-3 py-1 rounded-sm hover:bg-gray-100"
                                     @click.prevent="savePoster"
                                     :disabled="saving"
                                 >
@@ -424,6 +417,37 @@ import axios from 'axios';
 import MainNav from '../partials/MainNav.vue';
 import TitleLookup from '@/components/title-lookup.vue';
 
+/**
+ * A poster form with nothing filled in.
+ *
+ * Shared by the initial state and the reset so the two cannot drift: the reset
+ * used to blank every property it found, which wiped media_type and the
+ * switches to empty strings and made the next save fail validation.
+ */
+function blankPoster() {
+    return {
+        id: 0,
+        imdb_id: '',
+        media_type: 'movie',
+        name: '',
+        image: null,
+        mpaa_rating: '',
+        audience_rating: '',
+        trailer_path: '',
+        runtime: '',
+        show_trailer: false,
+        show_runtime: true,
+        show_in_rotation: true,
+        play_theme_music: false,
+        show_dolby_atmos: false,
+        show_dolby_51: false,
+        show_dolby_vision: false,
+        show_dtsx: false,
+        show_auro_3d: false,
+        show_imax: false,
+    };
+}
+
 export default {
     data: function () {
         return {
@@ -440,21 +464,10 @@ export default {
             formMessage: '',
             mode: '',
             music: null,
-            poster: {
-                id: '',
-                imdb_id: '',
-                media_type: 'movie',
-                name: '',
-                image: null,
-                mpaa_rating: '',
-                audience_rating: '',
-                trailer_path: '',
-                show_trailer: false,
-                show_runtime: true,
-                show_in_rotation: true,
-                runtime: '',
-                play_theme_music: false,
-            },
+            poster: blankPoster(),
+            // Bumped on reset so the file inputs are rebuilt; clearing the
+            // model does not clear the filename the browser is showing.
+            formGeneration: 0,
             savePosterBtn: 'Save Poster',
             socket: '',
         };
@@ -618,14 +631,14 @@ export default {
                 });
         },
         clearPoster() {
-            for (const prop of Object.getOwnPropertyNames(this.poster)) {
-                this.poster[prop] = '';
-            }
-            this.poster.id = 0;
-            this.poster.show_runtime = 1;
-            this.poster.show_in_rotation = 1;
-            this.poster.image = null;
+            this.poster = blankPoster();
             this.music = null;
+            this.formGeneration += 1;
+            this.errors = [];
+            this.formMessage = '';
+            this.fetchMessage = '';
+            this.fetchFailed = false;
+            this.fetchedArtwork = '';
             this.mode = 'new';
             this.setSavePosterBtn();
         },
