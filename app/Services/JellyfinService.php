@@ -104,8 +104,11 @@ class JellyfinService implements MovieSyncInterface
     public function syncMedia()
     {
         $json = $this->apiCall('/Items');
-        $movies = $json['Items'];
-        $this->processMovies($movies);
+
+        // An unreachable server, or one that answers with something that is not
+        // the item list, used to end the sync here rather than leave the
+        // library alone.
+        $this->processMovies($json['Items'] ?? []);
     }
 
     public function processMovies($movies)

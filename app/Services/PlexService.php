@@ -135,9 +135,12 @@ class PlexService implements MovieSyncInterface
 
     private function syncMovies($sections)
     {
-        foreach ($sections as $section) {
+        // A section list that was never configured comes back as null, and a
+        // section with nothing in it comes back with no Metadata key at all -
+        // both of which used to end the sync rather than skip the section.
+        foreach ($sections ?? [] as $section) {
             $json = $this->apiCall('/library/sections/'.$section.'/all');
-            $medias = $json['MediaContainer']['Metadata'];
+            $medias = $json['MediaContainer']['Metadata'] ?? [];
 
             foreach ($medias as $media) {
                 if ($media['type'] === 'movie') {
@@ -163,9 +166,9 @@ class PlexService implements MovieSyncInterface
 
     private function syncTv($sections)
     {
-        foreach ($sections as $section) {
+        foreach ($sections ?? [] as $section) {
             $json = $this->apiCall('/library/sections/'.$section.'/all');
-            $shows = $json['MediaContainer']['Metadata'];
+            $shows = $json['MediaContainer']['Metadata'] ?? [];
             foreach ($shows as $media) {
                 if ($media['type'] === 'show') {
                     $imageUrl = 'http://'.$this->plexIpAddress.':32400'.$media['thumb'].'?X-Plex-Token='.$this->plexToken;

@@ -34,6 +34,14 @@ process.on('unhandledRejection', (err) =>
     console.error('[dmp] unhandled rejection:', err && err.message ? err.message : err)
 );
 
+// This process is the display's voting and now-playing channel, and anything on
+// the network can emit at it. A malformed payload reaching a handler used to
+// throw synchronously and take the service down with it, which is a worse
+// outcome than the bad message being ignored.
+process.on('uncaughtException', (err) =>
+    console.error('[dmp] uncaught exception:', err && err.stack ? err.stack : err)
+);
+
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
@@ -209,8 +217,11 @@ io.on('connection', (socket) => {
     socket.emit('users', { users });
     socket.emit('session', sessionState());
 
-    socket.on('new:user', (data) => {
-        const voterId = String((data && data.voterId) || socket.id);
+    // A default parameter only covers a missing payload, not one sent as null,
+    // so each handler normalises what it was given.
+    socket.on('new:user', (payload) => {
+        const data = payload || {};
+        const voterId = String(data.voterId || socket.id);
         socketVoters.set(socket.id, voterId);
 
         const existing = users.find((user) => user.id === voterId);
@@ -247,14 +258,21 @@ io.on('connection', (socket) => {
     });
 
     // The admin opens a session: voters can join and the slideshow shows the QR.
-    socket.on('enable:voting', (data) => {
+    socket.on('enable:voting', (payload) => {
+        const data = payload || {};
+
         clearPendingCloses();
 
         // Nothing has been started yet, so put a ceiling on how long this can
         // sit there advertising itself.
         idleTimerId = setTimeout(closeSession, IDLE_SESSION_MS);
 
-        posters = (data.posters || []).map((poster) => ({ ...poster, votes: 0 }));
+        // Anything on the network can emit this, so the list has to be one
+        // before it is treated as one.
+        posters = (Array.isArray(data.posters) ? data.posters : []).map((poster) => ({
+            ...poster,
+            votes: 0,
+        }));
         maxSelections = Math.max(1, Number(data.maxSelections) || 1);
         timeLimit = Number(data.timeLimit) || 30;
         votingEnabled = true;
@@ -291,7 +309,7 @@ io.on('connection', (socket) => {
         // is plainly not idle any more.
         clearPendingCloses();
 
-        if (data && data.posters) {
+        if (data && Array.isArray(data.posters)) {
             posters = data.posters.map((poster) => ({ ...poster, votes: 0 }));
         }
         if (data && data.maxSelections) {
