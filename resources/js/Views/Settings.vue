@@ -7,100 +7,24 @@
                         <main-nav />
                     </div>
                     <div class="lg:col-span-9 p-4" style="background-color: #121212">
-                        <div class="settings-bar">
-                            <ul class="tabs">
-                                <li>
-                                    <a
-                                        class="active text-sm md:text-md"
-                                        href="#general"
-                                        @click.prevent="setTab($event)"
-                                        >General</a
-                                    >
-                                </li>
-                                <li>
-                                    <a
-                                        href="#theme"
-                                        class="text-sm md:text-md"
-                                        @click.prevent="setTab($event)"
-                                        >Theme</a
-                                    >
-                                </li>
-                                <li>
-                                    <a
-                                        href="#sources"
-                                        class="text-sm md:text-md"
-                                        @click.prevent="setTab($event)"
-                                        >Poster Sources</a
-                                    >
-                                </li>
-                                <li>
-                                    <a
-                                        href="#account"
-                                        class="text-sm md:text-md"
-                                        @click.prevent="setTab($event)"
-                                        >Account</a
-                                    >
-                                </li>
-                            </ul>
+                        <SettingsBar
+                            :tabs="tabs"
+                            :model-value="tab"
+                            :status-text="statusText"
+                            :status-class="statusClass"
+                            :saving="saving"
+                            :unsaved-changes="unsavedChanges"
+                            @update:model-value="setTab"
+                            @save="saveSettings"
+                        />
 
-                            <div class="settings-bar-actions">
-                                <span class="text-sm" :class="statusClass">{{ statusText }}</span>
-                                <button
-                                    type="submit"
-                                    class="btn text-md px-4 py-1 rounded-sm whitespace-nowrap"
-                                    :class="saveButtonClass"
-                                    :disabled="saving || !unsavedChanges"
-                                    @click.prevent="saveSettings"
-                                >
-                                    {{ saving ? 'Saving…' : 'Save settings' }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div v-if="pendingLeave" class="modal">
-                            <div class="modal-overlay" @click="stayOnPage"></div>
-                            <div class="modal-content max-w-lg rounded-sm overflow-hidden">
-                                <div class="inner p-6">
-                                    <header class="modal-header p-4">
-                                        <h4 class="text-xl font-bold text-white">
-                                            You have unsaved settings
-                                        </h4>
-                                    </header>
-                                    <div class="modal-body px-4 pb-2">
-                                        <p class="text-gray-300">
-                                            Leaving this page now will discard the changes you have
-                                            made.
-                                        </p>
-                                    </div>
-                                    <footer
-                                        class="modal-footer flex flex-wrap justify-end items-center gap-3 p-4"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="text-gray-300 px-3 py-2 rounded-sm hover:text-white"
-                                            @click.prevent="stayOnPage"
-                                        >
-                                            Keep editing
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="text-white px-4 py-2 rounded-sm bg-gray-600 hover:bg-gray-500"
-                                            @click.prevent="leaveWithoutSaving"
-                                        >
-                                            Discard changes
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="text-white px-4 py-2 rounded-sm bg-blue-600 hover:bg-blue-500"
-                                            :disabled="saving"
-                                            @click.prevent="saveThenLeave"
-                                        >
-                                            {{ saving ? 'Saving…' : 'Save and leave' }}
-                                        </button>
-                                    </footer>
-                                </div>
-                            </div>
-                        </div>
+                        <UnsavedChangesModal
+                            :open="!!pendingLeave"
+                            :saving="saving"
+                            @stay="stayOnPage"
+                            @discard="leaveWithoutSaving"
+                            @save="saveThenLeave"
+                        />
 
                         <div
                             v-if="errors.length || saveFailed"
@@ -113,875 +37,9 @@
                                 {{ err }}
                             </div>
                         </div>
+
                         <div class="tabs-content">
-                            <div id="general" class="tab-content active">
-                                <div class="mb-5">
-                                    <label
-                                        for="random"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="random"
-                                            aria-describedby="randomHelp"
-                                            v-model="settings.random_order"
-                                        />
-                                        <span class="ml-2">Randomize Poster Order</span>
-                                    </label>
-                                    <div id="randomHelp" class="text-gray-400 text-sm">
-                                        Randomize poster order or display posters in order you
-                                        selected.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label for="type" class="text-gray-300 block mb-2 font-bold">
-                                        Transition Type
-                                    </label>
-                                    <select
-                                        class="text-black"
-                                        id="type"
-                                        aria-describedby="typeHelp"
-                                        v-model="settings.transition_type"
-                                    >
-                                        <option value="fade">Fade</option>
-                                        <option value="crossfade">Cross-fade</option>
-                                        <option value="vertical">Vertical</option>
-                                        <option value="cut">Cut</option>
-                                    </select>
-
-                                    <div id="typeHelp" class="text-gray-400 text-sm">
-                                        How one poster gives way to the next. Fade takes both
-                                        through the background, so the screen dips darker in
-                                        between; cross-fade brings the new one in over the old, so
-                                        it does not. Vertical slides upward, and cut swaps them
-                                        outright with no animation.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label class="text-gray-300 inline-flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="fill-screen"
-                                            aria-describedby="fillScreenHelp"
-                                            v-model="settings.poster_fill_screen"
-                                        />
-                                        <span class="ml-2">Fill the screen with the poster</span>
-                                    </label>
-                                    <div id="fillScreenHelp" class="text-gray-400 text-sm">
-                                        The poster takes the whole display instead of sitting in a
-                                        box between the header and footer, which float over it
-                                        instead. It is scaled to fit rather than cropped, so it
-                                        keeps its shape and nothing is cut off.
-                                    </div>
-
-                                    <div v-if="settings.poster_fill_screen" class="mt-3">
-                                        <label
-                                            for="fill-scrim"
-                                            class="text-gray-300 block mb-2 font-bold"
-                                        >
-                                            Shading behind the header and footer
-                                        </label>
-                                        <select
-                                            class="text-black"
-                                            id="fill-scrim"
-                                            aria-describedby="fillScrimHelp"
-                                            v-model="settings.poster_fill_scrim"
-                                        >
-                                            <option value="none">None</option>
-                                            <option value="subtle">Subtle</option>
-                                            <option value="standard">Standard</option>
-                                            <option value="strong">Strong</option>
-                                        </select>
-                                        <div id="fillScrimHelp" class="text-gray-400 text-sm mt-1">
-                                            Darkens the top and bottom of the screen so the header
-                                            and footer text stays readable over the artwork. A dark
-                                            poster needs none of it; a bright one needs quite a lot.
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label class="text-gray-300 inline-flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="show-header-text"
-                                            aria-describedby="showHeaderTextHelp"
-                                            v-model="settings.show_header_text"
-                                        />
-                                        <span class="ml-2">
-                                            Show the Coming Soon / Now Playing text
-                                        </span>
-                                    </label>
-                                    <div id="showHeaderTextHelp" class="text-gray-400 text-sm">
-                                        Turn this off for a display that shows only artwork. The
-                                        runtime and the rest of the header are unaffected.
-                                    </div>
-
-                                    <div v-if="settings.show_header_text" class="mt-3">
-                                        <label
-                                            for="header-style"
-                                            class="text-gray-300 block mb-2 font-bold"
-                                        >
-                                            Header plate
-                                        </label>
-                                        <select
-                                            class="text-black"
-                                            id="header-style"
-                                            aria-describedby="headerStyleHelp"
-                                            v-model="settings.header_style"
-                                        >
-                                            <option value="plain">Plain</option>
-                                            <option value="rules">Rules either side</option>
-                                            <option value="marquee">Marquee bulbs</option>
-                                            <option value="plaque">Plaque</option>
-                                            <option value="neon">Neon glow</option>
-                                        </select>
-                                        <div
-                                            id="headerStyleHelp"
-                                            class="text-gray-400 text-sm mt-1"
-                                        >
-                                            Plaque is the box the header used to have, and keeps its
-                                            own border colour from the Theme tab.
-                                        </div>
-
-                                        <select
-                                            class="text-black mt-3"
-                                            id="header-position"
-                                            v-model="settings.header_position"
-                                        >
-                                            <option value="top">Above the poster</option>
-                                            <option value="bottom">Below the poster</option>
-                                        </select>
-
-                                        <label class="text-gray-300 inline-flex items-center mt-3">
-                                            <input
-                                                type="checkbox"
-                                                id="header-full-width"
-                                                v-model="settings.header_full_width"
-                                            />
-                                            <span class="ml-2">Span the width of the screen</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label class="text-gray-300 inline-flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="show-theater-name"
-                                            aria-describedby="showTheaterNameHelp"
-                                            v-model="settings.show_theater_name"
-                                        />
-                                        <span class="ml-2">Show the theater name</span>
-                                    </label>
-                                    <div id="showTheaterNameHelp" class="text-gray-400 text-sm">
-                                        The name of the room this display is in.
-                                    </div>
-
-                                    <div v-if="settings.show_theater_name" class="mt-3">
-                                        <input
-                                            type="text"
-                                            class="text-black w-full mb-2"
-                                            id="theater-name"
-                                            maxlength="120"
-                                            placeholder="The Roxy"
-                                            v-model="settings.theater_name"
-                                        />
-                                        <select
-                                            class="text-black"
-                                            id="theater-name-position"
-                                            v-model="settings.theater_name_position"
-                                        >
-                                            <option value="top">Above the poster</option>
-                                            <option value="bottom">Below the poster</option>
-                                        </select>
-
-                                        <label
-                                            for="theater-name-style"
-                                            class="text-gray-300 block mt-3 mb-2 font-bold"
-                                        >
-                                            Name plate
-                                        </label>
-                                        <select
-                                            class="text-black"
-                                            id="theater-name-style"
-                                            aria-describedby="theaterNameStyleHelp"
-                                            v-model="settings.theater_name_style"
-                                        >
-                                            <option value="plain">Plain</option>
-                                            <option value="rules">Rules either side</option>
-                                            <option value="marquee">Marquee bulbs</option>
-                                            <option value="plaque">Plaque</option>
-                                            <option value="neon">Neon glow</option>
-                                        </select>
-                                        <div
-                                            id="theaterNameStyleHelp"
-                                            class="text-gray-400 text-sm mt-1"
-                                        >
-                                            All of them are drawn in the header's text colour and
-                                            font, so the name matches the rest of the screen.
-                                        </div>
-
-                                        <label class="text-gray-300 inline-flex items-center mt-3">
-                                            <input
-                                                type="checkbox"
-                                                id="theater-name-full-width"
-                                                v-model="settings.theater_name_full_width"
-                                            />
-                                            <span class="ml-2">Span the width of the screen</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="display-speed"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Poster Display Speed</label
-                                    >
-
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="display-speed"
-                                        aria-describedby="display-speedHelp"
-                                        v-model="settings.poster_display_speed"
-                                    />
-                                    <div id="display-speedHelp" class="text-gray-400 text-sm">
-                                        Time between each poster. In ms. 15000 = 15 seconds.
-                                    </div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <div class="mb-5">
-                                    <label
-                                        for="coming-soon-text"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Coming Soon Text</label
-                                    >
-
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="coming-soon-text"
-                                        aria-describedby="coming-soon-textHelp"
-                                        v-model="settings.coming_soon_text"
-                                    />
-                                    <div
-                                        id="coming-soon-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="now-playing-text"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Now Playing Text</label
-                                    >
-
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="now-playing-text"
-                                        aria-describedby="now-playing-textHelp"
-                                        v-model="settings.now_playing_text"
-                                    />
-                                    <div
-                                        id="now-playing-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <h3 class="text-xl font-bold text-white mb-5">Global Options</h3>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="show-runtime"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="show-runtime"
-                                            v-model="settings.show_runtime"
-                                        />
-                                        <span class="ml-2">Show Runtime</span>
-                                    </label>
-                                    <div id="show-runtimeHelp" class="text-gray-400 text-sm">
-                                        Displays the movie runtime in the top left corner.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="mpaa-rating"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="mpaa-rating"
-                                            aria-describedby="mpaa-ratingHelp"
-                                            v-model="settings.show_mpaa_rating"
-                                        />
-                                        <span class="ml-2">Show Media Rating</span>
-                                    </label>
-                                    <div id="mpaa-ratingHelp" class="text-gray-400 text-sm">
-                                        Shows the movie or TV rating.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="audience-rating"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="audience-rating"
-                                            aria-describedby="audience-ratingHelp"
-                                            v-model="settings.show_audience_rating"
-                                        />
-                                        <span class="ml-2">Show Audience Rating</span></label
-                                    >
-                                    <div id="audience-ratingHelp" class="text-gray-400 text-sm">
-                                        Shows the audience rating.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="theme-music"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="theme-music"
-                                            aria-describedby="theme-musicHelp"
-                                            v-model="settings.play_theme_music"
-                                        />
-                                        <span class="ml-2">Play Theme Music</span></label
-                                    >
-                                    <div id="theme-musicHelp" class="text-gray-400 text-sm">
-                                        Play theme music for posters
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="processing-logos"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="processing-logos"
-                                            aria-describedby="processing-logosHelp"
-                                            v-model="settings.show_processing_logos"
-                                        />
-                                        <span class="ml-2">Show Processing Logos</span>
-                                    </label>
-                                    <div id="processing-logosHelp" class="text-gray-400 text-sm">
-                                        Shows logos such as Dolby Atmos or Dolby Vision.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="mpaa-limit"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        Movie Rating Display Limit
-                                    </label>
-                                    <select
-                                        class="text-black mb-2"
-                                        id="mpaa-limit"
-                                        aria-describedby="processing-mpaalimitHelp"
-                                        v-model="settings.mpaa_limit"
-                                    >
-                                        <option value="">None</option>
-                                        <option value="G">G</option>
-                                        <option value="PG">PG</option>
-                                        <option value="PG-13">PG-13</option>
-                                        <option value="R">R</option>
-                                        <option value="NC-17">NC-17</option>
-                                    </select>
-
-                                    <div
-                                        id="processing-mpaalimitHelp"
-                                        class="text-gray-400 text-sm"
-                                    >
-                                        Hide any media that is higher than the selected MPAA limit.
-                                        Media that is not rated will not be shown.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="tv-limit"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        TV Rating Display Limit
-                                    </label>
-                                    <select
-                                        class="text-black mb-2"
-                                        id="tv-limit"
-                                        aria-describedby="processing-tvlimitHelp"
-                                        v-model="settings.tv_limit"
-                                    >
-                                        <option value="">None</option>
-                                        <option value="TV-Y">TV-Y</option>
-                                        <option value="TV-Y7">TV-Y7</option>
-                                        <option value="TV-Y7 FV">TV-Y7 FV</option>
-                                        <option value="TV-G">TV-G</option>
-                                        <option value="TV-PG">TV-PG</option>
-                                        <option value="TV-14">TV-14</option>
-                                        <option value="TV-MA">TV-MA</option>
-                                    </select>
-
-                                    <div id="processing-tvlimitHelp" class="text-gray-400 text-sm">
-                                        Hide any media that is higher than the selected TV limit.
-                                        Media that is not rated will not be shown.
-                                    </div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <div class="mb-5">
-                                    <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_dolby_51"
-                                        />
-                                        <span class="ml-2">Show Dolby Digital 5.1 Logo</span></label
-                                    >
-                                    <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_dolby_atmos_vertical"
-                                        />
-                                        <span class="ml-2">Show Dolby Atmos Logo</span></label
-                                    >
-                                    <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_dolby_vision_vertical"
-                                        />
-                                        <span class="ml-2">Show Dolby Vision Logo</span></label
-                                    >
-                                    <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_dts"
-                                        />
-                                        <span class="ml-2">Show DTS:X Logo</span></label
-                                    >
-                                    <label
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_imax"
-                                        />
-                                        <span class="ml-2">Show IMAX Enhanced</span></label
-                                    >
-                                    <label
-                                        class="text-gray-300 block mb-5 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_auro_3d"
-                                        />
-                                        <span class="ml-2">Show Auro 3D Logo</span></label
-                                    >
-
-                                    <div class="mb-2">
-                                        <label
-                                            for="speaker-config"
-                                            class="text-gray-300 block mb-2 font-bold flex items-center"
-                                            >Speaker Config</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="text-black mb-2"
-                                            id="speaker-config"
-                                            aria-describedby="speaker-configHelp"
-                                            v-model="settings.speaker_config"
-                                            @input="formatSpeakerConfig"
-                                            maxlength="12"
-                                        />
-
-                                        <div id="speaker-configHelp" class="text-gray-400 text-sm">
-                                            Speaker config such as 5.1, 7.1.2, 9.4.6
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-2">
-                                        <label
-                                            for="speaker-config-location"
-                                            class="text-gray-300 block mb-2 font-bold flex items-center"
-                                            >Speaker Config Location</label
-                                        >
-                                        <select
-                                            class="text-black mb-2"
-                                            id="speaker-config-location"
-                                            aria-describedby="speaker-config-locationHelp"
-                                            v-model="settings.speaker_config_location"
-                                        >
-                                            <option value="bottom">Bottom</option>
-                                            <option value="top-right">Top Right</option>
-                                        </select>
-
-                                        <div
-                                            id="speaker-config-locationHelp"
-                                            class="text-gray-400 text-sm"
-                                        ></div>
-                                    </div>
-
-                                    <label
-                                        class="text-gray-300 block mb-5 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.show_speaker_config"
-                                        />
-                                        <span class="ml-2">Show Speaker Config</span></label
-                                    >
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <div class="mb-5">
-                                    <label
-                                        class="text-gray-300 block mb-1 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.validate_movie_titles"
-                                        />
-                                        <span class="ml-2">Validate movie titles when syncing</span>
-                                    </label>
-                                    <div class="text-sm mb-3">
-                                        Useful when using multiple sync services. The movie titles
-                                        will have to match exactly.
-                                    </div>
-
-                                    <label
-                                        class="text-gray-300 block mb-1 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.remove_black_bars"
-                                        />
-                                        <span class="ml-2">Remove side black bars</span>
-                                    </label>
-                                    <div class="text-sm mb-3">
-                                        The small space on each side of the poster. The space is
-                                        helpful when framing the TV.
-                                    </div>
-
-                                    <label
-                                        for="prologo-source"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                    >
-                                        Which logos to show
-                                    </label>
-                                    <select
-                                        class="text-black"
-                                        id="prologo-source"
-                                        aria-describedby="prologoSourceHelp"
-                                        v-model="prologoSource"
-                                    >
-                                        <option value="poster">
-                                            Only the ones each title supports
-                                        </option>
-                                        <option value="poster-then-global">
-                                            Each title's own, or the ones above if it has none
-                                        </option>
-                                        <option value="global">
-                                            The ones above, on every title
-                                        </option>
-                                    </select>
-                                    <div id="prologoSourceHelp" class="text-gray-400 text-sm mt-1">
-                                        A title's own formats are set when you edit it. The last
-                                        option ignores them and shows the same logos everywhere,
-                                        which is why a film with no Atmos soundtrack can end up
-                                        displaying the Atmos logo.
-                                    </div>
-                                </div>
-
-                                <hr class="mt-3 mb-7 border-gray-700" />
-
-                                <div class="mb-5">
-                                    <label
-                                        for="cec-controls"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="cec-controls"
-                                            aria-describedby="cec-controlsHelp"
-                                            v-model="settings.use_cec_power"
-                                        />
-                                        <span class="ml-2">Use HDMI CEC Controls</span>
-                                    </label>
-                                    <div id="cec-controlsHelp" class="text-gray-400 text-sm">
-                                        Allow the application to turn on/off your display during
-                                        certain time noted below.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="start-power-time"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Display Start Time</label
-                                    >
-
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="start-power-time"
-                                        aria-describedby="start-power-timeHelp"
-                                        v-model="settings.start_power_time"
-                                    />
-                                    <div id="start-power-timeHelp" class="text-gray-400 text-sm">
-                                        The start time you want you display to be on. HH:MM:SS
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="end-power-time"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Display End Time</label
-                                    >
-
-                                    <input
-                                        type="text"
-                                        class="text-black w-full"
-                                        id="end-power-time"
-                                        aria-describedby="end-power-timeHelp"
-                                        v-model="settings.end_power_time"
-                                    />
-                                    <div id="end-power-timeHelp" class="text-gray-400 text-sm">
-                                        The end time you want you display to be off. HH:MM:SS
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="theme" class="tab-content">
-                                <div class="mb-5">
-                                    <label
-                                        for="poster-bg-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Poster Background Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="poster-bg-color"
-                                        aria-describedby="poster-bg-color-textHelp"
-                                        v-model="settings.poster_bg_color"
-                                    />
-                                    <div
-                                        id="header-bg-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="header-bg-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Top Background Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="header-bg-color"
-                                        aria-describedby="header-bg-color-textHelp"
-                                        v-model="settings.header_bg_color"
-                                    />
-                                    <div
-                                        id="header-bg-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="header-text-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Top Text Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="header-text-color"
-                                        aria-describedby="header-text-color-textHelp"
-                                        v-model="settings.header_text_color"
-                                    />
-                                    <div
-                                        id="header-text-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="show-header-border"
-                                        class="text-gray-300 block mb-2 font-bold flex items-center"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="text-black"
-                                            id="show-header-border"
-                                            v-model="settings.show_header_border"
-                                        />
-                                        <span class="ml-2">Show Top Border</span>
-                                    </label>
-                                    <div id="show-header-border-Help" class="text-gray-400 text-sm">
-                                        Displays thin border around "Coming Soon/Now Playing" text.
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="header-border-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Top Border Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="header-border-color"
-                                        aria-describedby="header-border-color-textHelp"
-                                        v-model="settings.header_border_color"
-                                    />
-                                    <div
-                                        id="header-border-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="header-font"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Coming Soon/Now Playing Font</label
-                                    >
-
-                                    <select
-                                        class="w-full"
-                                        id="header-font"
-                                        aria-describedby="header-font-textHelp"
-                                        v-model="settings.header_font"
-                                    >
-                                        <option value="default">Default</option>
-                                        <option value="riemann-theater">Riemann Theater</option>
-                                        <option value="great-attraction">Great Attraction</option>
-                                        <option value="midnight-champion">Midnight Champion</option>
-                                        <option value="emerald">Emerald</option>
-                                        <option value="airstrike">Airstrike</option>
-                                        <option value="space-ranger">Space Ranger</option>
-                                        <option value="feast-flesh">Feast of Flesh</option>
-                                        <option value="camp-blood">Camp Blood</option>
-                                        <option value="friday13">Friday 13th</option>
-                                    </select>
-                                    <div
-                                        id="header-font-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="header-font-size"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Coming Soon/Now Playing Font Size</label
-                                    >
-
-                                    <select
-                                        class="w-full"
-                                        id="header-font-size"
-                                        aria-describedby="header-font-size-textHelp"
-                                        v-model="settings.header_font_size"
-                                    >
-                                        <option value="xsmall">X-Small</option>
-                                        <option value="small">Small</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="large">Large</option>
-                                        <option value="xlarge">X-Large</option>
-                                    </select>
-                                    <div
-                                        id="header-font-size-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="footer-bg-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Bottom Background Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="footer-bg-color"
-                                        aria-describedby="footer-bg-color-textHelp"
-                                        v-model="settings.footer_bg_color"
-                                    />
-                                    <div
-                                        id="footer-bg-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <label
-                                        for="footer-text-color"
-                                        class="text-gray-300 block mb-2 font-bold"
-                                        >Bottom Text Color</label
-                                    >
-
-                                    <input
-                                        type="color"
-                                        class="w-full"
-                                        id="footer-text-color"
-                                        aria-describedby="footer-text-color-textHelp"
-                                        v-model="settings.footer_text_color"
-                                    />
-                                    <div
-                                        id="footer-text-color-textHelp"
-                                        class="text-gray-400 text-sm"
-                                    ></div>
-                                </div>
-                            </div>
-                            <div id="sources" class="tab-content">
+                            <div v-show="tab === 'sources'" class="tab-content">
                                 <p class="text-gray-400 text-sm mb-7">
                                     Posters reach the display two ways, and they can be used
                                     together. Add titles yourself and DMP looks up the artwork and
@@ -1035,6 +93,25 @@
                                     your poster list, and it can switch the display to whatever is
                                     playing right now. Leave these off if you add posters yourself.
                                 </p>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="validate-movie-titles"
+                                            aria-describedby="validateTitlesHelp"
+                                            v-model="settings.validate_movie_titles"
+                                        />
+                                        <span class="ml-2">Validate movie titles when syncing</span>
+                                    </label>
+                                    <div id="validateTitlesHelp" class="text-gray-400 text-sm">
+                                        Titles have to match exactly before DMP treats two entries
+                                        as the same film. Worth having on when more than one of the
+                                        services below is syncing, so the same film does not arrive
+                                        twice.
+                                    </div>
+                                </div>
 
                                 <div class="mb-5">
                                     <label
@@ -1445,7 +522,79 @@
                                     <div id="kodipassHelp" class="text-gray-400 text-sm"></div>
                                 </div>
                             </div>
-                            <div id="account" class="tab-content">
+
+                            <div v-show="tab === 'power'" class="tab-content">
+                                <h3 class="text-white font-bold text-lg mb-1">Screen power</h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    DMP can switch the television off overnight and back on in the
+                                    morning over HDMI CEC, so the display is not lit in an empty
+                                    room. The television has to have CEC enabled — manufacturers
+                                    each have their own name for it.
+                                </p>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            class="text-black"
+                                            id="cec-controls"
+                                            aria-describedby="cecControlsHelp"
+                                            v-model="settings.use_cec_power"
+                                        />
+                                        <span class="ml-2"
+                                            >Turn the display on and off on a schedule</span
+                                        >
+                                    </label>
+                                    <div id="cecControlsHelp" class="text-gray-400 text-sm">
+                                        Off by default. With this off, the screen stays on whenever
+                                        the Pi is running.
+                                    </div>
+
+                                    <div v-if="settings.use_cec_power" class="mt-3">
+                                        <label
+                                            for="start-power-time"
+                                            class="text-gray-300 block mb-2 font-bold"
+                                            >On at</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="text-black"
+                                            id="start-power-time"
+                                            aria-describedby="startPowerTimeHelp"
+                                            v-model="settings.start_power_time"
+                                            placeholder="08:00:00"
+                                        />
+                                        <div
+                                            id="startPowerTimeHelp"
+                                            class="text-gray-400 text-sm mt-1"
+                                        >
+                                            Twenty-four hour clock, as HH:MM:SS.
+                                        </div>
+
+                                        <label
+                                            for="end-power-time"
+                                            class="text-gray-300 block mt-3 mb-2 font-bold"
+                                            >Off at</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="text-black"
+                                            id="end-power-time"
+                                            aria-describedby="endPowerTimeHelp"
+                                            v-model="settings.end_power_time"
+                                            placeholder="23:00:00"
+                                        />
+                                        <div
+                                            id="endPowerTimeHelp"
+                                            class="text-gray-400 text-sm mt-1"
+                                        >
+                                            Twenty-four hour clock, as HH:MM:SS.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-show="tab === 'account'" class="tab-content">
                                 <p class="text-gray-400 text-sm mb-7">
                                     Change the username and password you sign in with.
                                 </p>
@@ -1598,7 +747,6 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- / .tabs-content -->
                     </div>
                 </div>
             </div>
@@ -1608,24 +756,35 @@
 
 <script>
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import MainNav from '@/partials/MainNav.vue';
+import SettingsBar from '@/components/settings-bar.vue';
+import UnsavedChangesModal from '@/components/unsaved-changes-modal.vue';
+import settingsForm from '@/mixins/settings-form';
 import { useAuthStore } from '@/store/auth';
 
+/**
+ * How the box is wired up: where posters come from, when the screen is on, and
+ * who is allowed in.
+ *
+ * Everything about what the screen draws moved to the Display page. What is
+ * left here is the three things you set up once and rarely touch again, which
+ * is why they were the worst possible neighbours for the display options that
+ * are fiddled with constantly.
+ */
 export default {
-    data: function () {
+    name: 'Settings',
+    mixins: [settingsForm],
+    components: { MainNav, SettingsBar, UnsavedChangesModal },
+    data() {
         return {
-            loading: false,
-            settingsMessage: '',
-            errors: [],
-            saving: false,
-            saveFailed: false,
-            justSaved: false,
-            // JSON of the settings as last loaded or saved. Anything different
-            // from this is an unsaved change.
-            savedSnapshot: '',
-            // The navigation held back while the unsaved-changes prompt is up.
-            pendingLeave: null,
+            tabs: [
+                { id: 'sources', label: 'Poster Sources' },
+                { id: 'power', label: 'Screen power' },
+                { id: 'account', label: 'Account' },
+            ],
+            plexSections: [],
+            plexTvSection: '',
+            plexMovieSection: '',
             account: {
                 username: '',
                 password: '',
@@ -1636,197 +795,88 @@ export default {
             accountMessage: '',
             accountFailed: false,
             accountErrors: [],
-            settings: {
-                require_login: true,
-                poster_fill_screen: false,
-                poster_fill_scrim: 'standard',
-                show_header_text: true,
-                show_theater_name: false,
-                theater_name: '',
-                theater_name_position: 'bottom',
-                theater_name_style: 'plain',
-                theater_name_full_width: false,
-                header_style: 'plain',
-                header_position: 'top',
-                header_full_width: false,
-                mpaa_limit: '',
-                tv_limit: '',
-                plex_token: '',
-                plex_ip_address: '',
-                jellyfin_token: '',
-                jellyfin_ip_address: '',
-                transition_type: 'fade',
-            },
-            plexSections: [],
-            plexTvSection: '',
-            plexMovieSection: '',
-            socket: '',
         };
     },
-    components: { MainNav },
-    watch: {},
     computed: {
-        /**
-         * Whether the form differs from what is stored.
-         *
-         * The settings page is long enough that the old button at the very
-         * bottom was easy to miss, so the header bar has to say plainly
-         * whether anything is waiting to be saved.
-         */
-        unsavedChanges() {
-            return (
-                this.savedSnapshot !== '' && JSON.stringify(this.settings) !== this.savedSnapshot
-            );
-        },
-        statusText() {
-            if (this.saving) {
-                return 'Saving…';
-            }
-            if (this.saveFailed) {
-                return 'Not saved';
-            }
-            if (this.unsavedChanges) {
-                return 'Unsaved changes';
-            }
-            if (this.justSaved) {
-                return 'Saved';
-            }
-            return '';
-        },
-        /**
-         * Laravel's 422 body repeats the first field error in "message", so
-         * showing both put the same sentence on screen twice.
-         */
-        errorHeading() {
-            if (this.errors.length) {
-                return this.errors.length === 1
-                    ? 'That setting could not be saved:'
-                    : 'Those settings could not be saved:';
-            }
-
-            return this.settingsMessage || 'Those settings could not be saved.';
-        },
-        statusClass() {
-            if (this.saveFailed) {
-                return 'text-red-400';
-            }
-            if (this.unsavedChanges) {
-                return 'text-amber-300';
-            }
-            return 'text-green-400';
-        },
-        /**
-         * The two flags underneath are really one decision, and as a pair of
-         * checkboxes they did not say what they did: the first overrides every
-         * title, which is not what "use logos from global settings" sounds
-         * like. Presented as the three states they can actually be in.
-         */
-        prologoSource: {
-            get() {
-                if (this.settings.use_global_prologos) {
-                    return 'global';
-                }
-
-                return this.settings.use_global_prologos_if_no_poster_prologos
-                    ? 'poster-then-global'
-                    : 'poster';
-            },
-            set(value) {
-                this.settings.use_global_prologos = value === 'global';
-                this.settings.use_global_prologos_if_no_poster_prologos =
-                    value === 'poster-then-global';
-            },
-        },
-        saveButtonClass() {
-            return this.unsavedChanges && !this.saving
-                ? 'text-white bg-blue-600 hover:bg-blue-500'
-                : 'text-gray-400 bg-gray-700 cursor-default';
-        },
         plexTvSections() {
-            return this.plexSections.filter((item) => {
-                return item.type === 'show';
-            });
+            return this.plexSections.filter((item) => item.type === 'show');
         },
         plexMovieSections() {
-            return this.plexSections.filter((item) => {
-                return item.type === 'movie';
-            });
+            return this.plexSections.filter((item) => item.type === 'movie');
         },
     },
+    mounted() {
+        const auth = useAuthStore();
+        Promise.resolve(auth.loadStatus()).then(() => {
+            this.account.username = auth.user ? auth.user.username : '';
+        });
+    },
     methods: {
-        setTab(event) {
-            let tab = event.target.getAttribute('href');
-            let $tabItems = document.querySelectorAll('.tabs a');
-            let $tabContents = document.querySelectorAll('.tab-content');
-            let $activeTab = event.target;
-            let $activeTabContent = document.querySelector(tab);
-
-            $tabContents.forEach((el) => {
-                el.classList.remove('active');
-            });
-            $tabItems.forEach((el) => {
-                el.classList.remove('active');
-            });
-
-            $activeTab.classList.add('active');
-            $activeTabContent.classList.add('active');
+        /** Called once the settings arrive, when we know whether Plex is on. */
+        settingsLoaded() {
+            if (this.settings.plex_service) {
+                this.getServiceSections('plex');
+            }
         },
-        getSettings() {
+        getServiceSections(service) {
             axios
-                .get('/api/settings/full')
+                .get('/api/service-sections/' + service)
                 .then((response) => {
-                    this.settings = this.withSelectDefaults(response.data);
-                    this.markClean();
-                    if (this.settings.plex_service) {
-                        this.getServiceSections('plex');
-                    }
+                    this.plexSections = response.data;
                 })
                 .catch((e) => {
                     console.log(e.message);
                 });
         },
-        /**
-         * Held back by beforeRouteLeave when there is something unsaved. The
-         * three buttons resolve it.
-         */
-        stayOnPage() {
-            if (this.pendingLeave) {
-                this.pendingLeave(false);
-                this.pendingLeave = null;
-            }
-        },
-        leaveWithoutSaving() {
-            if (this.pendingLeave) {
-                const proceed = this.pendingLeave;
-                this.pendingLeave = null;
-                this.markClean(); // so the beforeunload handler does not fire too
-                proceed();
-            }
-        },
-        saveThenLeave() {
-            this.saveSettings().then(() => {
-                if (this.saveFailed) {
-                    // Cancel the navigation and step out of the way: the
-                    // reason it failed is in the banner behind this dialog,
-                    // and leaving the dialog up just invites another attempt.
-                    this.stayOnPage();
+        getMovieLibraryName(service, key) {
+            if (service === 'plex') {
+                const obj = this.plexMovieSections.find((item) => item.key === key);
 
-                    return;
+                return obj ? obj.title : '';
+            }
+        },
+        getTvLibraryName(service, key) {
+            if (service === 'plex') {
+                const obj = this.plexTvSections.find((item) => item.key === key);
+
+                return obj ? obj.title : '';
+            }
+        },
+        addMovieSyncLibrary(service) {
+            if (service === 'plex' && this.plexMovieSection) {
+                if (!this.settings.plex_movie_sections) {
+                    this.settings.plex_movie_sections = [];
                 }
-
-                this.leaveWithoutSaving();
-            });
-        },
-        /**
-         * Covers leaving the app entirely - reload, tab close, typed URL. The
-         * router guard cannot see those.
-         */
-        warnBeforeUnload(event) {
-            if (!this.unsavedChanges) {
-                return;
+                if (!this.settings.plex_movie_sections.includes(this.plexMovieSection)) {
+                    this.settings.plex_movie_sections.push(this.plexMovieSection);
+                }
             }
-            event.preventDefault();
-            event.returnValue = '';
+        },
+        addTvSyncLibrary(service) {
+            if (service === 'plex' && this.plexTvSection) {
+                if (!this.settings.plex_tv_sections) {
+                    this.settings.plex_tv_sections = [];
+                }
+                if (!this.settings.plex_tv_sections.includes(this.plexTvSection)) {
+                    this.settings.plex_tv_sections.push(this.plexTvSection);
+                }
+            }
+        },
+        removeMovieSyncLibrary(service, item) {
+            if (service === 'plex') {
+                this.settings.plex_movie_sections.splice(
+                    this.settings.plex_movie_sections.indexOf(item),
+                    1,
+                );
+            }
+        },
+        removeTvSyncLibrary(service, item) {
+            if (service === 'plex') {
+                this.settings.plex_tv_sections.splice(
+                    this.settings.plex_tv_sections.indexOf(item),
+                    1,
+                );
+            }
         },
         /**
          * The account form is deliberately separate from the settings save
@@ -1876,188 +926,9 @@ export default {
                     this.savingAccount = false;
                 });
         },
-        /**
-         * A select bound to null matches no option, not the one whose value is
-         * the empty string - so "None" rendered blank on any install that had
-         * never set a rating limit, and the field looked broken. Nothing here
-         * changes what is stored; null and '' both mean no limit.
-         */
-        withSelectDefaults(settings) {
-            const emptyIsAChoice = ['mpaa_limit', 'tv_limit'];
-
-            emptyIsAChoice.forEach((key) => {
-                if (settings[key] === null || settings[key] === undefined) {
-                    settings[key] = '';
-                }
-            });
-
-            if (!settings.theater_name_position) {
-                settings.theater_name_position = 'bottom';
-            }
-
-            if (!settings.theater_name_style) {
-                settings.theater_name_style = 'plain';
-            }
-
-            if (!settings.header_style) {
-                settings.header_style = 'plain';
-            }
-
-            if (!settings.header_position) {
-                settings.header_position = 'top';
-            }
-
-            if (!settings.poster_fill_scrim) {
-                settings.poster_fill_scrim = 'standard';
-            }
-
-            // Same trap as the rating limits: a select bound to null renders
-            // blank rather than showing the option it is really on.
-            if (!settings.transition_type) {
-                settings.transition_type = 'fade';
-            }
-
-            return settings;
-        },
-        markClean() {
-            this.savedSnapshot = JSON.stringify(this.settings);
-        },
-        saveSettings() {
-            if (this.saving || !this.unsavedChanges) {
-                return Promise.resolve();
-            }
-
-            this.settingsMessage = '';
-            this.errors = [];
-            this.saveFailed = false;
-            this.justSaved = false;
-            this.saving = true;
-
-            // Sent alongside rather than written onto this.settings, which
-            // would otherwise register as an unsaved change of its own.
-            return axios
-                .post('/api/settings', { ...this.settings, _method: 'put' })
-                .then(() => {
-                    this.markClean();
-                    this.justSaved = true;
-                    setTimeout(() => {
-                        this.justSaved = false;
-                    }, 4000);
-                })
-                .catch((e) => {
-                    this.saveFailed = true;
-                    const response = e.response;
-                    this.settingsMessage =
-                        (response && response.data && response.data.message) || e.message;
-
-                    const errors = (response && response.data && response.data.errors) || {};
-                    Object.keys(errors).forEach((field) => {
-                        if (errors[field] instanceof Array) {
-                            errors[field].forEach((err) => this.errors.push(err));
-                        }
-                    });
-                })
-                .finally(() => {
-                    this.saving = false;
-                });
-        },
-        getMovieLibraryName(service, key) {
-            if (service === 'plex') {
-                let obj = this.plexMovieSections.find((item) => {
-                    return item.key === key;
-                });
-                return obj ? obj.title : '';
-            }
-        },
-        getTvLibraryName(service, key) {
-            if (service === 'plex') {
-                let obj = this.plexTvSections.find((item) => {
-                    return item.key === key;
-                });
-                return obj ? obj.title : '';
-            }
-        },
-        addMovieSyncLibrary(service) {
-            if (service === 'plex') {
-                if (this.plexMovieSection) {
-                    if (!this.settings.plex_movie_sections) {
-                        this.settings.plex_movie_sections = [];
-                    }
-                    if (!this.settings.plex_movie_sections.includes(this.plexMovieSection)) {
-                        this.settings.plex_movie_sections.push(this.plexMovieSection);
-                    }
-                }
-            }
-        },
-        addTvSyncLibrary(service) {
-            if (service === 'plex') {
-                if (this.plexTvSection) {
-                    if (!this.settings.plex_tv_sections) {
-                        this.settings.plex_tv_sections = [];
-                    }
-                    if (!this.settings.plex_tv_sections.includes(this.plexTvSection)) {
-                        this.settings.plex_tv_sections.push(this.plexTvSection);
-                    }
-                }
-            }
-        },
-        removeMovieSyncLibrary(service, item) {
-            if (service === 'plex') {
-                this.settings.plex_movie_sections.splice(
-                    this.settings.plex_movie_sections.indexOf(item),
-                    1
-                );
-            }
-        },
-        removeTvSyncLibrary(service, item) {
-            if (service === 'plex') {
-                this.settings.plex_tv_sections.splice(
-                    this.settings.plex_tv_sections.indexOf(item),
-                    1
-                );
-            }
-        },
-        getServiceSections(service) {
-            axios
-                .get('/api/service-sections/' + service)
-                .then((response) => {
-                    this.plexSections = response.data;
-                })
-                .catch((e) => {
-                    console.log(e.message);
-                });
-        },
-        formatSpeakerConfig(input) {
-            this.settings.speaker_config = input.target.value.replace(/[^1-9.]/g, '');
-        },
     },
-    created() {},
-    mounted() {
-        this.getSettings();
-        if (typeof io !== 'undefined') {
-            this.socket = io('http://' + location.hostname + ':3000');
-        }
-        window.addEventListener('beforeunload', this.warnBeforeUnload);
-
-        const auth = useAuthStore();
-        Promise.resolve(auth.loadStatus()).then(() => {
-            this.account.username = auth.user ? auth.user.username : '';
-        });
-    },
-    beforeUnmount() {
-        window.removeEventListener('beforeunload', this.warnBeforeUnload);
-    },
-    /**
-     * Hold back in-app navigation while there are unsaved settings, and let the
-     * prompt decide. Resolving with false cancels the navigation.
-     */
     beforeRouteLeave(to, from, next) {
-        if (!this.unsavedChanges) {
-            next();
-            return;
-        }
-
-        this.pendingLeave = (proceed = true) => next(proceed === false ? false : undefined);
+        this.confirmLeave(to, from, next);
     },
 };
 </script>
@@ -2069,84 +940,13 @@ input[type='number'] {
     border-radius: 2px;
 }
 
-/*
- * Tabs on the left, save on the right, and stuck to the top: the settings form
- * is long enough that a button at the bottom was easy to miss, and easy to
- * forget after scrolling back up.
- */
-.settings-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-end;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background-color: #121212;
-    padding: 8px 0;
-    margin-bottom: 4px;
-}
-
-.settings-bar-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-bottom: 4px;
-}
-
-.settings-bar-actions button:disabled {
-    opacity: 0.75;
-}
-
-.tabs {
-    display: flex;
-
-    li {
-        margin-right: 6px;
-
-        &:last-child {
-            margin-right: 0;
-        }
-
-        a {
-            display: block;
-            padding: 8px 0;
-            min-width: 112px;
-            text-align: center;
-            color: #888;
-            background-color: #333;
-
-            &:hover {
-                background-color: #777;
-                color: #ccc;
-                transition: background-color 0.25s ease;
-            }
-
-            &.active {
-                color: #fff;
-                background-color: #555;
-
-                &:hover {
-                    background-color: #777;
-                    transition: background-color 0.25s ease;
-                }
-            }
-        }
-    }
-}
 .tabs-content {
     margin-bottom: 24px;
     position: relative;
 
     .tab-content {
-        display: none;
         padding: 24px;
-
-        &.active {
-            display: block;
-            border-top: 1px solid #555;
-        }
+        border-top: 1px solid #555;
     }
 }
 </style>

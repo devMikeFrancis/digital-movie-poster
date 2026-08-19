@@ -2,8 +2,8 @@
 
 Turning the TV on and off by HDMI-CEC, and blanking it when the room is empty.
 
-With `Use HDMI CEC Controls` enabled, DMP turns the TV on and off at the hours
-set in Settings. This runs on the device from Laravel's scheduler, so it works
+With **Settings → Screen power → Turn the display on and off on a schedule**
+enabled, DMP turns the TV on and off at the hours set beneath it. This runs on the device from Laravel's scheduler, so it works
 whether or not a browser is open, and it needs a cron entry — `install.sh` adds
 one:
 

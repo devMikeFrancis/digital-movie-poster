@@ -8,7 +8,7 @@ vi.mock('axios', () => ({
 }));
 vi.mock('socket.io-client', () => ({ io: vi.fn(() => ({ on: vi.fn(), disconnect: vi.fn() })) }));
 
-import Settings from '@/Views/Settings.vue';
+import Display from '@/Views/Display.vue';
 
 /**
  * The two flags behind this are one decision, and as a pair of checkboxes they
@@ -17,8 +17,12 @@ import Settings from '@/Views/Settings.vue';
  * soundtrack showing the Atmos logo is that setting working as written.
  */
 function settingsScreen() {
-    return mount(Settings, {
-        global: { plugins: [createPinia()], stubs: { MainNav: true, 'router-link': true } },
+    return mount(Display, {
+        global: {
+            plugins: [createPinia()],
+            stubs: { MainNav: true, 'router-link': true },
+            mocks: { $route: { query: {} }, $router: { replace: vi.fn() } },
+        },
     });
 }
 
@@ -73,7 +77,7 @@ describe('which processing logos to show', () => {
         const source = readFileSync('resources/js/components/processing-logos.vue', 'utf8');
 
         const bare = [...source.matchAll(/<svg\b[^>]*>\s*<(rect|path|polygon)\b([^>]*)>/g)].filter(
-            (m) => !/fill|:style|style=/.test(m[2])
+            (m) => !/fill|:style|style=/.test(m[2]),
         );
 
         expect(bare.map((m) => m[0].slice(-70))).toEqual([]);

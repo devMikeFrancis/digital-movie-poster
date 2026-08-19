@@ -23,7 +23,6 @@ class SettingsSecrecyTest extends TestCase
         'kodi_password' => 'kodi-secret-value',
         'kodi_username' => 'kodi-user-value',
         'tmdb_api_key_v3' => 'tmdb-v3-secret-value',
-        'tmdb_api_key_v4' => 'tmdb-v4-secret-value',
         'plex_ip_address' => '10.9.8.7',
         'jellyfin_ip_address' => '10.9.8.6',
     ];
