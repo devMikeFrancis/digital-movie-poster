@@ -53,7 +53,7 @@
                                 </div>
 
                                 <p class="text-white">
-                                    This project is maintained by Mike Francis at
+                                    Version 2 and ongoing development by Mike Francis at
                                     <a
                                         class="text-gray-400 hover:text-white"
                                         href="https://github.com/devMikeFrancis/digital-movie-poster"
@@ -62,7 +62,7 @@
                                     >
                                 </p>
                                 <p class="text-gray-400 text-sm mt-2">
-                                    Originally created by Don Jones.
+                                    Created by Don Jones, who built version 1.
                                 </p>
 
                                 <div class="pt-12">

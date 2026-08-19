@@ -40,3 +40,7 @@ Everything beyond the overview in the [project README](../README.md).
 
 There is no GitHub wiki. This directory is the documentation, and it lives with
 the code so a change and its explanation arrive together.
+
+DMP was created by Don Jones, who built version 1. Version 2 onwards — the
+refreshed architecture and continuing development — is by
+[Mike Francis](https://github.com/devMikeFrancis).
