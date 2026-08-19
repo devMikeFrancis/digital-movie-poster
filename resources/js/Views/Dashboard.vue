@@ -30,7 +30,13 @@
                                 }"
                                 :style="blackBars(poster)"
                             >
-                                <Transition :name="transitionPrefix + '-poster'">
+                                <Transition
+                                    :name="transitionPrefix + '-poster'"
+                                    @enter="liftPoster"
+                                    @before-leave="sinkPoster"
+                                    @after-leave="resetPosterLayer"
+                                    @leave-cancelled="resetPosterLayer"
+                                >
                                     <div
                                         v-if="poster.show"
                                         :style="
@@ -199,6 +205,61 @@ export default {
 
             if (!this.loading && !this.isPlaying) {
                 this.startTransitionImages();
+            }
+        },
+        /*
+         * Stacking for the cross-fade, applied to each poster's wrapper rather
+         * than to the element the transition classes land on.
+         *
+         * Every poster in the list has its own wrapper, and those wrappers are
+         * fixed with will-change, so each is its own stacking context - a
+         * z-index on the inner element can only order it against its own
+         * siblings, of which it has none. Across wrappers the order was simply
+         * document order, so whether the incoming poster arrived on top of the
+         * outgoing one depended on where the two happened to sit in the list.
+         * Going from the last poster back to the first, it arrived underneath,
+         * and the cross-fade came out as a hard cut.
+         */
+        /*
+         * On enter rather than before-enter: Vue runs before-enter while the
+         * element is still detached, so there is no wrapper to put a z-index on
+         * yet and the lift quietly did nothing. Leaving worked, which made it
+         * look as though only half the mechanism was wired up.
+         */
+        liftPoster(el) {
+            this.setPosterLayer(el, '2');
+        },
+        sinkPoster(el) {
+            // after-leave runs once the element is out of the tree, so note
+            // where it was while it is still possible to.
+            if (el) {
+                el.__posterWrapper = el.parentElement;
+            }
+
+            this.setPosterLayer(el, '1');
+        },
+        setPosterLayer(el, value) {
+            if (this.transitionPrefix !== 'crossfade') {
+                return;
+            }
+
+            if (el && el.parentElement) {
+                el.parentElement.style.zIndex = value;
+            }
+        },
+        /**
+         * Only ever clears the wrapper it is handed. Clearing all of them
+         * looked tidier and was wrong: a late leave from the previous change
+         * wiped the lift the current one had just set, dropping the arriving
+         * poster back underneath.
+         */
+        resetPosterLayer(el) {
+            const wrapper = el && (el.parentElement || el.__posterWrapper);
+
+            // Not guarded on the transition type: clearing an inline z-index is
+            // always safe, and the type may have been changed mid-change.
+            if (wrapper) {
+                wrapper.style.zIndex = '';
             }
         },
         blackBars(poster) {
@@ -517,16 +578,13 @@ export default {
  * opacity underneath and is only dropped once it is covered, so the screen
  * never darkens between posters.
  */
+/*
+ * Ordering is handled on the wrappers in JS - see liftPoster - because each
+ * poster sits in its own stacking context and cannot be ordered against the
+ * others from here.
+ */
 .crossfade-poster-enter-active {
-    /*
-     * Positioned so the z-index below is not ignored. The poster's inner div is
-     * static by default, which made both stacking orders inert - and stacking
-     * is the whole mechanism here, since the incoming poster has to be painted
-     * over the outgoing one for the screen not to dip.
-     */
-    position: relative;
     transition: opacity 1.6s ease;
-    z-index: 2;
 }
 
 .crossfade-poster-enter-from {
@@ -534,9 +592,7 @@ export default {
 }
 
 .crossfade-poster-leave-active {
-    position: relative;
     transition: opacity 0.01s linear 1.6s;
-    z-index: 1;
 }
 
 .crossfade-poster-leave-to {
