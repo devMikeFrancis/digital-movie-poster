@@ -698,29 +698,33 @@
                                     </div>
 
                                     <label
-                                        class="text-gray-300 block mb-3 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="settings.use_global_prologos"
-                                        />
-                                        <span class="ml-2"
-                                            >Use processing logos from global settings</span
-                                        >
+                                        for="prologo-source"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
+                                        Which logos to show
                                     </label>
-                                    <label
-                                        class="text-gray-300 block mb-3 font-bold flex items-center"
-                                        ><input
-                                            class="text-black"
-                                            type="checkbox"
-                                            v-model="
-                                                settings.use_global_prologos_if_no_poster_prologos
-                                            "
-                                        />
-                                        <span class="ml-2"
-                                            >Use global processing logos if no poster logos</span
-                                        >
-                                    </label>
+                                    <select
+                                        class="text-black"
+                                        id="prologo-source"
+                                        aria-describedby="prologoSourceHelp"
+                                        v-model="prologoSource"
+                                    >
+                                        <option value="poster">
+                                            Only the ones each title supports
+                                        </option>
+                                        <option value="poster-then-global">
+                                            Each title's own, or the ones above if it has none
+                                        </option>
+                                        <option value="global">
+                                            The ones above, on every title
+                                        </option>
+                                    </select>
+                                    <div id="prologoSourceHelp" class="text-gray-400 text-sm mt-1">
+                                        A title's own formats are set when you edit it. The last
+                                        option ignores them and shows the same logos everywhere,
+                                        which is why a film with no Atmos soundtrack can end up
+                                        displaying the Atmos logo.
+                                    </div>
                                 </div>
 
                                 <hr class="mt-3 mb-7 border-gray-700" />
@@ -1710,6 +1714,28 @@ export default {
                 return 'text-amber-300';
             }
             return 'text-green-400';
+        },
+        /**
+         * The two flags underneath are really one decision, and as a pair of
+         * checkboxes they did not say what they did: the first overrides every
+         * title, which is not what "use logos from global settings" sounds
+         * like. Presented as the three states they can actually be in.
+         */
+        prologoSource: {
+            get() {
+                if (this.settings.use_global_prologos) {
+                    return 'global';
+                }
+
+                return this.settings.use_global_prologos_if_no_poster_prologos
+                    ? 'poster-then-global'
+                    : 'poster';
+            },
+            set(value) {
+                this.settings.use_global_prologos = value === 'global';
+                this.settings.use_global_prologos_if_no_poster_prologos =
+                    value === 'poster-then-global';
+            },
         },
         saveButtonClass() {
             return this.unsavedChanges && !this.saving
