@@ -1,5 +1,7 @@
 <template>
     <div>
+        <VotingScreen @active="onVotingActive" />
+
         <div class="movie-posters">
             <div class="loading-overlay" v-if="loading">
                 <div class="p-6" @click="gotoPosters()" v-html="loadingMessage"></div>
@@ -11,7 +13,6 @@
                 v-if="!isPlaying"
             >
                 <TopHeader />
-                <VotingQr />
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
                         <div
@@ -86,7 +87,7 @@
 import { mapState, mapGetters, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import TopHeader from '@/components/top-header.vue';
-import VotingQr from '@/components/voting-qr.vue';
+import VotingScreen from '@/components/voting-screen.vue';
 import BottomFooter from '@/components/bottom-footer.vue';
 
 const $recentAdded = document.querySelector('#recent-added-container');
@@ -97,11 +98,12 @@ export default {
         return {
             borderWidth: 2,
             starSize: 28,
+            votingActive: false,
         };
     },
     components: {
         TopHeader,
-        VotingQr,
+        VotingScreen,
         BottomFooter,
     },
     watch: {
@@ -123,7 +125,7 @@ export default {
                     this.getNowPlaying();
                     this.stopTransitionImages();
                 } else {
-                    if (!this.loading) {
+                    if (!this.loading && !this.votingActive) {
                         console.log('WATCHER - nowPlaying START TRANSITION IMAGES');
                         this.startTransitionImages();
                     }
@@ -162,6 +164,26 @@ export default {
             'playTrailer',
             'playVideo',
         ]),
+        /**
+         * A vote takes the display over, so the slideshow is parked while one
+         * is on - the same treatment now-playing gets. Without this the posters
+         * carry on cycling behind the voting screen, and the trailer audio
+         * carries on over it.
+         */
+        onVotingActive(active) {
+            this.votingActive = active;
+
+            if (active) {
+                this.stopTransitionImages();
+                this.stopMusic();
+
+                return;
+            }
+
+            if (!this.loading && !this.isPlaying) {
+                this.startTransitionImages();
+            }
+        },
         blackBars(poster) {
             if (poster) {
                 if (poster.show_trailer && poster.trailer_path) {
@@ -339,7 +361,9 @@ export default {
 
 .slide-poster-enter-active,
 .slide-poster-leave-active {
-    transition: transform 1.2s ease, opacity 1s ease;
+    transition:
+        transform 1.2s ease,
+        opacity 1s ease;
     transform: translate3d(0, 0, 0);
 }
 

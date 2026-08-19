@@ -156,7 +156,11 @@ no Redis.
 3. Set **Picks per voter** — how many posters each person may choose. Note that
    allowing as many picks as there are posters lets everyone vote for
    everything, which usually ends in a tie.
-4. Press **Open for joining**. A QR code appears in the corner of the display.
+4. Press **Open for joining**. The display stops its slideshow and becomes a
+   voting screen: **Vote Now**, the QR code large in the middle, and how long is
+   left along the bottom once the round starts. A small code in the corner of a
+   changing slideshow asked people to notice it between posters and then scan
+   something the size of a stamp from across the room.
 5. People scan it, land on `/vote`, and enter a name. That page is public on
    purpose: voters are guests and have no account. It cannot change any
    setting — it can only cast votes into a session you opened.
@@ -168,8 +172,9 @@ no Redis.
    holds the controls.
    Latecomers are welcome: anyone who scans and joins after voting has started
    picks up the clock where it is and votes with whatever time is left.
-7. Ten seconds after the results, the session closes itself and the QR code
-   disappears. **Close session** ends it sooner. The winner is not lost at that
+7. The winner appears on that same display screen when the round ends. Ten
+   seconds later the session closes itself and the display goes back to the
+   slideshow. **Close session** ends it sooner. The winner is not lost at that
    point: it stays on the Setup tab, and on the voting page for anyone still
    watching, labelled as the last session's winner until the next round starts.
 
