@@ -174,6 +174,13 @@ no Redis.
 The number of picks is enforced on the server as well as in the page, so a
 modified client cannot vote more times than the session allows.
 
+Votes survive the connection. Phones lock, tabs get closed, and a backgrounded
+tab has its websocket closed out from under it - a vote already cast stays in
+the count for the rest of the round. Each browser keeps a voter id in local
+storage, so coming back rejoins the same ballot: the page shows the picks
+already made, changing them replaces that vote, and reconnecting does not cast a
+second one.
+
 ## Display on/off schedule
 
 With `Use HDMI CEC Controls` enabled, DMP turns the TV on and off at the hours

@@ -98,6 +98,32 @@
 <script>
 import { io } from 'socket.io-client';
 
+const VOTER_KEY = 'dmp.voterId';
+
+/**
+ * A name for this browser's ballot that outlives the connection.
+ *
+ * Votes used to be keyed by socket id, so a phone locking its screen - which
+ * closes the websocket - lost the vote, and coming back cast a second one.
+ * Stored rather than generated per load so a reload rejoins the same ballot.
+ */
+function voterId() {
+    try {
+        let id = window.localStorage.getItem(VOTER_KEY);
+
+        if (!id) {
+            id = 'v-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+            window.localStorage.setItem(VOTER_KEY, id);
+        }
+
+        return id;
+    } catch (e) {
+        // Private browsing with storage denied: fall back to a per-load id.
+        // The vote still survives a background, just not a full reload.
+        return 'v-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+}
+
 /**
  * The screen people reach by scanning the QR code on the display.
  *
@@ -110,6 +136,7 @@ export default {
     data() {
         return {
             socket: null,
+            voterId: voterId(),
             name: '',
             joined: false,
             votingEnabled: false,
@@ -182,6 +209,13 @@ export default {
                           : 'Nobody voted.';
             });
 
+            // Sent when joining: whatever this voter already chose this round,
+            // so a reload or a woken phone shows their picks instead of an
+            // empty ballot they might cast again.
+            this.socket.on('your:votes', (data) => {
+                this.chosen = Array.isArray(data && data.posterIds) ? [...data.posterIds] : [];
+            });
+
             this.socket.on('voting:disabled', () => {
                 this.showResults = false;
                 this.joined = false;
@@ -233,7 +267,7 @@ export default {
             if (!this.name.trim()) {
                 return;
             }
-            this.socket.emit('new:user', { name: this.name.trim() });
+            this.socket.emit('new:user', { name: this.name.trim(), voterId: this.voterId });
             this.joined = true;
         },
         toggle(posterId) {
