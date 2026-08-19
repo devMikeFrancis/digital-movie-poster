@@ -6,6 +6,7 @@ use App\Http\Requests\SettingsRequest;
 use App\Http\Resources\PublicSettingResource;
 use App\Models\Setting;
 use App\Services\ApplicationUpdater;
+use App\Support\AdminAccess;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -35,6 +36,11 @@ class SettingController extends Controller
     {
         $settings = Setting::firstOrFail();
         $settings->fill($request->validated())->save();
+
+        // The middleware asks AdminAccess whether a login is needed, and it
+        // remembers the answer for the request - so a change to that setting
+        // has to clear it rather than take effect on the next page load.
+        AdminAccess::forget();
 
         return response()->json(['saved' => 1]);
     }

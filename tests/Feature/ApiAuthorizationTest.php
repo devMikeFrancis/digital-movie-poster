@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Poster;
+use App\Models\Setting;
 use App\Models\User;
+use App\Support\AdminAccess;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -89,7 +91,10 @@ class ApiAuthorizationTest extends TestCase
 
     public function test_everything_opens_up_when_login_is_disabled(): void
     {
-        config(['dmp.auth.required' => false]);
+        // The stored setting is what the middleware reads now; the env value
+        // only seeds it.
+        Setting::first()->update(['require_login' => false]);
+        AdminAccess::forget();
 
         $this->postJson('/api/show-in-rotation', ['all_show_in_rotation' => true])->assertOk();
         $this->getJson('/api/settings/full')->assertOk();
