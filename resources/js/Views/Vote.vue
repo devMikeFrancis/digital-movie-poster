@@ -3,10 +3,23 @@
         <div class="vote-inner">
             <!-- Nothing running -->
             <div v-if="!votingEnabled && !showResults" class="text-center">
-                <h1 class="text-white text-2xl font-bold mb-2">No vote running</h1>
+                <div v-if="lastWinners.length" class="mb-8">
+                    <h1 class="text-white text-2xl font-bold mb-4">Last session's winner</h1>
+                    <div class="poster-grid justify-center">
+                        <div v-for="winner in lastWinners" :key="winner.id" class="winner">
+                            <img :src="'/storage/posters/' + winner.file_name" :alt="winner.name" />
+                            <span class="text-white text-sm">
+                                {{ winner.votes }} vote<span v-if="winner.votes !== 1">s</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 v-else class="text-white text-2xl font-bold mb-2">No vote running</h1>
                 <p class="text-gray-400">
-                    Nobody has opened a vote yet. Leave this page open — it will wake up on its own
-                    when one starts.
+                    <span v-if="!lastWinners.length">Nobody has opened a vote yet. </span>
+                    Leave this page open — it will wake up on its own when
+                    {{ lastWinners.length ? 'the next vote' : 'one' }} starts.
                 </p>
             </div>
 
@@ -144,6 +157,7 @@ export default {
             maxSelections: 1,
             posters: [],
             voters: [],
+            lastResult: null,
             chosen: [],
             timer: 0,
             countdown: null,
@@ -152,6 +166,13 @@ export default {
             resultMessage: '',
             winners: [],
         };
+    },
+    computed: {
+        lastWinners() {
+            return this.lastResult && Array.isArray(this.lastResult.winner)
+                ? this.lastResult.winner
+                : [];
+        },
     },
     methods: {
         connect() {
@@ -162,6 +183,7 @@ export default {
                 this.votingStarted = state.votingStarted;
                 this.maxSelections = state.maxSelections;
                 this.voters = state.users || [];
+                this.lastResult = state.lastResult || null;
 
                 if (state.posters && state.posters.length) {
                     this.posters = state.posters;
