@@ -186,12 +186,17 @@ export const usePostersStore = defineStore('posters', {
                 });
         },
         setInitialPosterView() {
-            let poster = '';
-            if (this.settings.random_order) {
-                poster = this.mediaPosters[this.getRandomPoster()];
-            } else {
-                poster = this.mediaPosters[0];
+            // A rating limit can exclude every poster, and unrated ones are
+            // excluded too - so there is not always a first poster to show.
+            // Reaching for one regardless threw during boot and left the
+            // display blank for good rather than for one change.
+            if (this.mediaPosters.length === 0) {
+                return;
             }
+
+            const poster = this.settings.random_order
+                ? this.mediaPosters[this.getRandomPoster()]
+                : this.mediaPosters[0];
 
             poster.show = true;
 
@@ -263,7 +268,10 @@ export const usePostersStore = defineStore('posters', {
                 return true;
             }
             if (mpaaLimit === 'G') {
-                return poster.mpaa_rating === 'G';
+                // Was reading an undefined 'poster' rather than the rating
+                // passed in, so choosing the strictest limit threw inside the
+                // filter and took the whole poster list with it.
+                return rating === 'G';
             }
             if (mpaaLimit === 'PG') {
                 return this.pgLimits.includes(rating);
@@ -285,7 +293,7 @@ export const usePostersStore = defineStore('posters', {
                 return true;
             }
             if (mpaaLimit === 'TV-Y') {
-                return poster.mpaa_rating === 'TV-Y';
+                return rating === 'TV-Y';
             }
             if (mpaaLimit === 'TV-Y7') {
                 return this.tvY7Limits.includes(rating);
@@ -395,37 +403,54 @@ export const usePostersStore = defineStore('posters', {
             this.show_imax = this.settings.show_imax;
             this.show_dolby_51 = this.settings.show_dolby_51;
         },
-        getRandomPoster() {
-            return Math.floor(Math.random() * this.moviePosters.length);
+        /**
+         * An index into the posters actually on show.
+         *
+         * Drawn against moviePosters before, which is the whole library: with a
+         * rating limit set the shown list is shorter, so the index could land
+         * past its end and leave nothing to show at all.
+         *
+         * Never returns the poster already up either. Doing so meant showing
+         * and then hiding the same object, which left the screen blank until
+         * the next change came round.
+         */
+        getRandomPoster(currentIndex = -1) {
+            const length = this.mediaPosters.length;
+
+            if (length <= 1) {
+                return 0;
+            }
+
+            const index = Math.floor(Math.random() * length);
+
+            return index === currentIndex ? (index + 1) % length : index;
         },
         getInSequencePoster() {
             console.log('GET NEXT POSTER');
-            const len = this.mediaPosters.length;
-            const currIndex = this.mediaPosters.findIndex((poster) => poster.show === true);
-            let poster,
-                pastPoster,
-                activeIndex = 0;
+            const posters = this.mediaPosters;
+            const len = posters.length;
 
-            if (this.settings.random_order) {
-                activeIndex = this.getRandomPoster();
-            } else {
-                activeIndex = currIndex + 1 === len ? 0 : currIndex + 1;
+            if (len === 0) {
+                return null;
             }
 
-            if (len === 1) {
-                poster = this.mediaPosters[0];
-                pastPoster = Object.assign(this.mediaPosters[0], {});
-                poster.show = true;
-            } else {
-                poster = this.mediaPosters[activeIndex];
-                pastPoster = this.mediaPosters[currIndex];
-                if (poster) {
-                    poster.show = true;
-                }
-                if (pastPoster) {
-                    pastPoster.show = false;
-                }
+            const currIndex = posters.findIndex((poster) => poster.show === true);
+            const activeIndex = this.settings.random_order
+                ? this.getRandomPoster(currIndex)
+                : (currIndex + 1) % len;
+
+            const poster = posters[activeIndex];
+            const pastPoster = currIndex > -1 ? posters[currIndex] : null;
+
+            // Hidden first, and never the poster about to be shown: the two
+            // used to be the same object whenever the random pick landed on the
+            // poster already up, and clearing it afterwards left the screen
+            // blank until the next change.
+            if (pastPoster && pastPoster !== poster) {
+                pastPoster.show = false;
             }
+
+            poster.show = true;
 
             return poster;
         },
