@@ -81,8 +81,15 @@
         </div>
 
         <div class="dolby-vision-stacked" v-if="show_dolby_vision_vertical">
+            <!--
+                The bounding box the drawing tool exported came with this, and
+                its fill:none rule lived in the standalone file's stylesheet
+                rather than travelling with the markup - so inlined here it fell
+                back to the SVG default of black and put a solid rectangle
+                behind the logo. Every other logo's box sits inside a
+                g fill="none" and was fine.
+            -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 993 363.46">
-                <rect class="cls-1" x="-116" y="-122.95" width="1224.66" height="609.54" />
                 <g>
                     <rect
                         :style="'fill: ' + settings.footer_text_color"

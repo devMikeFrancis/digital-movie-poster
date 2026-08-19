@@ -90,6 +90,20 @@ The wording — what it says instead of *Coming Soon* and *Now Playing* — is o
 the same **General** tab. The fonts, sizes, colours and borders are under
 **Settings → Theme**.
 
+## Processing logos
+
+**Which logos to show** decides where the Dolby Atmos, Dolby Vision, DTS:X,
+Auro-3D, IMAX and 5.1 badges come from:
+
+| | |
+| :--- | :--- |
+| **Only the ones each title supports** | The formats set on the poster when you edit it. |
+| **Each title's own, or the ones above if it has none** | Falls back to the global set for titles you have not filled in. |
+| **The ones above, on every title** | Ignores what each title supports and shows the same badges everywhere. |
+
+The last one is why a film with no Atmos soundtrack can end up displaying the
+Atmos logo. Choose the first if the badges should mean something.
+
 ## Limiting what is shown
 
 **Movie Rating Display Limit** and **TV Rating Display Limit** hide anything
