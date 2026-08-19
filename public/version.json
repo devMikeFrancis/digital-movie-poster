@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.10",
-    "changelog": "A display that starts before the server is ready now waits and tries again, instead of sitting on the loading screen until someone reloads it - which is what happened if the Pi reached the browser first. Also credits version 1 to Don Jones, who created DMP, on the About page.",
+    "latest": "2.1.11",
+    "changelog": "Syncing from Kodi now works for libraries with more than twenty films - past that it synced the first twenty and stopped. A media server that is switched off no longer stops the others from syncing, and a sync no longer gives up when a library section is empty or was never chosen. The socket server behind voting and now-playing also survives a malformed message from anything on the network instead of stopping.",
     "past_updates": [
+        {
+            "version": "2.1.10",
+            "changelog": "A display that starts before the server is ready now waits and tries again, instead of sitting on the loading screen until someone reloads it - which is what happened if the Pi reached the browser first. Also credits version 1 to Don Jones, who created DMP, on the About page."
+        },
         {
             "version": "2.1.9",
             "changelog": "Important if you are on 2.1.8. The four-hourly library check introduced there asked for something the display is not allowed to request, and the failure left the screen blank until it was reloaded - so a display would go blank about four hours after starting. It now reads the poster list the same way it does at boot, and keeps whatever is on screen up while it does it. Please take this update."
