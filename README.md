@@ -168,8 +168,10 @@ no Redis.
    holds the controls.
    Latecomers are welcome: anyone who scans and joins after voting has started
    picks up the clock where it is and votes with whatever time is left.
-7. Thirty seconds after the results, the session closes itself and the QR code
-   disappears. **Close session** ends it sooner.
+7. Ten seconds after the results, the session closes itself and the QR code
+   disappears. **Close session** ends it sooner. The winner is not lost at that
+   point: it stays on the Setup tab, and on the voting page for anyone still
+   watching, labelled as the last session's winner until the next round starts.
 
 The number of picks is enforced on the server as well as in the page, so a
 modified client cannot vote more times than the session allows.
