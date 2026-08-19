@@ -414,6 +414,8 @@
 
 <script>
 import axios from 'axios';
+import { mapActions } from 'pinia';
+import { usePostersStore } from '@/store/posters';
 import MainNav from '../partials/MainNav.vue';
 import TitleLookup from '@/components/title-lookup.vue';
 
@@ -475,6 +477,7 @@ export default {
     components: { MainNav, TitleLookup },
     watch: {},
     methods: {
+        ...mapActions(usePostersStore, ['requestDisplayReload']),
         /**
          * Fill the form in from a title the operator picked in the search
          * results, or fetched by IMDB id.
@@ -608,6 +611,11 @@ export default {
                     this.mode = 'edit';
                     this.music = null;
                     this.poster.image = null;
+
+                    // A running display holds the library it loaded with, so a
+                    // poster saved now would not appear on screen until it was
+                    // restarted or refreshed by hand.
+                    this.requestDisplayReload();
 
                     setTimeout(() => {
                         this.setSavePosterBtn();

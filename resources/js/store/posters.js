@@ -2,6 +2,9 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { defineStore } from 'pinia';
 
+/** How often a running display pulls the poster library again. */
+const POSTER_SYNC_MS = 1000 * 60 * 60 * 4;
+
 export const usePostersStore = defineStore('posters', {
     state: () => ({
         loading: true,
@@ -254,13 +257,24 @@ export const usePostersStore = defineStore('posters', {
                 this.useSettingsProLogos();
             }
         },
+        // Four hours, which is what the arithmetic here was meant to say. It
+        // came to a little over twenty-seven years, so a display never picked
+        // up a poster added after it started - the screen kept cycling whatever
+        // was in the library the last time it loaded.
         startSyncPosters() {
-            this.recentlyAddedInterval = setInterval(
-                () => {
-                    this.cachePosters();
-                },
-                60000 * 60 * 60 * 1000 * 4
-            ); // Every 4 hours
+            this.recentlyAddedInterval = setInterval(() => {
+                this.cachePosters();
+            }, POSTER_SYNC_MS);
+        },
+        /**
+         * Tells any display on the network to pull the library again. The same
+         * command the Refresh Movie Posters button sends, so that adding a
+         * poster does not need a second, manual step to be seen.
+         */
+        requestDisplayReload() {
+            if (this.socket && typeof this.socket.emit === 'function') {
+                this.socket.emit('dispatch:command', { command: 'reload' });
+            }
         },
         withinMpaaLimit(rating) {
             let mpaaLimit = this.settings.mpaa_limit;
