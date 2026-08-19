@@ -75,7 +75,27 @@ class UpdateApplicationTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $version['latest']);
         $this->assertNotEmpty($version['changelog']);
         $this->assertNotEmpty($version['past_updates']);
-        $this->assertSame('1.7.153', $version['past_updates'][0]['version']);
+
+        foreach ($version['past_updates'] as $past) {
+            $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $past['version']);
+            $this->assertNotEmpty($past['changelog']);
+        }
+
+        // Assert the shape of a release rather than one release's number, which
+        // pinning the previous version turned into a test that had to be edited
+        // every time a version was published. What actually has to hold is that
+        // the newest entry in the history is the release before this one: a bump
+        // that forgot to archive its predecessor, or one that went backwards,
+        // both leave devices unable to see the update.
+        $this->assertGreaterThan(
+            0,
+            version_compare($version['latest'], $version['past_updates'][0]['version']),
+            'The published version must be newer than the top of the history.'
+        );
+
+        $archived = array_column($version['past_updates'], 'version');
+        $this->assertNotContains($version['latest'], $archived);
+        $this->assertSame($archived, array_unique($archived));
     }
 
     public function test_check_update_serves_the_published_version(): void
