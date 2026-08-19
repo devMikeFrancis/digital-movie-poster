@@ -53,11 +53,22 @@ screen shape looks wrong in a way a poster does not.
 display that should show only artwork. The runtime and the rest of the header
 are unaffected.
 
+**Header plate** dresses the wording with the same five options as the theatre
+name below — plain, rules, marquee bulbs, plaque or neon. *Plaque* is the box
+the header used to have; it keeps its own border colour from the **Theme** tab,
+and a display that already had that box was carried over to it, so nothing
+changed appearance on updating.
+
+The header can sit **above or below the poster**, and either plate can **span
+the width of the screen** instead of hugging its words — the rules stretch, the
+bulbs repeat across, and a plaque becomes a band.
+
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.
 
-**Name plate** decides how it is dressed. All five are drawn in the header's
-text colour, so the name matches the rest of the screen:
+**Name plate** decides how it is dressed, with the same five as the header. All
+are drawn in the header's text colour, so the name matches the rest of the
+screen:
 
 | | |
 | :--- | :--- |

@@ -14,7 +14,7 @@
                 v-if="!isPlaying"
             >
                 <TheaterName v-if="theaterNameOn === 'top'" />
-                <TopHeader />
+                <TopHeader v-if="headerOn === 'top'" />
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
                         <div
@@ -55,6 +55,7 @@
                         <div id="music"></div>
                     </div>
                 </div>
+                <TopHeader v-if="headerOn === 'bottom'" />
                 <BottomFooter />
                 <TheaterName v-if="theaterNameOn === 'bottom'" />
             </div>
@@ -67,7 +68,7 @@
                     @click.prevent="gotoPosters()"
                 >
                     <TheaterName v-if="theaterNameOn === 'top'" />
-                    <TopHeader />
+                    <TopHeader v-if="headerOn === 'top'" />
 
                     <div class="now-playing-container">
                         <div
@@ -81,6 +82,7 @@
                         ></div>
                     </div>
 
+                    <TopHeader v-if="headerOn === 'bottom'" />
                     <BottomFooter />
                     <TheaterName v-if="theaterNameOn === 'bottom'" />
                 </div>
@@ -162,6 +164,9 @@ export default {
             const choice = this.settings.poster_fill_scrim || 'standard';
 
             return this.fillScreen ? 'scrim-' + choice : '';
+        },
+        headerOn() {
+            return this.settings.header_position === 'bottom' ? 'bottom' : 'top';
         },
         theaterNameOn() {
             if (!this.settings.show_theater_name || !this.settings.theater_name) {

@@ -9,23 +9,9 @@
                 >{{ localRuntime }} min</span
             >
         </Transition>
-        <h1
-            v-if="showHeaderText"
-            :style="
-                headerSize +
-                headerFont +
-                'color:' +
-                settings.header_text_color +
-                '; border-color: ' +
-                settings.header_border_color +
-                ';' +
-                (settings.show_header_border
-                    ? 'border-size: 1px; border-type: solid'
-                    : 'border: none; padding: 0')
-            "
-        >
-            {{ headerText }}
-        </h1>
+        <span v-if="showHeaderText" class="dmp-plate" :class="plateClasses" :style="plateVars">
+            <h1 class="dmp-plate-text" :style="headerSize + headerFont">{{ headerText }}</h1>
+        </span>
         <SpeakerConfig
             v-if="settings.speaker_config_location === 'top-right' && settings.show_speaker_config"
         />
@@ -65,6 +51,31 @@ export default {
         },
         transitionName() {
             return this.transitionPrefix + '-meta';
+        },
+        plateClasses() {
+            const styles = ['plain', 'rules', 'marquee', 'plaque', 'neon'];
+            const chosen = styles.includes(this.settings.header_style)
+                ? this.settings.header_style
+                : 'plain';
+
+            return [
+                'dmp-plate--' + chosen,
+                { 'dmp-plate--full': !!this.settings.header_full_width },
+            ];
+        },
+        /**
+         * The decorations draw themselves in currentColor. A plaque keeps its
+         * own border colour, because that was a separate setting before this
+         * became a style and displays using it should not lose it.
+         */
+        plateVars() {
+            const vars = { color: this.settings.header_text_color };
+
+            if (this.settings.header_style === 'plaque' && this.settings.header_border_color) {
+                vars.borderColor = this.settings.header_border_color;
+            }
+
+            return vars;
         },
         posterKey() {
             return this.nowPlaying ? 'now-playing' : this.currentPosterId;
@@ -142,11 +153,8 @@ export default {
 
     h1 {
         text-transform: uppercase;
-        padding: 12px 24px 14px 24px;
-        border: 4px solid #fff;
         font-size: 4vw;
         font-weight: 700;
-        color: #fff;
         line-height: 1;
         letter-spacing: 3px;
         margin: 0;
