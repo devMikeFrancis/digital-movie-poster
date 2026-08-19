@@ -1,6 +1,6 @@
 <template>
     <header class="top-header" :style="'background-color:' + settings.header_bg_color">
-        <Transition :name="transitionName">
+        <Transition :name="transitionName" mode="out-in">
             <span
                 class="runtime"
                 v-if="settings.show_runtime && localRuntime"
@@ -157,47 +157,42 @@ export default {
  * The runtime belongs to the poster, so it changes with it rather than
  * snapping to the next film while the artwork is still fading.
  */
+/*
+ * The details swap rather than overlap. The poster's cross-fade holds the
+ * outgoing image at full opacity while the incoming one covers it, which works
+ * because a poster covers a poster. These are centred text and icons of
+ * different widths, so nothing covers anything and both sets were readable at
+ * once. With out-in below, the old details leave before the new ones arrive,
+ * and the whole swap still fits inside the poster's change.
+ */
 .fade-meta-enter-active,
-.fade-meta-leave-active {
-    transition: opacity 2.2s ease;
+.fade-meta-leave-active,
+.crossfade-meta-enter-active,
+.crossfade-meta-leave-active {
+    transition: opacity 0.6s ease;
 }
 
 .fade-meta-enter-from,
-.fade-meta-leave-to {
+.fade-meta-leave-to,
+.crossfade-meta-enter-from,
+.crossfade-meta-leave-to {
     opacity: 0;
 }
 
 .slide-meta-enter-active,
 .slide-meta-leave-active {
     transition:
-        transform 1.2s ease,
-        opacity 1s ease;
+        transform 0.5s ease,
+        opacity 0.5s ease;
 }
 
 .slide-meta-leave-to {
-    transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -60%, 0);
     opacity: 0;
 }
 
 .slide-meta-enter-from {
-    transform: translate3d(0, 100%, 0);
-    opacity: 0;
-}
-.crossfade-meta-enter-active {
-    transition: opacity 1.6s ease;
-    z-index: 2;
-}
-
-.crossfade-meta-enter-from {
-    opacity: 0;
-}
-
-.crossfade-meta-leave-active {
-    transition: opacity 0.01s linear 1.6s;
-    z-index: 1;
-}
-
-.crossfade-meta-leave-to {
+    transform: translate3d(0, 60%, 0);
     opacity: 0;
 }
 
