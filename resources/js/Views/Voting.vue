@@ -1,245 +1,307 @@
 <template>
-    <div>
-        <div class="loading-overlay" v-if="loading">
-            <div class="p-12">{{ loadingMessage }}</div>
-        </div>
-        <div
-            class="get-ready-overlay"
-            v-bind:class="{ show: status === 'inProgress' && ready > 0 }"
-        >
-            <div class="get-ready mb-1">Get Ready!</div>
-            <div class="ready-time">{{ ready }}</div>
-        </div>
-
-        <div class="timer-container" v-if="votingStarted">
-            <div class="timer text-white">
-                {{ timer }}
-            </div>
-        </div>
-
-        <div class="admin-voting-tabs">
-            <button type="button" :class="{ active: tab === 'setup' }" @click="tab = 'setup'">
-                Setup
-            </button>
-            <button type="button" :class="{ active: tab === 'live' }" @click="tab = 'live'">
-                Live session
-            </button>
-            <span class="session-state" :class="votingEnabled ? 'on' : 'off'">{{ sessionLabel }}</span>
-        </div>
-
-        <!-- ------ -->
-
-        <div
-            class="md:container md:mx-auto lg:container lg:mx-auto p-4"
-            v-bind:class="{ 'pt-24': votingStarted }"
-        >
+    <div class="admin py-5">
+        <div class="md:container md:mx-auto lg:container lg:mx-auto">
             <div class="grid lg:grid-cols-12 gap-4">
-                <div class="md:col-span-2">
-                    <div v-if="users.length && loggedin">
-                        <h3 class="text-white font-bold text-2xl mb-3">Voters</h3>
-                        <ul class="block mb-8">
-                            <li v-for="user in users" class="text-xl text-white mb-2">
-                                <span
-                                    v-bind:class="{ 'text-yellow-200': myId === user.id }"
-                                    style="text-transform: capitalize"
-                                    >{{ user.name }}</span
+                <div class="lg:col-span-3">
+                    <main-nav />
+                </div>
+
+                <div class="lg:col-span-9 p-4" style="background-color: #121212">
+                    <div class="voting-bar">
+                        <ul class="tabs">
+                            <li>
+                                <a
+                                    href="#setup"
+                                    class="text-sm md:text-md"
+                                    :class="{ active: tab === 'setup' }"
+                                    @click.prevent="tab = 'setup'"
+                                    >Setup</a
                                 >
-                                <span class="inline-block ml-2 user-voted" v-if="user.voted"
-                                    ><svg
-                                        aria-hidden="true"
-                                        focusable="false"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 512 512"
-                                    >
-                                        <path
-                                            fill="currentColor"
-                                            d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
-                                        ></path></svg
-                                ></span>
+                            </li>
+                            <li>
+                                <a
+                                    href="#live"
+                                    class="text-sm md:text-md"
+                                    :class="{ active: tab === 'live' }"
+                                    @click.prevent="tab = 'live'"
+                                    >Live session</a
+                                >
                             </li>
                         </ul>
 
-                        <hr class="border-gray-700 mb-8" v-if="!votingStarted" />
-
-                        <a
-                            href="#"
-                            class="text-white inline-block hover:text-gray-300"
-                            @click.prevent="resetVoting()"
-                            v-if="!votingStarted"
-                            >Reset</a
-                        >
+                        <span class="session-state" :class="sessionStateClass">{{
+                            sessionLabel
+                        }}</span>
                     </div>
-                </div>
 
-                <div class="md:col-span-10" v-if="!votingStarted && loggedin && status !== 'done'">
-                    <div class="grid lg:grid-cols-12 gap-4 mb-3">
-                        <div class="md:col-span-5 flex items-center">
-                            <label class="text-white inline-flex items-center">
-                                <input type="checkbox" v-model="random" />
-                                <span class="ml-2">Randomize Posters</span>
+                    <!-- Setup: everything that has to be decided before people join. -->
+                    <div v-show="tab === 'setup'" class="tab-panel">
+                        <div class="panel">
+                            <h3 class="panel-title">Posters in the running</h3>
+
+                            <label class="text-white inline-flex items-center mb-4">
+                                <input type="checkbox" v-model="random" :disabled="votingEnabled" />
+                                <span class="ml-2">Pick them at random</span>
                             </label>
-                            <div class="" v-if="random">
-                                <label class="text-white inline-flex items-center">
-                                    <input
-                                        type="number"
-                                        pattern="[0-9]+"
-                                        class="
-                                            text-black
-                                            h-10
-                                            w-16
-                                            px-2
-                                            ml-3
-                                            rounded-lg
-                                            focus:shadow-sm
-                                            focus:outline-none
-                                        "
-                                        v-model="posterLimit"
-                                    />
-                                    <span class="ml-2">Random Limit</span>
-                                </label>
+
+                            <div v-if="random" class="field">
+                                <label class="field-label" for="poster-limit">How many</label>
+                                <input
+                                    id="poster-limit"
+                                    type="number"
+                                    min="1"
+                                    :max="posters.length || 1"
+                                    class="field-input w-24"
+                                    v-model="posterLimit"
+                                    :disabled="votingEnabled"
+                                />
+                                <p class="field-help">
+                                    {{ posters.length }} posters to draw from.
+                                </p>
+                            </div>
+
+                            <div v-else>
+                                <p class="field-help mb-3">
+                                    Choose the posters people will vote on.
+                                    <span class="text-gray-300">{{ chosenPosters.length }}</span>
+                                    selected.
+                                </p>
+                                <div class="posters-container flex flex-wrap">
+                                    <div v-for="poster in posters" class="choose-poster-item">
+                                        <label class="text-white block">
+                                            <input
+                                                type="checkbox"
+                                                v-model="poster.checked"
+                                                :disabled="votingEnabled"
+                                                @change="togglePoster($event, poster)"
+                                            />
+                                            <div>
+                                                <img
+                                                    :src="'/storage/posters/_tn_' + poster.file_name"
+                                                    class="rounded-lg shadow-lg hover:shadow-none"
+                                                    :alt="poster.name"
+                                                />
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="md:col-span-5">
-                            <label class="text-white inline-flex items-center">
-                                <input
-                                    type="number"
-                                    pattern="[0-9]+"
-                                    class="
-                                        text-black
-                                        h-10
-                                        w-16
-                                        px-2
-                                        rounded-lg
-                                        focus:shadow-sm
-                                        focus:outline-none
-                                    "
-                                    v-model="timeLimit"
-                                />
-                                <span class="ml-2"
-                                    >Voting Timer <span class="text-sm">(seconds)</span></span
-                                >
-                            </label>
+                        <div class="panel">
+                            <h3 class="panel-title">Rules</h3>
+
+                            <div class="fields">
+                                <div class="field">
+                                    <label class="field-label" for="time-limit">
+                                        Voting timer
+                                    </label>
+                                    <input
+                                        id="time-limit"
+                                        type="number"
+                                        min="5"
+                                        class="field-input w-24"
+                                        v-model="timeLimit"
+                                        :disabled="votingStarted"
+                                    />
+                                    <p class="field-help">Seconds, once voting starts.</p>
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label" for="max-selections">
+                                        Picks per voter
+                                    </label>
+                                    <input
+                                        id="max-selections"
+                                        type="number"
+                                        min="1"
+                                        :max="selectionCap"
+                                        class="field-input w-24"
+                                        v-model="maxSelections"
+                                        :disabled="votingEnabled"
+                                    />
+                                    <p class="field-help">
+                                        Allowing as many picks as there are posters lets everyone
+                                        vote for everything, which usually ends in a tie.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="md:col-span-2 text-right">
-                            <div class="start-messages">
-                                <div
-                                    v-for="startMessage in startMessages"
-                                    class="start-message text-white"
-                                >
+                        <div class="panel-actions">
+                            <div class="start-messages" v-if="startMessages.length">
+                                <div v-for="startMessage in startMessages" class="start-message">
                                     {{ startMessage }}
                                 </div>
                             </div>
-                            <div class="mb-4">
-                                <label class="text-gray-300 block mb-1 font-bold">
-                                    Picks per voter
-                                </label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    :max="selectionCap"
-                                    class="h-10 w-24 px-3 text-black rounded"
-                                    v-model="maxSelections"
-                                />
-                                <div class="text-gray-400 text-sm mt-1">
-                                    How many posters each person may choose. Setting this to the
-                                    number in the running lets everyone pick everything, which
-                                    usually ends in a tie.
-                                </div>
-                            </div>
 
-                            <div class="flex flex-wrap gap-2">
+                            <template v-if="!votingEnabled">
                                 <button
                                     type="button"
-                                    class="h-10 px-3 text-white rounded-lg bg-green-700 hover:bg-green-600"
-                                    v-if="!votingEnabled"
+                                    class="btn-primary"
                                     @click="openVoting()"
                                 >
                                     Open for joining
                                 </button>
-                                <button
-                                    type="button"
-                                    class="h-10 px-3 text-white rounded-lg bg-blue-700 hover:bg-blue-400"
-                                    :disabled="votingStarted"
-                                    @click="startVoting()"
-                                >
-                                    Start Voting
+                                <p class="field-help">
+                                    Puts a QR code on the display so people can join from their
+                                    phones. Voting starts when you say so.
+                                </p>
+                            </template>
+
+                            <template v-else>
+                                <button type="button" class="btn-plain" @click="tab = 'live'">
+                                    Go to the live session
                                 </button>
-                                <button
-                                    type="button"
-                                    class="h-10 px-3 text-white rounded-lg bg-gray-700 hover:bg-gray-600"
-                                    v-if="votingEnabled"
-                                    @click="closeVoting()"
-                                >
-                                    Close session
-                                </button>
-                            </div>
-                            <p class="text-gray-400 text-sm mt-2" v-if="votingEnabled">
-                                A QR code is showing on the display. People can scan it to join.
+                                <p class="field-help">
+                                    A session is already open. Close it to change any of this.
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Live: running the session that is already open. -->
+                    <div v-show="tab === 'live'" class="tab-panel">
+                        <div class="panel" v-if="!votingEnabled">
+                            <h3 class="panel-title">No session open</h3>
+                            <p class="field-help mb-4">
+                                Choose your posters and rules first, then open the session for
+                                joining.
                             </p>
+                            <button type="button" class="btn-plain" @click="tab = 'setup'">
+                                Go to setup
+                            </button>
                         </div>
-                    </div>
 
-                    <div class="posters-container flex flex-wrap space-between" v-if="!random">
-                        <div v-for="poster in posters" class="choose-poster-item">
-                            <label class="text-white block">
-                                <input
-                                    type="checkbox"
-                                    v-model="poster.checked"
-                                    @change="togglePoster($event, poster)"
-                                />
-                                <div>
+                        <template v-else>
+                            <div class="panel">
+                                <div class="stats">
+                                    <div class="stat">
+                                        <span class="stat-value">{{ users.length }}</span>
+                                        <span class="stat-label">joined</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">{{ votedCount }}</span>
+                                        <span class="stat-label">voted</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">{{ maxSelections }}</span>
+                                        <span class="stat-label">picks each</span>
+                                    </div>
+                                    <div class="stat" v-if="votingStarted">
+                                        <span class="stat-value">{{
+                                            ready > 0 ? ready : timer
+                                        }}</span>
+                                        <span class="stat-label">{{
+                                            ready > 0 ? 'get ready' : 'seconds left'
+                                        }}</span>
+                                    </div>
+                                </div>
+
+                                <p class="field-help" v-if="!votingStarted">
+                                    A QR code is showing on the display, pointing at
+                                    <span class="text-gray-300">{{ voteUrl }}</span
+                                    >. People can scan it to join.
+                                </p>
+                            </div>
+
+                            <div class="panel">
+                                <h3 class="panel-title">Voters</h3>
+                                <p class="field-help" v-if="!users.length">
+                                    Nobody has joined yet.
+                                </p>
+                                <ul class="voters" v-else>
+                                    <li v-for="user in users" class="voter">
+                                        <span style="text-transform: capitalize">{{
+                                            user.name
+                                        }}</span>
+                                        <span class="inline-block ml-2 user-voted" v-if="user.voted"
+                                            ><svg
+                                                aria-hidden="true"
+                                                focusable="false"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 512 512"
+                                            >
+                                                <path
+                                                    fill="currentColor"
+                                                    d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+                                                ></path></svg
+                                        ></span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="panel" v-if="runningPosters.length">
+                                <h3 class="panel-title">On the ballot</h3>
+                                <div class="posters-container flex flex-wrap">
+                                    <div
+                                        v-for="poster in runningPosters"
+                                        class="running-poster-item"
+                                    >
+                                        <img
+                                            :src="'/storage/posters/_tn_' + poster.file_name"
+                                            class="rounded-lg shadow-lg"
+                                            :alt="poster.name"
+                                        />
+                                        <span class="running-poster-votes"
+                                            >{{ poster.votes || 0 }} vote<span
+                                                v-if="poster.votes !== 1"
+                                                >s</span
+                                            ></span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-actions">
+                                <div class="start-messages" v-if="startMessages.length">
+                                    <div v-for="startMessage in startMessages" class="start-message">
+                                        {{ startMessage }}
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        class="btn-primary"
+                                        :disabled="votingStarted"
+                                        @click="startVoting()"
+                                    >
+                                        Start voting
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-plain"
+                                        :disabled="votingStarted"
+                                        @click="resetVoting()"
+                                    >
+                                        Reset votes
+                                    </button>
+                                    <button type="button" class="btn-plain" @click="closeVoting()">
+                                        Close session
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div class="panel text-center" v-if="showResults">
+                            <h3 class="text-white font-bold text-3xl mb-4">
+                                We Have a {{ resultMessage }}!
+                            </h3>
+                            <div class="winner-container flex flex-wrap justify-center">
+                                <div class="winner-item" v-for="winner in winners">
+                                    <span class="votes"
+                                        >{{ winner.votes }} vote<span v-if="winner.votes !== 1"
+                                            >s</span
+                                        ></span
+                                    >
                                     <img
-                                        :src="'/storage/posters/_tn_' + poster.file_name"
-                                        class="rounded-lg shadow-lg hover:shadow-none"
-                                        :alt="poster.name"
+                                        :src="'/storage/posters/' + winner.file_name"
+                                        :alt="winner.name"
+                                        class="rounded-lg shadow-lg"
                                     />
                                 </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="vote-container md:col-span-10" v-if="votingStarted">
-                    <div class="posters-container flex flex-wrap space-between">
-                        <div v-for="vposter in votingOnPosters" class="vote-poster-item">
-                            <label>
-                                <input
-                                    type="radio"
-                                    class="vote-toggle"
-                                    v-bind:value="vposter.id"
-                                    v-model="vote"
-                                    :disabled="timer === 0"
-                                />
-                                <div>
-                                    <img
-                                        :src="'/storage/posters/' + vposter.file_name"
-                                        class="rounded-lg shadow-lg hover:shadow-none"
-                                        :alt="vposter.name"
-                                    />
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sm:col-span-12 md:col-span-10 text-center" v-if="showResults">
-                    <h3 class="text-white font-bold text-3xl mb-4">
-                        We Have a {{ resultMessage }}!
-                    </h3>
-                    <div class="winner-container flex flex-wrap justify-center">
-                        <div class="winner-item" v-for="winner in winners">
-                            <span class="votes"
-                                >{{ winner.votes }} vote<span v-if="winner.votes !== 1"
-                                    >s</span
-                                ></span
-                            >
-                            <img
-                                :src="'/storage/posters/' + winner.file_name"
-                                :alt="winner.name"
-                                class="rounded-lg shadow-lg"
-                            />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -251,37 +313,38 @@
 <script>
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import EventEmitter from 'eventemitter3';
+import MainNav from '../partials/MainNav.vue';
 
+/**
+ * The admin console for a voting session. It is a control surface, not a
+ * ballot: since the QR code went on the display, votes are cast on /vote from
+ * people's phones, and this screen opens the session, starts it, and watches
+ * the count come in.
+ */
 export default {
+    components: {
+        MainNav,
+    },
     data: function () {
         return {
-            loading: false,
-            loadingMessage: 'Loading',
-            votingMessages: [],
-            startMessages: [],
-            loggedin: true, // the admin screen no longer asks for a name
             tab: 'setup',
+            startMessages: [],
             votingEnabled: false,
+            votingStarted: false,
             maxSelections: 3,
             socket: '',
             users: [],
-            name: '',
             posters: [],
+            runningPosters: [],
             random: false,
-            votingStarted: false,
             posterLimit: 3,
             chosenPosters: [],
-            votingOnPosters: [],
-            votes: [],
             timeLimit: 30,
             timer: 0,
-            ready: 5,
-            lastWinner: {},
+            ready: 0,
             status: 'none',
             readyInterval: null,
             timerInterval: null,
-            vote: '',
             showResults: false,
             resultMessage: '',
             winners: [],
@@ -292,7 +355,15 @@ export default {
             if (this.votingStarted) {
                 return 'Voting in progress';
             }
+
             return this.votingEnabled ? 'Open for joining' : 'No session';
+        },
+        sessionStateClass() {
+            if (this.votingStarted) {
+                return 'live';
+            }
+
+            return this.votingEnabled ? 'on' : 'off';
         },
         selectionCap() {
             // Never offer more picks than there are posters to pick from.
@@ -302,12 +373,11 @@ export default {
 
             return Math.max(1, inRunning || 1);
         },
-    },
-    watch: {
-        vote(newValue, oldValue) {
-            if (this.votingStarted) {
-                this.toggleVote(newValue, oldValue);
-            }
+        votedCount() {
+            return this.users.filter((user) => user.voted).length;
+        },
+        voteUrl() {
+            return window.location.origin + '/vote';
         },
     },
     methods: {
@@ -315,22 +385,19 @@ export default {
             this.startSockets();
             this.getPosters();
         },
-        signIn() {
-            if (this.name.length > 1) {
-                this.socket.emit('new:user', { name: this.name });
-                this.loggedin = true;
+        disconnectSocket() {
+            if (this.socket && typeof this.socket.disconnect === 'function') {
+                this.socket.disconnect();
             }
+            this.socket = '';
         },
         startSockets() {
             this.socket = io('http://' + location.hostname + ':3000');
 
-            this.socket.on('connect', () => {
-                this.myId = this.socket.id;
-            });
-
             this.socket.on('session', (state) => {
                 this.votingEnabled = state.votingEnabled;
                 this.votingStarted = state.votingStarted;
+                this.runningPosters = state.posters || [];
 
                 // Only adopt the server's figure once a session exists, or the
                 // idle default would overwrite what the admin has typed.
@@ -342,29 +409,25 @@ export default {
             this.socket.on('voting:disabled', () => {
                 this.votingEnabled = false;
                 this.votingStarted = false;
+                this.runningPosters = [];
+                this.timer = 0;
+                this.ready = 0;
             });
 
             this.socket.on('users', (data) => {
                 this.users = data.users;
             });
 
-            /*
-            this.socket.on('status', (data) => {
-                this.votingStarted = data.votingStarted;
-                this.votingOnPosters = data.posters;
-                this.timer = data.timer;
-                this.lastWinner = data.lastWinner;
-                this.status = data.status;
-                if (this.status === 'inProgress') {
-                    this.startTimer();
-                }
-            });*/
-
             this.socket.on('start:voting', (data) => {
+                this.showResults = false;
+                this.winners = [];
+                this.ready = 5;
                 this.votingStarted = data.votingStarted;
-                this.votingOnPosters = data.posters;
+                this.runningPosters = data.posters || [];
                 this.timer = data.timer;
                 this.status = data.status;
+                this.tab = 'live';
+
                 if (this.status === 'inProgress') {
                     this.startReadyTimer();
                 }
@@ -380,24 +443,17 @@ export default {
                 }
 
                 this.winners = data.results.winner;
-
                 this.votingStarted = data.votingStarted;
-                this.votingOnPosters = [];
-                this.votes = [];
-                this.vote = '';
-                this.random = false;
-                this.posterLimit = 3;
-                this.chosenPosters = [];
                 this.timer = 0;
-                this.ready = 5;
+                this.ready = 0;
                 this.status = data.status;
                 this.showResults = true;
             });
 
             this.socket.on('user:voted', (data) => {
-                this.users.forEach((v) => {
-                    if (v.id === data.user_id) {
-                        v.voted = true;
+                this.users.forEach((user) => {
+                    if (user.id === data.user_id) {
+                        user.voted = true;
                     }
                 });
             });
@@ -435,76 +491,73 @@ export default {
                 return false;
             }
 
+            this.showResults = false;
+            this.winners = [];
+
             this.socket.emit('enable:voting', {
                 posters,
                 maxSelections: Math.min(parseInt(this.maxSelections) || 1, posters.length),
                 timeLimit: this.timeLimit,
             });
+
             this.tab = 'live';
         },
         closeVoting() {
+            this.startMessages = [];
             this.socket.emit('disable:voting', {});
         },
         /**
-         * The posters going into the running, honouring the limit whether they
-         * were picked by hand or at random.
+         * The posters going into the running. Hand-picked means exactly what
+         * was picked; the limit is how many to draw when going at random.
          */
         postersForSession() {
-            if (!this.random && this.chosenPosters.length === 0) {
-                this.startMessages.push('Please choose at least one poster.');
-                return null;
+            if (!this.random) {
+                if (this.chosenPosters.length === 0) {
+                    this.startMessages.push('Please choose at least one poster.');
+                    return null;
+                }
+
+                return this.chosenPosters.map((poster) => ({ ...poster, votes: 0 }));
             }
 
-            if (this.random && !parseInt(this.posterLimit)) {
+            const limit = parseInt(this.posterLimit);
+
+            if (!limit) {
                 this.startMessages.push('Enter how many random posters to use.');
                 return null;
             }
 
-            if (parseInt(this.posterLimit) > this.posters.length) {
+            if (limit > this.posters.length) {
                 this.startMessages.push('You do not have that many posters.');
                 return null;
             }
 
-            const chosen = this.random
-                ? this.getRandomPosters()
-                : this.chosenPosters.slice(0, parseInt(this.posterLimit) || this.chosenPosters.length);
-
-            return chosen.map((poster) => ({ ...poster, votes: 0, checked: false }));
+            return this.getRandomPosters().map((poster) => ({ ...poster, votes: 0 }));
         },
+        /**
+         * Starts the session that is already open. The posters are whatever the
+         * server published when it opened - re-deriving them here would draw a
+         * fresh random set and change the ballot out from under everyone who
+         * had already joined.
+         */
         startVoting() {
             this.startMessages = [];
-            let posters = this.chosenPosters;
 
-            if (!this.random && this.chosenPosters.length === 0) {
-                this.startMessages.push('Please choose at least one poster.');
+            if (!this.votingEnabled) {
+                this.startMessages.push('Open a session for joining first.');
                 return false;
             }
 
-            if (this.random && this.posterLimit === 0) {
-                this.startMessages.push('Enter a limit of random posters.');
-                return false;
-            }
-
-            if (this.posterLimit > this.posters.length) {
-                this.startMessages.push('Cannot choose an amount more than posters.');
-                return false;
-            }
-
-            if (this.random) {
-                posters = this.getRandomPosters();
-            }
-
-            posters.forEach((v, i) => {
-                posters[i].votes = 0;
-                posters[i].checked = false;
-            });
+            this.showResults = false;
+            this.winners = [];
 
             this.socket.emit('start:voting', {
-                posters,
                 timeLimit: this.timeLimit,
-                maxSelections: Math.min(parseInt(this.maxSelections) || 1, posters.length),
+                maxSelections: Math.min(
+                    parseInt(this.maxSelections) || 1,
+                    this.runningPosters.length || 1
+                ),
             });
-            this.tab = 'live';
         },
         getRandomPosters() {
             let limit = parseInt(this.posterLimit);
@@ -522,6 +575,7 @@ export default {
             return result;
         },
         startReadyTimer() {
+            clearInterval(this.readyInterval);
             this.readyInterval = setInterval(() => {
                 if (this.ready === 1) {
                     this.startTimer();
@@ -534,6 +588,7 @@ export default {
             }, 1000);
         },
         startTimer() {
+            clearInterval(this.timerInterval);
             this.timerInterval = setInterval(() => {
                 if (this.timer === 0) {
                     clearInterval(this.timerInterval);
@@ -542,154 +597,250 @@ export default {
                 }
             }, 1000);
         },
-        toggleVote(newValue, oldValue) {
-            this.voteMessages = [];
-            if (oldValue.length === 0) {
-                oldValue = 0;
-            }
-            if (this.timer > 0) {
-                const data = { new: newValue, old: oldValue };
-                this.socket.emit('toggle:vote', data);
-            } else {
-                this.voteMessages.push('Sorry, time is up!');
-            }
-        },
         resetVoting() {
             this.socket.emit('reset:voting', {});
-            this.votingStarted = false;
-            this.votingOnPosters = [];
-            this.votes = [];
-            this.vote = '';
-            this.status = 'none';
-            this.winners = [];
             this.showResults = false;
-            this.ready = 5;
-            this.timer = 30;
-            this.chosenPosters = [];
-            this.posterLimit = 3;
-            this.random = false;
+            this.winners = [];
+            this.status = 'open';
+            this.ready = 0;
+            this.timer = 0;
         },
     },
-    created() {},
     mounted() {
         this.boot();
+    },
+    beforeUnmount() {
+        // Without this the socket outlives the screen: SPA navigation never
+        // unloads the page, so the server keeps listing you as a voter and the
+        // participant list fills with people who already left.
+        clearInterval(this.readyInterval);
+        clearInterval(this.timerInterval);
+        this.disconnectSocket();
     },
 };
 </script>
 
 <style scoped lang="scss">
-.admin-voting-tabs {
+/*
+ * Tabs on the left, session state on the right, and stuck to the top: which
+ * state the session is in decides what every control on the page does, so it
+ * should stay readable while scrolling a long poster grid.
+ */
+.voting-bar {
     display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: #121212;
+    padding: 8px 0;
+    margin-bottom: 4px;
+}
 
-    button {
-        padding: 8px 16px;
-        color: #888;
-        background-color: #333;
-        border-radius: 3px;
+.tabs {
+    display: flex;
 
-        &:hover {
-            color: #ccc;
-            background-color: #444;
+    li {
+        margin-right: 6px;
+
+        &:last-child {
+            margin-right: 0;
         }
 
-        &.active {
-            color: #fff;
-            background-color: #555;
-        }
-    }
+        a {
+            display: block;
+            padding: 8px 0;
+            min-width: 112px;
+            text-align: center;
+            color: #888;
+            background-color: #333;
 
-    .session-state {
-        margin-left: auto;
-        font-size: 14px;
-        padding: 4px 10px;
-        border-radius: 3px;
+            &:hover {
+                background-color: #777;
+                color: #ccc;
+                transition: background-color 0.25s ease;
+            }
 
-        &.on {
-            color: #bbf7d0;
-            background-color: #14532d;
-        }
+            &.active {
+                color: #fff;
+                background-color: #555;
 
-        &.off {
-            color: #9ca3af;
-            background-color: #1f2937;
+                &:hover {
+                    background-color: #777;
+                }
+            }
         }
     }
 }
 
-.vote-container,
-.posters-container,
-.winner-container {
+.session-state {
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 3px;
+
+    &.live {
+        color: #fef08a;
+        background-color: #713f12;
+    }
+
+    &.on {
+        color: #bbf7d0;
+        background-color: #14532d;
+    }
+
+    &.off {
+        color: #9ca3af;
+        background-color: #1f2937;
+    }
+}
+
+.tab-panel {
+    padding-top: 20px;
+}
+
+.panel {
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    background-color: #1c1c1c;
+    border-radius: 4px;
+}
+
+.panel-title {
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.panel-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 0 24px 8px;
+}
+
+/*
+ * Label above input above help text, so a number field and the sentence
+ * explaining it stay together instead of drifting apart across a wide row.
+ */
+.fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.field {
+    max-width: 340px;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: #d1d5db;
+}
+
+.field-input {
+    height: 42px;
+    padding: 0 10px;
+    color: #000;
+    border-radius: 2px;
+}
+
+.field-help {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.btn-primary,
+.btn-plain {
+    height: 40px;
+    padding: 0 16px;
+    color: #fff;
+    border-radius: 4px;
+
+    &:disabled {
+        color: #9ca3af;
+        background-color: #374151;
+        cursor: default;
+    }
+}
+
+.btn-primary {
+    background-color: #1d4ed8;
+
+    &:hover:enabled {
+        background-color: #2563eb;
+    }
+}
+
+.btn-plain {
+    background-color: #374151;
+
+    &:hover:enabled {
+        background-color: #4b5563;
+    }
+}
+
+.start-messages {
+    color: #fca5a5;
+}
+
+.voters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.voter {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    color: #fff;
+    background-color: #2b2b2b;
+    border-radius: 999px;
+}
+
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-bottom: 12px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #fff;
+}
+
+.stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #9ca3af;
+}
+
+.posters-container {
     padding: 12px;
     background: #222;
-}
-.loading-overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: #fff;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background-color: #000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
-}
-
-.login-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #222;
-    z-index: 500;
-
-    .inner {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-}
-
-.get-ready-overlay {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background-color: #000;
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    z-index: 200;
-
-    .get-ready {
-        font-size: 46px;
-        font-weight: 700;
-    }
-
-    .ready-time {
-        font-size: 72px;
-    }
-
-    &.show {
-        display: flex;
-    }
+    border-radius: 4px;
 }
 
 .user-voted {
+    color: #4ade80;
+
     svg {
         width: 16px;
         height: 16px;
@@ -736,56 +887,34 @@ export default {
         position: relative;
         pointer-events: none;
     }
+
     img {
         max-width: 112px;
         height: auto;
     }
 }
 
-.vote-poster-item {
-    input {
-        display: none;
-    }
-    input:checked + div {
-        &:after {
-            display: block;
-            width: 60px;
-            height: 60px;
-            background-color: #000;
-            background-image: url('/images/thumbs-up.svg');
-            background-size: 24px 24px;
-            background-repeat: no-repeat;
-            background-position: center;
-            content: '';
-            border-radius: 50%;
-            border: 2px solid #fbbf24;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            pointer-events: none;
-        }
-    }
+.running-poster-item {
+    margin: 12px;
+    text-align: center;
 
-    label {
-        cursor: pointer;
-        transition: opacity 0.25s ease;
-
-        &:hover {
-            opacity: 0.65;
-        }
-    }
-
-    div {
-        margin: 12px;
-        position: relative;
-        pointer-events: none;
-    }
     img {
-        max-width: 200px;
+        max-width: 112px;
         height: auto;
     }
+}
+
+.running-poster-votes {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+.winner-container {
+    padding: 12px;
+    background: #222;
+    border-radius: 4px;
 }
 
 .winner-item {
@@ -793,74 +922,15 @@ export default {
     text-align: center;
 
     .votes {
+        display: block;
         color: #fff;
         font-size: 24px;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
     }
 
     img {
         max-width: 300px;
         height: auto;
-    }
-}
-
-.timer-container {
-    display: flex;
-    justify-content: center;
-    background-color: #000;
-    padding: 12px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 300;
-}
-
-.timer {
-    width: 80px;
-    padding: 6px 0;
-    text-align: center;
-    font-size: 28px;
-    color: #fff;
-    font-weight: 500;
-    letter-spacing: 2px;
-    border: 2px solid #fff;
-    border-radius: 4px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 2s;
-}
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
-.fade2-enter-active,
-.fade2-leave-active {
-    transition: opacity 1s;
-}
-.fade2-enter,
-.fade2-leave-to {
-    opacity: 0;
-}
-
-@keyframes FadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-@keyframes FadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
     }
 }
 </style>
