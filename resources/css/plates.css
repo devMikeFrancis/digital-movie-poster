@@ -1,0 +1,93 @@
+/*
+ * Plates.
+ *
+ * The header wording and the theatre name are the same kind of thing - a short
+ * line of signage over the artwork - so they share one implementation rather
+ * than each growing its own. A plate hugs its text; the decoration is drawn
+ * around it in currentColor, so it takes whatever colour the text is set to and
+ * stays sharp at any size.
+ *
+ * Not scoped to a component, because two components use it.
+ */
+
+.dmp-plate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6vw;
+    max-width: 92%;
+}
+
+/*
+ * Full width spans the screen instead of hugging the words. The rules stretch
+ * with it, the bulbs repeat across it, and a plaque becomes a band.
+ */
+.dmp-plate--full {
+    display: flex;
+    width: 100%;
+    max-width: none;
+}
+
+/*
+ * Rules - hairlines either side, which reads as a caption rather than a label.
+ * The plate hugs its text, so the rules need somewhere to grow into or they
+ * come out at zero width and the style looks like it did nothing.
+ */
+.dmp-plate--rules {
+    width: 100%;
+}
+
+.dmp-plate--rules::before,
+.dmp-plate--rules::after {
+    content: '';
+    flex: 1 1 auto;
+    max-width: 16vw;
+    height: 0.22vh;
+    min-height: 1px;
+    background-color: currentColor;
+    opacity: 0.55;
+}
+
+.dmp-plate--rules.dmp-plate--full::before,
+.dmp-plate--rules.dmp-plate--full::after {
+    max-width: none;
+}
+
+/*
+ * Marquee - a row of bulbs above and below, the one decoration that reads as a
+ * cinema from across a room.
+ */
+.dmp-plate--marquee {
+    flex-direction: column;
+    gap: 0.9vh;
+    padding: 0 1.5vw;
+}
+
+.dmp-plate--marquee::before,
+.dmp-plate--marquee::after {
+    content: '';
+    width: 100%;
+    height: 1.1vh;
+    background-image: radial-gradient(circle, currentColor 0 30%, transparent 34%);
+    background-size: 2.4vh 1.1vh;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: 0.85;
+}
+
+/* Plaque - a bordered plate, like an engraved sign. */
+.dmp-plate--plaque {
+    padding: 0.9vh 2.4vw;
+    border: 0.28vh solid currentColor;
+    border-radius: 0.5vh;
+    box-shadow: inset 0 0 0 0.22vh rgb(255 255 255 / 0.12);
+}
+
+/* Neon - a soft halo in the same colour, for a dark room. */
+.dmp-plate--neon > .dmp-plate-text,
+.dmp-plate--neon.dmp-plate-text {
+    text-shadow:
+        0 0 0.5vh currentColor,
+        0 0 1.4vh currentColor,
+        0 0 3vh currentColor;
+}

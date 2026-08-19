@@ -14,7 +14,7 @@
                 v-if="!isPlaying"
             >
                 <TheaterName v-if="theaterNameOn === 'top'" />
-                <TopHeader />
+                <TopHeader v-if="headerOn === 'top'" />
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
                         <div
@@ -55,6 +55,7 @@
                         <div id="music"></div>
                     </div>
                 </div>
+                <TopHeader v-if="headerOn === 'bottom'" />
                 <BottomFooter />
                 <TheaterName v-if="theaterNameOn === 'bottom'" />
             </div>
@@ -67,7 +68,7 @@
                     @click.prevent="gotoPosters()"
                 >
                     <TheaterName v-if="theaterNameOn === 'top'" />
-                    <TopHeader />
+                    <TopHeader v-if="headerOn === 'top'" />
 
                     <div class="now-playing-container">
                         <div
@@ -81,6 +82,7 @@
                         ></div>
                     </div>
 
+                    <TopHeader v-if="headerOn === 'bottom'" />
                     <BottomFooter />
                     <TheaterName v-if="theaterNameOn === 'bottom'" />
                 </div>
@@ -162,6 +164,9 @@ export default {
             const choice = this.settings.poster_fill_scrim || 'standard';
 
             return this.fillScreen ? 'scrim-' + choice : '';
+        },
+        headerOn() {
+            return this.settings.header_position === 'bottom' ? 'bottom' : 'top';
         },
         theaterNameOn() {
             if (!this.settings.show_theater_name || !this.settings.theater_name) {
@@ -429,11 +434,18 @@ export default {
      * it was covered up. A gradient behind the two ends keeps the text
      * readable over whatever happens to be there.
      */
+    /*
+     * Above anything the cross-fade puts on a poster. Those wrappers are given
+     * 1 and 2 while a change is running, and the entering one keeps its 2 until
+     * the outgoing poster has gone - so at 2 the chrome tied with it and lost
+     * on document order, and the header, the theatre name and the footer
+     * disappeared under the artwork and stayed there.
+     */
     .top-header,
     .poster-footer,
     .theater-name {
         position: relative;
-        z-index: 2;
+        z-index: 4;
         background-color: transparent !important;
     }
 
@@ -444,7 +456,8 @@ export default {
         left: 0;
         right: 0;
         height: var(--scrim-height, 30vh);
-        z-index: 1;
+        // Over the poster, under the text it is there to back.
+        z-index: 3;
         pointer-events: none;
     }
 

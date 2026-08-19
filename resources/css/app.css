@@ -3,6 +3,7 @@
 @import './base.css';
 @import './modal.css';
 @import './animations.css';
+@import './plates.css';
 
 @plugin '@tailwindcss/forms';
 

@@ -1,11 +1,8 @@
 <template>
-    <div
-        class="theater-name"
-        :style="
-            'background-color:' + settings.footer_bg_color + '; color:' + settings.header_text_color
-        "
-    >
-        <span :style="nameFont">{{ settings.theater_name }}</span>
+    <div class="theater-name" :style="plateVars">
+        <span class="dmp-plate" :class="plateClasses">
+            <span class="dmp-plate-text" :style="nameFont">{{ settings.theater_name }}</span>
+        </span>
     </div>
 </template>
 
@@ -18,12 +15,34 @@ import { usePostersStore } from '@/store/posters';
  *
  * Borrows the header's font choice rather than adding another one to pick: on a
  * display where the header reads in a cinema face, a house name in the default
- * sans next to it looks like a mistake.
+ * sans next to it looks like a mistake. The decoration is drawn in the header's
+ * text colour for the same reason.
  */
 export default {
     name: 'TheaterName',
     computed: {
         ...mapState(usePostersStore, ['settings']),
+        plateClasses() {
+            const styles = ['plain', 'rules', 'marquee', 'plaque', 'neon'];
+            const chosen = styles.includes(this.settings.theater_name_style)
+                ? this.settings.theater_name_style
+                : 'plain';
+
+            return [
+                'dmp-plate--' + chosen,
+                { 'dmp-plate--full': !!this.settings.theater_name_full_width },
+            ];
+        },
+        /**
+         * The decorations are drawn with currentColor, so they only need the
+         * text colour set once here rather than threaded through each rule.
+         */
+        plateVars() {
+            return {
+                color: this.settings.header_text_color,
+                backgroundColor: this.settings.footer_bg_color,
+            };
+        },
         nameFont() {
             const fonts = {
                 'riemann-theater': 'Riemann Theatre',
@@ -48,17 +67,26 @@ export default {
 <style lang="scss" scoped>
 .theater-name {
     width: 100%;
-    padding: 1.2vh 2vw;
+    padding: 1.4vh 2vw;
     text-align: center;
+    line-height: 1.1;
+}
+
+.theater-name :deep(.dmp-plate-text) {
     font-size: 3.2vh;
     font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    // The last letter's tracking would otherwise push the text off centre.
+    text-indent: 0.14em;
+}
+
+.theater-name :deep(.dmp-plate--plaque .dmp-plate-text) {
+    font-size: 2.9vh;
 }
 
 .rotated {
-    .theater-name {
+    .theater-name :deep(.dmp-plate-text) {
         font-size: 2.8vh;
     }
 }

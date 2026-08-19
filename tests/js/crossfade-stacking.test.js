@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -102,6 +103,27 @@ describe('cross-fade stacking', () => {
         vm.resetPosterLayer(leaving);
 
         expect(wrapper.style.zIndex).toBe('');
+    });
+
+    it('keeps the header, theatre name and footer above the poster in fill mode', () => {
+        // The cross-fade puts 1 and 2 on the poster wrappers, and the entering
+        // one keeps its 2 until the outgoing poster has gone. At 2 the chrome
+        // tied with it and lost on document order, so the header, the theatre
+        // name and the footer vanished under the artwork and stayed there.
+        const source = readFileSync('resources/js/Views/Dashboard.vue', 'utf8');
+
+        const layerUsedByLift = Math.max(
+            ...[...source.matchAll(/setPosterLayer\(el, '(\d+)'\)/g)].map((m) => Number(m[1]))
+        );
+
+        const fillBlock = source.slice(source.indexOf('.fill-screen {'));
+        const chrome = fillBlock.match(
+            /\.top-header,\s*\.poster-footer,\s*\.theater-name \{[\s\S]*?z-index:\s*(\d+)/
+        );
+
+        expect(layerUsedByLift).toBeGreaterThan(0);
+        expect(chrome).not.toBeNull();
+        expect(Number(chrome[1])).toBeGreaterThan(layerUsedByLift);
     });
 
     it.each(['fade', 'vertical', 'cut'])('leaves %s alone', (type) => {

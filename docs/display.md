@@ -53,8 +53,33 @@ screen shape looks wrong in a way a poster does not.
 display that should show only artwork. The runtime and the rest of the header
 are unaffected.
 
+**Header plate** dresses the wording with the same five options as the theatre
+name below — plain, rules, marquee bulbs, plaque or neon. *Plaque* is the box
+the header used to have; it keeps its own border colour from the **Theme** tab,
+and a display that already had that box was carried over to it, so nothing
+changed appearance on updating.
+
+The header can sit **above or below the poster**, and either plate can **span
+the width of the screen** instead of hugging its words — the rules stretch, the
+bulbs repeat across, and a plaque becomes a band.
+
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.
+
+**Name plate** decides how it is dressed, with the same five as the header. All
+are drawn in the header's text colour, so the name matches the rest of the
+screen:
+
+| | |
+| :--- | :--- |
+| **Plain** | The name on its own. The default, and what a display already showing its name keeps. |
+| **Rules either side** | Hairlines flanking the name — reads as a caption rather than a label. |
+| **Marquee bulbs** | A row of bulbs above and below. The one that reads as a cinema from across a room. |
+| **Plaque** | A bordered plate that hugs the name, like an engraved sign. |
+| **Neon glow** | A soft halo in the same colour. Best in a dark room, and best with a colour that is not white. |
+
+![The display with the theater name in the marquee style, bulbs above and below
+the name](images/theater-name.png)
 
 The wording — what it says instead of *Coming Soon* and *Now Playing* — is on
 the same **General** tab. The fonts, sizes, colours and borders are under

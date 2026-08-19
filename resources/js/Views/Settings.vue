@@ -219,6 +219,52 @@
                                         Turn this off for a display that shows only artwork. The
                                         runtime and the rest of the header are unaffected.
                                     </div>
+
+                                    <div v-if="settings.show_header_text" class="mt-3">
+                                        <label
+                                            for="header-style"
+                                            class="text-gray-300 block mb-2 font-bold"
+                                        >
+                                            Header plate
+                                        </label>
+                                        <select
+                                            class="text-black"
+                                            id="header-style"
+                                            aria-describedby="headerStyleHelp"
+                                            v-model="settings.header_style"
+                                        >
+                                            <option value="plain">Plain</option>
+                                            <option value="rules">Rules either side</option>
+                                            <option value="marquee">Marquee bulbs</option>
+                                            <option value="plaque">Plaque</option>
+                                            <option value="neon">Neon glow</option>
+                                        </select>
+                                        <div
+                                            id="headerStyleHelp"
+                                            class="text-gray-400 text-sm mt-1"
+                                        >
+                                            Plaque is the box the header used to have, and keeps its
+                                            own border colour from the Theme tab.
+                                        </div>
+
+                                        <select
+                                            class="text-black mt-3"
+                                            id="header-position"
+                                            v-model="settings.header_position"
+                                        >
+                                            <option value="top">Above the poster</option>
+                                            <option value="bottom">Below the poster</option>
+                                        </select>
+
+                                        <label class="text-gray-300 inline-flex items-center mt-3">
+                                            <input
+                                                type="checkbox"
+                                                id="header-full-width"
+                                                v-model="settings.header_full_width"
+                                            />
+                                            <span class="ml-2">Span the width of the screen</span>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div class="mb-5">
@@ -252,6 +298,41 @@
                                             <option value="top">Above the poster</option>
                                             <option value="bottom">Below the poster</option>
                                         </select>
+
+                                        <label
+                                            for="theater-name-style"
+                                            class="text-gray-300 block mt-3 mb-2 font-bold"
+                                        >
+                                            Name plate
+                                        </label>
+                                        <select
+                                            class="text-black"
+                                            id="theater-name-style"
+                                            aria-describedby="theaterNameStyleHelp"
+                                            v-model="settings.theater_name_style"
+                                        >
+                                            <option value="plain">Plain</option>
+                                            <option value="rules">Rules either side</option>
+                                            <option value="marquee">Marquee bulbs</option>
+                                            <option value="plaque">Plaque</option>
+                                            <option value="neon">Neon glow</option>
+                                        </select>
+                                        <div
+                                            id="theaterNameStyleHelp"
+                                            class="text-gray-400 text-sm mt-1"
+                                        >
+                                            All of them are drawn in the header's text colour and
+                                            font, so the name matches the rest of the screen.
+                                        </div>
+
+                                        <label class="text-gray-300 inline-flex items-center mt-3">
+                                            <input
+                                                type="checkbox"
+                                                id="theater-name-full-width"
+                                                v-model="settings.theater_name_full_width"
+                                            />
+                                            <span class="ml-2">Span the width of the screen</span>
+                                        </label>
                                     </div>
                                 </div>
 
@@ -1559,6 +1640,11 @@ export default {
                 show_theater_name: false,
                 theater_name: '',
                 theater_name_position: 'bottom',
+                theater_name_style: 'plain',
+                theater_name_full_width: false,
+                header_style: 'plain',
+                header_position: 'top',
+                header_full_width: false,
                 mpaa_limit: '',
                 tv_limit: '',
                 plex_token: '',
@@ -1781,6 +1867,18 @@ export default {
 
             if (!settings.theater_name_position) {
                 settings.theater_name_position = 'bottom';
+            }
+
+            if (!settings.theater_name_style) {
+                settings.theater_name_style = 'plain';
+            }
+
+            if (!settings.header_style) {
+                settings.header_style = 'plain';
+            }
+
+            if (!settings.header_position) {
+                settings.header_position = 'top';
             }
 
             if (!settings.poster_fill_scrim) {
