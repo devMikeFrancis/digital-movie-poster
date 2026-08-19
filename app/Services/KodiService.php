@@ -56,8 +56,11 @@ class KodiService implements MovieSyncInterface
                 $this->processMovies($movies);
 
                 if ($end < $json['result']['limits']['total']) {
-                    $page = $page + 1;
-                    $this->syncMovies($page);
+                    // syncMovies() does not exist on this class - the method is
+                    // syncMedia. Anyone with more than one page of movies got a
+                    // fatal here, so the first twenty synced and the rest never
+                    // did.
+                    $this->syncMedia($page + 1);
                 }
             }
         }

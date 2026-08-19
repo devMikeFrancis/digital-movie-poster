@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Poster;
 use App\Models\Setting;
 use App\Traits\PosterProcess;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PosterService
@@ -16,24 +17,35 @@ class PosterService
         $this->settings = Setting::first();
     }
 
+    /**
+     * Pull posters from every media server that is switched on.
+     *
+     * Each one is run on its own. They used to run in a row with nothing
+     * catching anything, so a media server that was switched off at the wall
+     * took the whole sync down with it and the ones after it never ran.
+     *
+     * @return array{success: bool, failed: list<string>}
+     */
     public function cache()
     {
-        if ($this->settings->plex_service) {
-            $plexService = new PlexService;
-            $plexService->syncMedia();
+        $services = array_filter([
+            'plex' => $this->settings->plex_service ? PlexService::class : null,
+            'jellyfin' => $this->settings->jellyfin_service ? JellyfinService::class : null,
+            'kodi' => $this->settings->kodi_service ? KodiService::class : null,
+        ]);
+
+        $failed = [];
+
+        foreach ($services as $name => $class) {
+            try {
+                (new $class)->syncMedia();
+            } catch (\Throwable $e) {
+                $failed[] = $name;
+                Log::warning('Sync from '.$name.' failed: '.$e->getMessage());
+            }
         }
 
-        if ($this->settings->jellyfin_service) {
-            $jellyfinService = new JellyfinService;
-            $jellyfinService->syncMedia();
-        }
-
-        if ($this->settings->kodi_service) {
-            $kodiService = new KodiService;
-            $kodiService->syncMedia();
-        }
-
-        return ['success' => true];
+        return ['success' => $failed === [], 'failed' => $failed];
     }
 
     public function store($request): Poster
