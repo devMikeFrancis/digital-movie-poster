@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.0",
-    "changelog": "Movie voting from a QR code: open a session from the Voting screen, a code appears on the display, and people vote from their phones without an account. Latecomers can join a vote already running, and a vote survives a phone locking or a tab closing. Also adds title search with artwork lookup, username-and-password sign-in with an Account tab for changing it, and a clearer Poster Sources tab that warns before you leave with unsaved changes. Updating from 2.0.0 works from this screen; from 1.x, re-run install.sh on the device.",
+    "latest": "2.1.1",
+    "changelog": "The display now gives the whole screen to a vote while one is running - Vote Now, a large QR code and the countdown - and shows the winner before returning to the slideshow. Voting can be ended early, a session left open closes itself, and the admin console no longer lingers after one ends. New display options: fill the screen with the poster (scaled to fit, never cropped), hide the Coming Soon / Now Playing text, and show your theater name above or below the poster. The rating display limits no longer show blank when no limit is set, and the details around a poster now change with it instead of ahead of it.",
     "past_updates": [
+        {
+            "version": "2.1.0",
+            "changelog": "Movie voting from a QR code: open a session from the Voting screen, a code appears on the display, and people vote from their phones without an account. Latecomers can join a vote already running, and a vote survives a phone locking or a tab closing. Also adds title search with artwork lookup, username-and-password sign-in with an Account tab for changing it, and a clearer Poster Sources tab that warns before you leave with unsaved changes. Updating from 2.0.0 works from this screen; from 1.x, re-run install.sh on the device."
+        },
         {
             "version": "2.0.0",
             "changelog": "Laravel 13 refresh. Needs PHP 8.3+, so this cannot be installed from this screen - re-run install.sh on the device. The admin screens now ask for a login, and media server credentials are no longer sent to the browser."
