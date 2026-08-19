@@ -171,17 +171,37 @@ export const usePostersStore = defineStore('posters', {
             axios
                 .get('/api/posters?show_in_rotation=true')
                 .then((response) => {
-                    let posters = response.data.posters;
-                    if (this.moviePosters.length === 0 && posters.length > 0) {
-                        this.moviePosters = posters;
+                    const posters = response.data.posters;
+                    const wasEmpty = this.moviePosters.length === 0;
+                    const showing = this.currentPosterId;
+
+                    this.moviePosters = posters;
+
+                    // The posters that arrive are fresh objects with nothing
+                    // marked as showing, so put the one that is already on
+                    // screen back up - otherwise a routine refresh blanks the
+                    // display until the next change.
+                    const current = posters.find((poster) => poster.id === showing);
+                    if (current) {
+                        current.show = true;
+                    }
+
+                    if (wasEmpty && posters.length > 0) {
                         this.loading = false;
                         this.loadingMessage = 'Loading<br />Posters ...';
                         this.setInitialPosterView();
                         setTimeout(() => {
                             this.startTransitionImages();
                         }, 250);
-                    } else {
-                        this.moviePosters = posters;
+
+                        return;
+                    }
+
+                    // The poster on screen may have been taken out of the
+                    // rotation, or filtered out by a rating limit, while the
+                    // display was running.
+                    if (posters.length > 0 && !this.mediaPosters.some((poster) => poster.show)) {
+                        this.setInitialPosterView();
                     }
                 })
                 .catch((e) => {
@@ -262,8 +282,9 @@ export const usePostersStore = defineStore('posters', {
         // up a poster added after it started - the screen kept cycling whatever
         // was in the library the last time it loaded.
         startSyncPosters() {
+            clearInterval(this.recentlyAddedInterval);
             this.recentlyAddedInterval = setInterval(() => {
-                this.cachePosters();
+                this.reloadMoviePosters();
             }, POSTER_SYNC_MS);
         },
         /**
@@ -480,38 +501,6 @@ export const usePostersStore = defineStore('posters', {
                 poster = this.getInSequencePoster();
                 this.handlePosterView(poster);
             }
-        },
-        cachePosters() {
-            console.log('SYNCING POSTERS');
-            axios
-                .get('/api/cache-posters')
-                .then((response) => {
-                    this.stopTransitionImages();
-                    this.moviePosters = response.data.posters;
-
-                    // The list that arrives has nothing marked as showing, so
-                    // put a poster up before starting the clock again.
-                    this.setInitialPosterView();
-
-                    if (this.loading) {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.startTransitionImages();
-                        }, this.bootTime);
-
-                        return;
-                    }
-
-                    // Not booting, so the screen is live and carries straight
-                    // on. Restarting used to be skipped whenever loading was
-                    // false, which is every routine sync: the transitions
-                    // stopped, the list was replaced with one that had nothing
-                    // showing, and the display sat empty from then on.
-                    this.startTransitionImages();
-                })
-                .catch((e) => {
-                    console.log(e.message);
-                });
         },
         playMusic() {
             setTimeout(() => {

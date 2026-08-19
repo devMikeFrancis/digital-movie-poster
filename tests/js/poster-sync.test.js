@@ -47,12 +47,25 @@ describe('keeping the display in step with the library', () => {
 
     it('pulls the library when that comes round', () => {
         const store = usePostersStore();
-        store.cachePosters = vi.fn();
+        store.reloadMoviePosters = vi.fn();
 
         store.startSyncPosters();
         vi.advanceTimersByTime(1000 * 60 * 60 * 4);
 
-        expect(store.cachePosters).toHaveBeenCalledTimes(1);
+        expect(store.reloadMoviePosters).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-reads the library from an endpoint the display is allowed to call', () => {
+        // It used to call /api/cache-posters, which sits behind the admin
+        // session and queues a media-server sync - so the display got a 401,
+        // and the response carries no posters even when it succeeds.
+        const store = usePostersStore();
+        store.reloadMoviePosters = vi.fn();
+
+        store.startSyncPosters();
+        vi.advanceTimersByTime(1000 * 60 * 60 * 4);
+
+        expect(store.reloadMoviePosters).toHaveBeenCalled();
     });
 
     it('asks the display to reload so a saved poster appears without a second step', () => {
@@ -65,46 +78,33 @@ describe('keeping the display in step with the library', () => {
         expect(emit).toHaveBeenCalledWith('dispatch:command', { command: 'reload' });
     });
 
-    it('keeps a poster on screen across a routine sync', async () => {
-        // The fetched list has nothing marked as showing. Swapping it in and
-        // walking away left the screen empty until the next change - and since
-        // the transitions had been stopped and were only restarted while
-        // booting, there was no next change.
+    it('keeps the poster on screen up across a routine refresh', async () => {
         const store = usePostersStore();
-        store.settings = {
-            random_order: false,
-            mpaa_limit: '',
-            tv_limit: '',
-            poster_display_speed: 15000,
-        };
+        store.settings = { random_order: false, mpaa_limit: '', tv_limit: '' };
         store.moviePosters = library(3);
+        store.currentPosterId = 2;
         store.loading = false;
         get.mockResolvedValue({ data: { posters: library(5) } });
 
-        await store.cachePosters();
+        await store.reloadMoviePosters();
+
+        const showing = store.mediaPosters.filter((p) => p.show);
+        expect(showing).toHaveLength(1);
+        expect(showing[0].id).toBe(2);
+    });
+
+    it('puts a poster up when the one on screen has left the rotation', async () => {
+        const store = usePostersStore();
+        store.settings = { random_order: false, mpaa_limit: '', tv_limit: '' };
+        store.moviePosters = library(3);
+        store.currentPosterId = 99;
+        store.loading = false;
+        get.mockResolvedValue({ data: { posters: library(5) } });
+
+        await store.reloadMoviePosters();
 
         expect(store.mediaPosters.filter((p) => p.show)).toHaveLength(1);
     });
-
-    it('starts the clock again after a routine sync', async () => {
-        const store = usePostersStore();
-        store.settings = {
-            random_order: false,
-            mpaa_limit: '',
-            tv_limit: '',
-            poster_display_speed: 15000,
-        };
-        store.moviePosters = library(3);
-        store.loading = false;
-        get.mockResolvedValue({ data: { posters: library(5) } });
-
-        await store.cachePosters();
-        store.transitionImages = vi.fn();
-        vi.advanceTimersByTime(15000);
-
-        expect(window.transitionImagesInterval).toBeTruthy();
-    });
-
     it('does not leave a second clock running when started twice', () => {
         const store = usePostersStore();
         store.settings = { poster_display_speed: 15000 };
