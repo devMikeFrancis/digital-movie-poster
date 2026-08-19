@@ -36,6 +36,25 @@
 
                     <!-- Setup: everything that has to be decided before people join. -->
                     <div v-show="tab === 'setup'" class="tab-panel">
+                        <div class="panel" v-if="lastWinners.length">
+                            <h3 class="panel-title">Last session's winner</h3>
+                            <div class="winner-container flex flex-wrap">
+                                <div class="winner-item past" v-for="winner in lastWinners">
+                                    <span class="votes"
+                                        >{{ winner.votes }} vote<span v-if="winner.votes !== 1"
+                                            >s</span
+                                        ></span
+                                    >
+                                    <img
+                                        :src="'/storage/posters/_tn_' + winner.file_name"
+                                        :alt="winner.name"
+                                        class="rounded-lg shadow-lg"
+                                    />
+                                </div>
+                            </div>
+                            <p class="field-help">{{ lastResultLabel }}</p>
+                        </div>
+
                         <div class="panel">
                             <h3 class="panel-title">Posters in the running</h3>
 
@@ -368,6 +387,7 @@ export default {
             users: [],
             posters: [],
             runningPosters: [],
+            lastResult: null,
             random: false,
             posterLimit: 3,
             chosenPosters: [],
@@ -432,6 +452,20 @@ export default {
             // announcing a winner that does not exist.
             return 'Nobody voted.';
         },
+        lastWinners() {
+            return this.lastResult && Array.isArray(this.lastResult.winner)
+                ? this.lastResult.winner
+                : [];
+        },
+        lastResultLabel() {
+            if (!this.lastResult) {
+                return '';
+            }
+
+            return this.lastResult.status === 'tie'
+                ? 'That round ended in a tie.'
+                : 'Stays here until the next round starts.';
+        },
         votedCount() {
             return this.users.filter((user) => user.voted).length;
         },
@@ -457,6 +491,7 @@ export default {
                 this.votingEnabled = state.votingEnabled;
                 this.votingStarted = state.votingStarted;
                 this.runningPosters = state.posters || [];
+                this.lastResult = state.lastResult || null;
 
                 // The session broadcast carries the whole voter list, so take
                 // it from here rather than accumulating user:voted events: a
@@ -1028,6 +1063,18 @@ export default {
     padding: 12px;
     background: #222;
     border-radius: 4px;
+}
+
+/* Smaller than a live result: setting up the next round is the job here. */
+.winner-item.past {
+    .votes {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    img {
+        max-width: 112px;
+    }
 }
 
 .winner-item {

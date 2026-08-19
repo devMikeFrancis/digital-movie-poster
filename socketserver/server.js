@@ -59,6 +59,12 @@ let disableTimerId = null;
 let timeLimit = 30;
 let timer = 0;
 let lastWinner = {};
+
+// The finished round, kept past the end of the session so the setup screen and
+// anyone still on the voting page can see who won last time. Cleared when a new
+// round starts, not when the session closes.
+let lastResult = null;
+
 let status = 'none';
 
 // voter id -> array of poster ids that voter has chosen. Holding the whole
@@ -78,7 +84,9 @@ const selections = new Map();
 const socketVoters = new Map();
 
 // Results stay up for this long, then the session closes and the QR disappears.
-const RESULTS_VISIBLE_MS = Number(process.env.VOTING_RESULTS_MS || 30000);
+// The winner is not lost at that point - it is kept as lastResult and shown as
+// the previous session's winner until a new round starts.
+const RESULTS_VISIBLE_MS = Number(process.env.VOTING_RESULTS_MS || 10000);
 
 function tally() {
     const counts = new Map();
@@ -102,6 +110,7 @@ function sessionState() {
         status,
         posters,
         lastWinner,
+        lastResult,
         users,
     };
 }
@@ -120,6 +129,13 @@ function closeSession() {
     votingStarted = false;
     posters = [];
     selections.clear();
+
+    // The session is over, so nobody is in it. Voters used to fall off this
+    // list as their sockets closed, but a ballot now outlives its connection -
+    // without clearing here, the finished session's voters lingered on the
+    // console and made a closed session look like it was still running.
+    users = [];
+
     timer = 0;
     timeLimit = 30;
     maxSelections = 1;
@@ -149,6 +165,7 @@ function calcWinner() {
 
     votingStarted = false;
     status = 'done';
+    lastResult = { status: winningStatus, winner };
 
     io.emit('end:voting', {
         votingStarted: false,
@@ -237,6 +254,12 @@ io.on('connection', (socket) => {
     socket.on('disable:voting', () => closeSession());
 
     socket.on('start:voting', (data) => {
+        // Starting again inside the results window would otherwise leave the
+        // previous round's close timer pending, and it would shut the new
+        // session down partway through.
+        clearTimeout(disableTimerId);
+        disableTimerId = null;
+
         if (data && data.posters) {
             posters = data.posters.map((poster) => ({ ...poster, votes: 0 }));
         }
@@ -244,6 +267,7 @@ io.on('connection', (socket) => {
             maxSelections = Math.max(1, Number(data.maxSelections) || 1);
         }
 
+        lastResult = null;
         timeLimit = Number((data && data.timeLimit) || timeLimit) || 30;
         timer = timeLimit;
         votingEnabled = true;
