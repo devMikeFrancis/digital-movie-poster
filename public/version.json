@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.12",
-    "changelog": "The runtime, rating, logos and stars around a poster now swap cleanly when the poster changes. They were fading in over the previous set rather than replacing it, so for a moment both were readable at once.",
+    "latest": "2.1.13",
+    "changelog": "Whether the admin screens ask for a login is a setting now, under Settings then Account, instead of something you had to edit on the device. Your current arrangement carries over untouched - if a login is being asked for today it still will be after this update. The display never asks either way. The documentation also gained screenshots of each screen.",
     "past_updates": [
+        {
+            "version": "2.1.12",
+            "changelog": "The runtime, rating, logos and stars around a poster now swap cleanly when the poster changes. They were fading in over the previous set rather than replacing it, so for a moment both were readable at once."
+        },
         {
             "version": "2.1.11",
             "changelog": "Syncing from Kodi now works for libraries with more than twenty films - past that it synced the first twenty and stopped. A media server that is switched off no longer stops the others from syncing, and a sync no longer gives up when a library section is empty or was never chosen. The socket server behind voting and now-playing also survives a malformed message from anything on the network instead of stopping."
