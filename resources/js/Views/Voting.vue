@@ -55,9 +55,7 @@
                                     v-model="posterLimit"
                                     :disabled="votingEnabled"
                                 />
-                                <p class="field-help">
-                                    {{ posters.length }} posters to draw from.
-                                </p>
+                                <p class="field-help">{{ posters.length }} posters to draw from.</p>
                             </div>
 
                             <div v-else>
@@ -77,7 +75,9 @@
                                             />
                                             <div>
                                                 <img
-                                                    :src="'/storage/posters/_tn_' + poster.file_name"
+                                                    :src="
+                                                        '/storage/posters/_tn_' + poster.file_name
+                                                    "
                                                     class="rounded-lg shadow-lg hover:shadow-none"
                                                     :alt="poster.name"
                                                 />
@@ -136,11 +136,7 @@
                             </div>
 
                             <template v-if="!votingEnabled">
-                                <button
-                                    type="button"
-                                    class="btn-primary"
-                                    @click="openVoting()"
-                                >
+                                <button type="button" class="btn-primary" @click="openVoting()">
                                     Open for joining
                                 </button>
                                 <p class="field-help">
@@ -162,7 +158,7 @@
 
                     <!-- Live: running the session that is already open. -->
                     <div v-show="tab === 'live'" class="tab-panel">
-                        <div class="panel" v-if="!votingEnabled">
+                        <div class="panel" v-if="!votingEnabled && !showResults">
                             <h3 class="panel-title">No session open</h3>
                             <p class="field-help mb-4">
                                 Choose your posters and rules first, then open the session for
@@ -255,7 +251,10 @@
 
                             <div class="panel-actions">
                                 <div class="start-messages" v-if="startMessages.length">
-                                    <div v-for="startMessage in startMessages" class="start-message">
+                                    <div
+                                        v-for="startMessage in startMessages"
+                                        class="start-message"
+                                    >
                                         {{ startMessage }}
                                     </div>
                                 </div>
@@ -286,9 +285,12 @@
 
                         <div class="panel text-center" v-if="showResults">
                             <h3 class="text-white font-bold text-3xl mb-4">
-                                We Have a {{ resultMessage }}!
+                                {{ resultHeading }}
                             </h3>
-                            <div class="winner-container flex flex-wrap justify-center">
+                            <div
+                                class="winner-container flex flex-wrap justify-center"
+                                v-if="winners.length"
+                            >
                                 <div class="winner-item" v-for="winner in winners">
                                     <span class="votes"
                                         >{{ winner.votes }} vote<span v-if="winner.votes !== 1"
@@ -302,6 +304,10 @@
                                     />
                                 </div>
                             </div>
+
+                            <button type="button" class="btn-plain mt-6" @click="clearResults()">
+                                Set up another vote
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -346,7 +352,7 @@ export default {
             readyInterval: null,
             timerInterval: null,
             showResults: false,
-            resultMessage: '',
+            resultStatus: '',
             winners: [],
         };
     },
@@ -373,11 +379,34 @@ export default {
 
             return Math.max(1, inRunning || 1);
         },
+        resultHeading() {
+            if (this.resultStatus === 'tie') {
+                return 'We Have a TIE!';
+            }
+
+            if (this.resultStatus === 'winner') {
+                return 'We Have a WINNER!';
+            }
+
+            // Nobody picked anything before the timer ran out. Saying so beats
+            // announcing a winner that does not exist.
+            return 'Nobody voted.';
+        },
         votedCount() {
             return this.users.filter((user) => user.voted).length;
         },
         voteUrl() {
             return window.location.origin + '/vote';
+        },
+    },
+    watch: {
+        // The cap moves as posters are picked or the random count changes, and
+        // a max attribute only stops you typing past it - it will not pull a
+        // number that is already too high back down.
+        selectionCap(cap) {
+            if (parseInt(this.maxSelections) > cap) {
+                this.maxSelections = cap;
+            }
         },
     },
     methods: {
@@ -398,6 +427,12 @@ export default {
                 this.votingEnabled = state.votingEnabled;
                 this.votingStarted = state.votingStarted;
                 this.runningPosters = state.posters || [];
+
+                // The session broadcast carries the whole voter list, so take
+                // it from here rather than accumulating user:voted events: a
+                // new session clears everyone's tick, and the incremental
+                // handler alone would leave the last round's ticks showing.
+                this.users = state.users || [];
 
                 // Only adopt the server's figure once a session exists, or the
                 // idle default would overwrite what the admin has typed.
@@ -434,14 +469,7 @@ export default {
             });
 
             this.socket.on('end:voting', (data) => {
-                if (data.results.status === 'tie') {
-                    this.resultMessage = 'TIE';
-                }
-
-                if (data.results.status === 'winner') {
-                    this.resultMessage = 'WINNER';
-                }
-
+                this.resultStatus = data.results.status;
                 this.winners = data.results.winner;
                 this.votingStarted = data.votingStarted;
                 this.timer = 0;
@@ -517,7 +545,10 @@ export default {
                     return null;
                 }
 
-                return this.chosenPosters.map((poster) => ({ ...poster, votes: 0 }));
+                return this.chosenPosters.map((poster) => ({
+                    ...poster,
+                    votes: 0,
+                }));
             }
 
             const limit = parseInt(this.posterLimit);
@@ -532,7 +563,10 @@ export default {
                 return null;
             }
 
-            return this.getRandomPosters().map((poster) => ({ ...poster, votes: 0 }));
+            return this.getRandomPosters().map((poster) => ({
+                ...poster,
+                votes: 0,
+            }));
         },
         /**
          * Starts the session that is already open. The posters are whatever the
@@ -555,7 +589,7 @@ export default {
                 timeLimit: this.timeLimit,
                 maxSelections: Math.min(
                     parseInt(this.maxSelections) || 1,
-                    this.runningPosters.length || 1
+                    this.runningPosters.length || 1,
                 ),
             });
         },
@@ -596,6 +630,12 @@ export default {
                     this.timer--;
                 }
             }, 1000);
+        },
+        clearResults() {
+            this.showResults = false;
+            this.winners = [];
+            this.resultStatus = '';
+            this.tab = 'setup';
         },
         resetVoting() {
             this.socket.emit('reset:voting', {});
