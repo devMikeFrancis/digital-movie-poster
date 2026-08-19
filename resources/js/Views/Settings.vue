@@ -1307,10 +1307,7 @@
                             </div>
                             <div id="account" class="tab-content">
                                 <p class="text-gray-400 text-sm mb-7">
-                                    DMP has a single operator account. This changes the login you
-                                    are signed in with; it does not affect API tokens, which are
-                                    issued from the console with
-                                    <code class="text-gray-300">php artisan dmp:token</code>.
+                                    Change the username and password you sign in with.
                                 </p>
 
                                 <div class="mb-5">
