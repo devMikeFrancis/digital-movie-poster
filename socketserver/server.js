@@ -56,6 +56,7 @@ let maxSelections = 1;
 
 let timerId = null;
 let disableTimerId = null;
+let idleTimerId = null;
 let timeLimit = 30;
 let timer = 0;
 let lastWinner = {};
@@ -88,6 +89,12 @@ const socketVoters = new Map();
 // the previous session's winner until a new round starts.
 const RESULTS_VISIBLE_MS = Number(process.env.VOTING_RESULTS_MS || 10000);
 
+// A session that is opened for joining and then never started used to stay open
+// for ever, leaving the QR code stranded on the display. Generous on purpose:
+// an admin who opens the vote early and waits for the room to fill should not
+// have it closed out from under them.
+const IDLE_SESSION_MS = Number(process.env.VOTING_IDLE_MS || 600000);
+
 function tally() {
     const counts = new Map();
 
@@ -119,9 +126,15 @@ function broadcastSession() {
     io.emit('session', sessionState());
 }
 
-function closeSession() {
+function clearPendingCloses() {
     clearTimeout(disableTimerId);
+    clearTimeout(idleTimerId);
     disableTimerId = null;
+    idleTimerId = null;
+}
+
+function closeSession() {
+    clearPendingCloses();
     clearInterval(timerId);
     timerId = null;
 
@@ -178,7 +191,7 @@ function calcWinner() {
 
     // Give everyone time to see the result, then close the session so the
     // slideshow stops advertising a vote that has finished.
-    clearTimeout(disableTimerId);
+    clearPendingCloses();
     disableTimerId = setTimeout(closeSession, RESULTS_VISIBLE_MS);
 }
 
@@ -235,8 +248,11 @@ io.on('connection', (socket) => {
 
     // The admin opens a session: voters can join and the slideshow shows the QR.
     socket.on('enable:voting', (data) => {
-        clearTimeout(disableTimerId);
-        disableTimerId = null;
+        clearPendingCloses();
+
+        // Nothing has been started yet, so put a ceiling on how long this can
+        // sit there advertising itself.
+        idleTimerId = setTimeout(closeSession, IDLE_SESSION_MS);
 
         posters = (data.posters || []).map((poster) => ({ ...poster, votes: 0 }));
         maxSelections = Math.max(1, Number(data.maxSelections) || 1);
@@ -253,12 +269,27 @@ io.on('connection', (socket) => {
 
     socket.on('disable:voting', () => closeSession());
 
+    // Ends the round now rather than waiting for the clock: counts what is in,
+    // publishes the result, and lets the usual results window close the session.
+    socket.on('end:voting:now', () => {
+        if (!votingStarted) {
+            return;
+        }
+
+        clearInterval(timerId);
+        timerId = null;
+        timer = 0;
+
+        calcWinner();
+        console.log('[dmp] voting ended early by the admin');
+    });
+
     socket.on('start:voting', (data) => {
         // Starting again inside the results window would otherwise leave the
         // previous round's close timer pending, and it would shut the new
-        // session down partway through.
-        clearTimeout(disableTimerId);
-        disableTimerId = null;
+        // session down partway through. The idle timer goes too - the session
+        // is plainly not idle any more.
+        clearPendingCloses();
 
         if (data && data.posters) {
             posters = data.posters.map((poster) => ({ ...poster, votes: 0 }));

@@ -202,7 +202,15 @@
                             </button>
                         </div>
 
-                        <template v-else>
+                        <!--
+                            Bound to the session itself, not to "not the empty
+                            state": pairing this with the empty state's v-else
+                            meant that once results were showing it rendered
+                            again even though the session had closed, leaving a
+                            console full of live controls under a No session
+                            badge.
+                        -->
+                        <template v-if="votingEnabled">
                             <div class="panel">
                                 <div class="stats">
                                     <div class="stat">
@@ -294,9 +302,17 @@
 
                                 <div class="flex flex-wrap gap-2">
                                     <button
+                                        v-if="votingStarted"
                                         type="button"
                                         class="btn-primary"
-                                        :disabled="votingStarted"
+                                        @click="endVotingNow()"
+                                    >
+                                        Close voting
+                                    </button>
+                                    <button
+                                        v-else
+                                        type="button"
+                                        class="btn-primary"
                                         @click="startVoting()"
                                     >
                                         Start voting
@@ -304,7 +320,7 @@
                                     <button
                                         type="button"
                                         class="btn-plain"
-                                        :disabled="votingStarted"
+                                        :disabled="votingStarted || !votedCount"
                                         @click="resetVoting()"
                                     >
                                         Reset votes
@@ -317,12 +333,20 @@
                                     >
                                         Join the vote
                                     </a>
-                                    <button type="button" class="btn-plain" @click="closeVoting()">
+                                    <button
+                                        v-if="votingEnabled"
+                                        type="button"
+                                        class="btn-plain"
+                                        @click="closeVoting()"
+                                    >
                                         Close session
                                     </button>
                                 </div>
                                 <p class="field-help">
-                                    Joining opens the voter page in a new tab, the same one the QR
+                                    <span v-if="votingStarted"
+                                        >Closing voting counts what is in and shows the result
+                                        without waiting for the clock. </span
+                                    >Joining opens the voter page in a new tab, the same one the QR
                                     code leads to. Keep this tab open to run the session.
                                 </p>
                             </div>
@@ -605,6 +629,15 @@ export default {
             });
 
             this.tab = 'live';
+        },
+        /**
+         * Ends the round now rather than waiting out the clock. The result is
+         * whatever has been cast, and the session closes on the usual delay
+         * afterwards, so this is the early exit rather than a separate path.
+         */
+        endVotingNow() {
+            this.startMessages = [];
+            this.socket.emit('end:voting:now', {});
         },
         closeVoting() {
             this.startMessages = [];
