@@ -53,8 +53,11 @@ class SettingsRequest extends FormRequest
             'use_global_prologos' => 'required|boolean',
             'use_global_prologos_if_no_poster_prologos' => 'required|boolean',
             'transition_type' => 'required|string',
-            'show_bottom_text' => 'required|boolean',
-            'bottom_text' => 'nullable|string',
+            'poster_fill_screen' => 'required|boolean',
+            'show_header_text' => 'required|boolean',
+            'show_theater_name' => 'required|boolean',
+            'theater_name' => 'nullable|string|max:120',
+            'theater_name_position' => 'required|in:top,bottom',
             'jellyfin_service' => 'required|boolean',
             'jellyfin_ip_address' => 'required_if:jellyfin_service,true|nullable|string',
             'jellyfin_token' => 'required_if:jellyfin_service,true|nullable|string',
@@ -105,7 +108,14 @@ class SettingsRequest extends FormRequest
             'play_theme_music' => $this->boolean('play_theme_music'),
             'use_global_prologos' => $this->boolean('use_global_prologos'),
             'use_global_prologos_if_no_poster_prologos' => $this->boolean('use_global_prologos_if_no_poster_prologos'),
-            'show_bottom_text' => $this->boolean('show_bottom_text'),
+            'poster_fill_screen' => $this->boolean('poster_fill_screen'),
+            'show_header_text' => $this->boolean('show_header_text'),
+            'show_theater_name' => $this->boolean('show_theater_name'),
+
+            // Defaulted here for the same reason the booleans above are: the
+            // admin UI always sends it, but a payload that leaves it out should
+            // land on the sensible option rather than fail validation.
+            'theater_name_position' => $this->input('theater_name_position') ?: 'bottom',
             'jellyfin_service' => $this->boolean('jellyfin_service'),
             'show_header_border' => $this->boolean('show_header_border'),
             'validate_movie_titles' => $this->boolean('validate_movie_titles'),

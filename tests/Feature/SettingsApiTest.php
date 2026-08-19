@@ -32,6 +32,59 @@ class SettingsApiTest extends TestCase
         $this->assertSame('Up Next', Setting::first()->coming_soon_text);
     }
 
+    public function test_display_options_are_saved(): void
+    {
+        $this->putJson('/api/settings', $this->validPayload([
+            'poster_fill_screen' => true,
+            'show_header_text' => false,
+            'show_theater_name' => true,
+            'theater_name' => 'The Roxy',
+            'theater_name_position' => 'top',
+        ]))->assertOk();
+
+        $settings = Setting::first();
+
+        $this->assertEquals(1, $settings->poster_fill_screen);
+        $this->assertEquals(0, $settings->show_header_text);
+        $this->assertEquals(1, $settings->show_theater_name);
+        $this->assertSame('The Roxy', $settings->theater_name);
+        $this->assertSame('top', $settings->theater_name_position);
+    }
+
+    public function test_the_theater_name_position_only_accepts_top_or_bottom(): void
+    {
+        $this->putJson('/api/settings', $this->validPayload([
+            'theater_name_position' => 'sideways',
+        ]))->assertStatus(422)->assertJsonValidationErrors('theater_name_position');
+    }
+
+    public function test_a_payload_without_a_theater_name_position_falls_back_to_bottom(): void
+    {
+        // The admin UI always sends it, but leaving it out should land on the
+        // sensible option rather than fail the whole save.
+        $payload = $this->validPayload();
+        unset($payload['theater_name_position']);
+
+        $this->putJson('/api/settings', $payload)->assertOk();
+
+        $this->assertSame('bottom', Setting::first()->theater_name_position);
+    }
+
+    public function test_the_display_can_see_the_new_options(): void
+    {
+        // The display reads the unauthenticated endpoint, so options it needs
+        // to render must survive the deny-list.
+        $this->getJson('/api/settings')
+            ->assertOk()
+            ->assertJsonStructure([
+                'poster_fill_screen',
+                'show_header_text',
+                'show_theater_name',
+                'theater_name',
+                'theater_name_position',
+            ]);
+    }
+
     public function test_settings_update_rejects_a_partial_payload(): void
     {
         $this->putJson('/api/settings', ['coming_soon_text' => 'Up Next'])
@@ -60,7 +113,8 @@ class SettingsApiTest extends TestCase
             'show_processing_logos', 'show_dolby_atmos_horizontal', 'show_dolby_atmos_vertical',
             'show_dolby_vision_horizontal', 'show_dolby_vision_vertical', 'show_dts', 'show_dolby_51',
             'show_imax', 'show_auro_3d', 'use_cec_power', 'show_runtime', 'play_theme_music',
-            'use_global_prologos', 'use_global_prologos_if_no_poster_prologos', 'show_bottom_text',
+            'use_global_prologos', 'use_global_prologos_if_no_poster_prologos', 'poster_fill_screen',
+            'show_header_text', 'show_theater_name',
             'jellyfin_service', 'kodi_service', 'show_header_border', 'validate_movie_titles',
             'remove_black_bars', 'show_speaker_config',
         ];

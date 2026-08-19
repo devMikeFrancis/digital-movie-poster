@@ -72,7 +72,9 @@
                                             made.
                                         </p>
                                     </div>
-                                    <footer class="modal-footer flex flex-wrap justify-end items-center gap-3 p-4">
+                                    <footer
+                                        class="modal-footer flex flex-wrap justify-end items-center gap-3 p-4"
+                                    >
                                         <button
                                             type="button"
                                             class="text-gray-300 px-3 py-2 rounded-sm hover:text-white"
@@ -149,6 +151,76 @@
 
                                     <div id="typeHelp" class="text-gray-400 text-sm">
                                         Fade in/out or Vertical slide transition.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="fill-screen"
+                                            aria-describedby="fillScreenHelp"
+                                            v-model="settings.poster_fill_screen"
+                                        />
+                                        <span class="ml-2">Fill the screen with the poster</span>
+                                    </label>
+                                    <div id="fillScreenHelp" class="text-gray-400 text-sm">
+                                        The poster takes the whole display instead of sitting in a
+                                        box between the header and footer, which sit over it
+                                        instead. It is scaled to fit rather than cropped, so it
+                                        keeps its shape and nothing is cut off.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="show-header-text"
+                                            aria-describedby="showHeaderTextHelp"
+                                            v-model="settings.show_header_text"
+                                        />
+                                        <span class="ml-2">
+                                            Show the Coming Soon / Now Playing text
+                                        </span>
+                                    </label>
+                                    <div id="showHeaderTextHelp" class="text-gray-400 text-sm">
+                                        Turn this off for a display that shows only artwork. The
+                                        runtime and the rest of the header are unaffected.
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="show-theater-name"
+                                            aria-describedby="showTheaterNameHelp"
+                                            v-model="settings.show_theater_name"
+                                        />
+                                        <span class="ml-2">Show the theater name</span>
+                                    </label>
+                                    <div id="showTheaterNameHelp" class="text-gray-400 text-sm">
+                                        The name of the room this display is in.
+                                    </div>
+
+                                    <div v-if="settings.show_theater_name" class="mt-3">
+                                        <input
+                                            type="text"
+                                            class="text-black w-full mb-2"
+                                            id="theater-name"
+                                            maxlength="120"
+                                            placeholder="The Roxy"
+                                            v-model="settings.theater_name"
+                                        />
+                                        <select
+                                            class="text-black"
+                                            id="theater-name-position"
+                                            v-model="settings.theater_name_position"
+                                        >
+                                            <option value="top">Above the poster</option>
+                                            <option value="bottom">Below the poster</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -431,14 +503,7 @@
                                     <div class="mb-2">
                                         <label
                                             for="speaker-config"
-                                            class="
-                                                text-gray-300
-                                                block
-                                                mb-2
-                                                font-bold
-                                                flex
-                                                items-center
-                                            "
+                                            class="text-gray-300 block mb-2 font-bold flex items-center"
                                             >Speaker Config</label
                                         >
                                         <input
@@ -459,14 +524,7 @@
                                     <div class="mb-2">
                                         <label
                                             for="speaker-config-location"
-                                            class="
-                                                text-gray-300
-                                                block
-                                                mb-2
-                                                font-bold
-                                                flex
-                                                items-center
-                                            "
+                                            class="text-gray-300 block mb-2 font-bold flex items-center"
                                             >Speaker Config Location</label
                                         >
                                         <select
@@ -820,8 +878,8 @@
                                 </h3>
                                 <p class="text-gray-400 text-sm mb-5">
                                     Used when you add a poster on the Posters screen, either by
-                                    searching for a title or by entering an IMDB ID. No media
-                                    server is needed for this.
+                                    searching for a title or by entering an IMDB ID. No media server
+                                    is needed for this.
                                 </p>
 
                                 <div class="mb-5">
@@ -1014,14 +1072,7 @@
                                     <div class="mb-5" v-if="settings.plex_sync_movies">
                                         <label
                                             for="plex-movie-sections"
-                                            class="
-                                                text-gray-300
-                                                block
-                                                mb-2
-                                                font-bold
-                                                flex
-                                                items-center
-                                            "
+                                            class="text-gray-300 block mb-2 font-bold flex items-center"
                                             >Plex Movie Libraries</label
                                         >
                                         <select id="plex-movie-sections" v-model="plexMovieSection">
@@ -1035,17 +1086,7 @@
                                             </option>
                                         </select>
                                         <button
-                                            class="
-                                                text-black text-sm
-                                                bg-white
-                                                border-2 border-gray-500
-                                                px-3
-                                                py-2
-                                                ml-3
-                                                rounded-none
-                                                hover:bg-gray-700
-                                                hover:text-white
-                                            "
+                                            class="text-black text-sm bg-white border-2 border-gray-500 px-3 py-2 ml-3 rounded-none hover:bg-gray-700 hover:text-white"
                                             @click.prevent="addMovieSyncLibrary('plex')"
                                         >
                                             &plus; Sync Library
@@ -1089,14 +1130,7 @@
                                     <div class="mb-5" v-if="settings.plex_sync_tv">
                                         <label
                                             for="plex-tv-sections"
-                                            class="
-                                                text-gray-300
-                                                block
-                                                mb-2
-                                                font-bold
-                                                flex
-                                                items-center
-                                            "
+                                            class="text-gray-300 block mb-2 font-bold flex items-center"
                                             >Plex TV Libraries</label
                                         >
                                         <select id="plex-tv-sections" v-model="plexTvSection">
@@ -1110,17 +1144,7 @@
                                             </option>
                                         </select>
                                         <button
-                                            class="
-                                                text-black text-sm
-                                                bg-white
-                                                border-2 border-gray-500
-                                                px-3
-                                                py-2
-                                                ml-3
-                                                rounded-none
-                                                hover:bg-gray-700
-                                                hover:text-white
-                                            "
+                                            class="text-black text-sm bg-white border-2 border-gray-500 px-3 py-2 ml-3 rounded-none hover:bg-gray-700 hover:text-white"
                                             @click.prevent="addTvSyncLibrary('plex')"
                                         >
                                             &plus; Sync Library
@@ -1179,8 +1203,8 @@
                                         <span class="ml-2">Enable Jellyfin Service</span></label
                                     >
                                     <div id="jellyfin-serviceHelp" class="text-gray-400 text-sm">
-                                        Syncs your Jellyfin movie library into your poster list,
-                                        and switches the display to whatever Jellyfin is playing.
+                                        Syncs your Jellyfin movie library into your poster list, and
+                                        switches the display to whatever Jellyfin is playing.
                                     </div>
                                 </div>
 
@@ -1311,7 +1335,10 @@
                                 </p>
 
                                 <div class="mb-5">
-                                    <label for="account-username" class="text-gray-300 block mb-2 font-bold">
+                                    <label
+                                        for="account-username"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
                                         Username
                                     </label>
                                     <input
@@ -1337,7 +1364,10 @@
                                 </p>
 
                                 <div class="mb-5">
-                                    <label for="account-password" class="text-gray-300 block mb-2 font-bold">
+                                    <label
+                                        for="account-password"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
                                         New password
                                     </label>
                                     <input
@@ -1347,11 +1377,16 @@
                                         v-model="account.password"
                                         autocomplete="new-password"
                                     />
-                                    <div class="text-gray-400 text-sm">At least eight characters.</div>
+                                    <div class="text-gray-400 text-sm">
+                                        At least eight characters.
+                                    </div>
                                 </div>
 
                                 <div class="mb-5">
-                                    <label for="account-password-confirm" class="text-gray-300 block mb-2 font-bold">
+                                    <label
+                                        for="account-password-confirm"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
                                         Confirm new password
                                     </label>
                                     <input
@@ -1366,7 +1401,10 @@
                                 <hr class="mt-3 mb-7 border-gray-700" />
 
                                 <div class="mb-5">
-                                    <label for="account-current" class="text-gray-300 block mb-2 font-bold">
+                                    <label
+                                        for="account-current"
+                                        class="text-gray-300 block mb-2 font-bold"
+                                    >
                                         Current password
                                     </label>
                                     <input
@@ -1385,7 +1423,11 @@
                                 <div
                                     v-if="accountMessage"
                                     class="px-4 py-3 rounded mb-4"
-                                    :class="accountFailed ? 'bg-red-900 text-white' : 'bg-green-900 text-white'"
+                                    :class="
+                                        accountFailed
+                                            ? 'bg-red-900 text-white'
+                                            : 'bg-green-900 text-white'
+                                    "
                                     role="alert"
                                 >
                                     <p>{{ accountMessage }}</p>
@@ -1406,7 +1448,6 @@
                             </div>
                         </div>
                         <!-- / .tabs-content -->
-
                     </div>
                 </div>
             </div>
@@ -1445,6 +1486,13 @@ export default {
             accountFailed: false,
             accountErrors: [],
             settings: {
+                poster_fill_screen: false,
+                show_header_text: true,
+                show_theater_name: false,
+                theater_name: '',
+                theater_name_position: 'bottom',
+                mpaa_limit: '',
+                tv_limit: '',
                 plex_token: '',
                 plex_ip_address: '',
                 jellyfin_token: '',
@@ -1468,7 +1516,9 @@ export default {
          * whether anything is waiting to be saved.
          */
         unsavedChanges() {
-            return this.savedSnapshot !== '' && JSON.stringify(this.settings) !== this.savedSnapshot;
+            return (
+                this.savedSnapshot !== '' && JSON.stringify(this.settings) !== this.savedSnapshot
+            );
         },
         statusText() {
             if (this.saving) {
@@ -1545,7 +1595,7 @@ export default {
             axios
                 .get('/api/settings/full')
                 .then((response) => {
-                    this.settings = response.data;
+                    this.settings = this.withSelectDefaults(response.data);
                     this.markClean();
                     if (this.settings.plex_service) {
                         this.getServiceSections('plex');
@@ -1627,7 +1677,8 @@ export default {
                 .catch((error) => {
                     this.accountFailed = true;
                     const body = error.response && error.response.data;
-                    this.accountMessage = (body && body.message) || 'The account could not be updated.';
+                    this.accountMessage =
+                        (body && body.message) || 'The account could not be updated.';
 
                     const errors = (body && body.errors) || {};
                     Object.keys(errors).forEach((field) => {
@@ -1644,6 +1695,27 @@ export default {
                 .finally(() => {
                     this.savingAccount = false;
                 });
+        },
+        /**
+         * A select bound to null matches no option, not the one whose value is
+         * the empty string - so "None" rendered blank on any install that had
+         * never set a rating limit, and the field looked broken. Nothing here
+         * changes what is stored; null and '' both mean no limit.
+         */
+        withSelectDefaults(settings) {
+            const emptyIsAChoice = ['mpaa_limit', 'tv_limit'];
+
+            emptyIsAChoice.forEach((key) => {
+                if (settings[key] === null || settings[key] === undefined) {
+                    settings[key] = '';
+                }
+            });
+
+            if (!settings.theater_name_position) {
+                settings.theater_name_position = 'bottom';
+            }
+
+            return settings;
         },
         markClean() {
             this.savedSnapshot = JSON.stringify(this.settings);
