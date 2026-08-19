@@ -115,14 +115,28 @@
                                         id="max-selections"
                                         type="number"
                                         min="1"
-                                        :max="selectionCap"
+                                        :max="posters.length || 1"
                                         class="field-input w-24"
                                         v-model="maxSelections"
                                         :disabled="votingEnabled"
                                     />
                                     <p class="field-help">
-                                        Allowing as many picks as there are posters lets everyone
-                                        vote for everything, which usually ends in a tie.
+                                        <span
+                                            v-if="
+                                                effectiveSelections < (parseInt(maxSelections) || 1)
+                                            "
+                                        >
+                                            Only {{ inRunning }} poster<span v-if="inRunning !== 1"
+                                                >s</span
+                                            >
+                                            in the running, so this session gives everyone
+                                            {{ effectiveSelections }}.
+                                        </span>
+                                        <span v-else>
+                                            Allowing as many picks as there are posters lets
+                                            everyone vote for everything, which usually ends in a
+                                            tie.
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -371,13 +385,27 @@ export default {
 
             return this.votingEnabled ? 'on' : 'off';
         },
-        selectionCap() {
-            // Never offer more picks than there are posters to pick from.
-            const inRunning = this.random
-                ? parseInt(this.posterLimit) || 0
-                : this.chosenPosters.length;
+        /**
+         * How many posters this session will actually run, or 0 while that is
+         * still being decided.
+         */
+        inRunning() {
+            if (this.random) {
+                return Math.min(parseInt(this.posterLimit) || 0, this.posters.length);
+            }
 
-            return Math.max(1, inRunning || 1);
+            return this.chosenPosters.length;
+        },
+        /**
+         * What the picks-per-voter field will really come out as. Nobody can
+         * pick more posters than the session is running, but the field itself
+         * is left alone: clamping it as posters were ticked walked the number
+         * down to 1 one poster at a time, and it never came back up.
+         */
+        effectiveSelections() {
+            const wanted = Math.max(1, parseInt(this.maxSelections) || 1);
+
+            return this.inRunning ? Math.min(wanted, this.inRunning) : wanted;
         },
         resultHeading() {
             if (this.resultStatus === 'tie') {
@@ -397,16 +425,6 @@ export default {
         },
         voteUrl() {
             return window.location.origin + '/vote';
-        },
-    },
-    watch: {
-        // The cap moves as posters are picked or the random count changes, and
-        // a max attribute only stops you typing past it - it will not pull a
-        // number that is already too high back down.
-        selectionCap(cap) {
-            if (parseInt(this.maxSelections) > cap) {
-                this.maxSelections = cap;
-            }
         },
     },
     methods: {
@@ -524,7 +542,7 @@ export default {
 
             this.socket.emit('enable:voting', {
                 posters,
-                maxSelections: Math.min(parseInt(this.maxSelections) || 1, posters.length),
+                maxSelections: Math.min(this.effectiveSelections, posters.length),
                 timeLimit: this.timeLimit,
             });
 
@@ -587,10 +605,7 @@ export default {
 
             this.socket.emit('start:voting', {
                 timeLimit: this.timeLimit,
-                maxSelections: Math.min(
-                    parseInt(this.maxSelections) || 1,
-                    this.runningPosters.length || 1,
-                ),
+                maxSelections: Math.min(this.effectiveSelections, this.runningPosters.length || 1),
             });
         },
         getRandomPosters() {
