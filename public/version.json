@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.7",
-    "changelog": "Stops the display going blank. With Randomize Poster Order on, the next poster could be the one already up, and showing it hid it - leaving an empty screen until the following change. Separately, setting the Movie limit to G or the TV limit to TV-Y emptied the display for good, and a limit that excluded every poster stopped it starting at all. Worth taking if you use random order or either rating limit.",
+    "latest": "2.1.8",
+    "changelog": "A display now picks up posters added after it started. It was meant to check every four hours and the arithmetic came to twenty-seven years, so the screen kept cycling whatever was in the library when it last loaded - saving a poster also tells the display to refresh now, so new titles appear straight away. Re-checking the library no longer empties the screen while it does it, and the poster clock can no longer end up running twice, which showed as posters changing at odd moments.",
     "past_updates": [
+        {
+            "version": "2.1.7",
+            "changelog": "Stops the display going blank. With Randomize Poster Order on, the next poster could be the one already up, and showing it hid it - leaving an empty screen until the following change. Separately, setting the Movie limit to G or the TV limit to TV-Y emptied the display for good, and a limit that excluded every poster stopped it starting at all. Worth taking if you use random order or either rating limit."
+        },
         {
             "version": "2.1.6",
             "changelog": "Cross-fade really cross-fades now. The previous attempt at it did not take effect, so whether the arriving poster came in over the outgoing one or behind it depended on where the two sat in your poster list - going from the last poster back to the first it came in behind, and the change looked like a hard cut instead."
