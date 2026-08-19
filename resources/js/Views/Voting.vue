@@ -1,5 +1,16 @@
 <template>
     <div>
+        <!--
+            The only way off this screen. Voting is a full-bleed presentation
+            view with no navigation of its own, and the Pi runs Chromium in
+            kiosk mode, so there is no back button or address bar to fall back
+            on. Sits above every overlay, including the loading one, so a
+            screen that fails to load is still escapable.
+        -->
+        <button type="button" class="voting-exit" @click.prevent="exitVoting">
+            &larr; Exit voting
+        </button>
+
         <div class="loading-overlay" v-if="loading">
             <div class="p-12">{{ loadingMessage }}</div>
         </div>
@@ -277,6 +288,16 @@ export default {
         },
     },
     methods: {
+        exitVoting() {
+            this.disconnectSocket();
+            this.$router.push('/posters');
+        },
+        disconnectSocket() {
+            if (this.socket && typeof this.socket.disconnect === 'function') {
+                this.socket.disconnect();
+            }
+            this.socket = '';
+        },
         boot() {
             this.startSockets();
             this.getPosters();
@@ -476,10 +497,36 @@ export default {
     mounted() {
         this.boot();
     },
+    beforeUnmount() {
+        // Without this the socket outlives the screen: SPA navigation never
+        // unloads the page, so the server keeps listing you as a voter and the
+        // participant list fills with people who already left.
+        this.disconnectSocket();
+    },
 };
 </script>
 
 <style scoped lang="scss">
+.voting-exit {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 600;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #ccc;
+    background-color: rgb(0 0 0 / 0.55);
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+
+    &:hover {
+        color: #fff;
+        background-color: rgb(0 0 0 / 0.85);
+    }
+}
+
 .vote-container,
 .posters-container,
 .winner-container {

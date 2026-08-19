@@ -17,9 +17,22 @@ const redis = new Redis({
     host: process.env.REDIS_HOST || '127.0.0.1',
     port: Number(process.env.REDIS_PORT || 6379),
     password: process.env.REDIS_PASSWORD || undefined,
+
+    // This process outlives any single Redis outage: the Pi may bring Redis up
+    // after this service, and Redis may be restarted under it. The default of
+    // 20 retries per request throws MaxRetriesPerRequestError from the command
+    // queue, which is not something the 'error' handler below can catch - it
+    // takes the whole process down, and with it voting and now-playing.
+    maxRetriesPerRequest: null,
+    retryStrategy: (attempt) => Math.min(attempt * 200, 5000),
 });
 
 redis.on('error', (err) => console.error('[dmp] redis error:', err.message));
+redis.on('ready', () => console.log('[dmp] redis connected'));
+
+process.on('unhandledRejection', (err) =>
+    console.error('[dmp] unhandled rejection:', err && err.message ? err.message : err)
+);
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
