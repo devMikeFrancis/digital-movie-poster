@@ -94,7 +94,7 @@ export default {
             return this.required && this.authenticated;
         },
         userName() {
-            return this.user ? this.user.name : '';
+            return this.user ? this.user.username : '';
         },
     },
     methods: {

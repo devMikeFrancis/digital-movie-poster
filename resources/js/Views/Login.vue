@@ -12,40 +12,29 @@
                 </h2>
                 <p class="text-sm text-gray-400 mb-6">
                     <template v-if="isSetup">
-                        This device does not have an account yet. The first one you create
-                        becomes the administrator.
+                        This device does not have an account yet. Pick a username and
+                        password; the first account created becomes the administrator.
                     </template>
                     <template v-else>Sign in to manage posters and settings.</template>
                 </p>
 
                 <form @submit.prevent="submit">
-                    <div v-if="isSetup" class="mb-4">
-                        <label class="block text-sm text-gray-300 mb-1" for="name">Name</label>
-                        <input
-                            id="name"
-                            v-model="form.name"
-                            type="text"
-                            autocomplete="name"
-                            class="w-full rounded"
-                            required
-                        />
-                        <p v-if="errorFor('name')" class="text-red-400 text-sm mt-1">
-                            {{ errorFor('name') }}
-                        </p>
-                    </div>
-
                     <div class="mb-4">
-                        <label class="block text-sm text-gray-300 mb-1" for="email">Email</label>
+                        <label class="block text-sm text-gray-300 mb-1" for="username">
+                            Username
+                        </label>
                         <input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
+                            id="username"
+                            v-model="form.username"
+                            type="text"
                             autocomplete="username"
+                            autocapitalize="none"
+                            spellcheck="false"
                             class="w-full rounded"
                             required
                         />
-                        <p v-if="errorFor('email')" class="text-red-400 text-sm mt-1">
-                            {{ errorFor('email') }}
+                        <p v-if="errorFor('username')" class="text-red-400 text-sm mt-1">
+                            {{ errorFor('username') }}
                         </p>
                     </div>
 
@@ -108,7 +97,7 @@ export default {
     name: 'Login',
     data() {
         return {
-            form: { name: '', email: '', password: '', password_confirmation: '' },
+            form: { username: '', password: '', password_confirmation: '' },
             errors: {},
             generalError: '',
             busy: false,
@@ -136,7 +125,10 @@ export default {
                 if (this.isSetup) {
                     await auth.setup(this.form);
                 } else {
-                    await auth.login({ email: this.form.email, password: this.form.password });
+                    await auth.login({
+                        username: this.form.username,
+                        password: this.form.password,
+                    });
                 }
 
                 const redirect = this.$route.query.redirect || '/posters';

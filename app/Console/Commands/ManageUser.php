@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 /**
@@ -15,8 +16,7 @@ use Illuminate\Validation\Rules\Password;
 class ManageUser extends Command
 {
     protected $signature = 'dmp:user
-                            {--email= : Email address to sign in with}
-                            {--name= : Display name}
+                            {--username= : Username to sign in with}
                             {--password= : Password (prompted for if omitted)}';
 
     protected $description = 'Create the DMP admin account or reset its password';
@@ -25,19 +25,18 @@ class ManageUser extends Command
     {
         $existing = User::query()->first();
 
-        $email = $this->option('email')
-            ?: $this->ask('Email address', $existing?->email ?? 'admin@digital-movie-poster.local');
-
-        $name = $this->option('name')
-            ?: $this->ask('Display name', $existing?->name ?? 'Administrator');
+        $username = $this->option('username')
+            ?: $this->ask('Username', $existing?->username ?? 'admin');
 
         $password = $this->option('password') ?: $this->secret('Password');
 
         $validator = Validator::make(
-            ['email' => $email, 'name' => $name, 'password' => $password],
+            ['username' => $username, 'password' => $password],
             [
-                'email' => ['required', 'email', 'max:255'],
-                'name' => ['required', 'string', 'max:255'],
+                'username' => [
+                    'required', 'string', 'min:3', 'max:255', 'alpha_dash',
+                    Rule::unique('users', 'username')->ignore($existing?->id),
+                ],
                 'password' => ['required', 'string', Password::min(8)],
             ]
         );
@@ -52,20 +51,18 @@ class ManageUser extends Command
 
         if ($existing) {
             $existing->update([
-                'name' => $name,
-                'email' => $email,
+                'username' => $username,
                 'password' => Hash::make($password),
             ]);
 
-            $this->info('Updated the admin account ('.$email.').');
+            $this->info('Updated the admin account ('.$username.').');
         } else {
             User::create([
-                'name' => $name,
-                'email' => $email,
+                'username' => $username,
                 'password' => Hash::make($password),
             ]);
 
-            $this->info('Created the admin account ('.$email.').');
+            $this->info('Created the admin account ('.$username.').');
         }
 
         if (! config('dmp.auth.required')) {
