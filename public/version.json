@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.3",
-    "changelog": "Two more ways for one poster to give way to the next. Cross-fade brings the new poster in over the old one, so the screen does not dip darker in between the way a plain fade does, and Cut swaps them outright with no animation. Fade and Vertical are unchanged, so a display already set to either looks exactly as it did.",
+    "latest": "2.1.4",
+    "changelog": "Fixes the Cross-fade transition, which was not stacking the incoming poster over the outgoing one and so was not really cross-fading. If you chose Cross-fade or Cut and the display slid vertically instead, that was a display still running older code: it reads any unfamiliar transition as the vertical slide. Taking this update sorts it, and a browser left open on the display wants a reload afterwards.",
     "past_updates": [
+        {
+            "version": "2.1.3",
+            "changelog": "Two more ways for one poster to give way to the next. Cross-fade brings the new poster in over the old one, so the screen does not dip darker in between the way a plain fade does, and Cut swaps them outright with no animation. Fade and Vertical are unchanged, so a display already set to either looks exactly as it did."
+        },
         {
             "version": "2.1.2",
             "changelog": "Fixes a poster that looked cut off at the top and bottom when filling the screen: the artwork was full height all along, but the header and footer were sitting on top of it. They now float over the poster, with shading behind them so the text stays readable - how heavy that shading is has its own setting. Also fixes the new display options showing as switched off in Settings when they were on, which could switch them off for real the next time you saved."
