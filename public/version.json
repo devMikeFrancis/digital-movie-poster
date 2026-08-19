@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.14",
-    "changelog": "The Coming Soon wording and your theater name can now be dressed as a proper sign - plain, with rules either side, marquee bulbs, a plaque or a neon glow - and either can span the width of the screen or sit above or below the poster. A header that already had its box keeps it, and anything else looks exactly as it did until you choose otherwise. Also fixes the header, theater name and footer disappearing under a poster that fills the screen.",
+    "latest": "2.1.15",
+    "changelog": "Settings is now two screens. Display holds everything about what goes on the screen - how posters cycle, the header and theater name, and the details drawn around a poster - with each font and colour sitting next to the thing it applies to instead of on a Theme tab of its own. Settings keeps the three things you set up once: where posters come from, when the screen switches on, and your account. Nothing was dropped, only moved, and the address bar now says which tab you are on so a reload comes back to it. Span the width of the screen now spreads the words themselves rather than just the invisible box around them - on a plain or neon plate it looked like it did nothing at all. Shading behind the header and footer only appears at an end that has something on it. The Dolby Vision logo no longer carries a black box behind it, which showed on any footer that was not black. And where processing logos come from is one question now instead of two checkboxes that could disagree - that pair is why a film with no Atmos soundtrack could end up showing the Atmos logo. Show Top Border is gone: the header plate styles replaced it a release ago and it had stopped doing anything.",
     "past_updates": [
+        {
+            "version": "2.1.14",
+            "changelog": "The Coming Soon wording and your theater name can now be dressed as a proper sign - plain, with rules either side, marquee bulbs, a plaque or a neon glow - and either can span the width of the screen or sit above or below the poster. A header that already had its box keeps it, and anything else looks exactly as it did until you choose otherwise. Also fixes the header, theater name and footer disappearing under a poster that fills the screen."
+        },
         {
             "version": "2.1.13",
             "changelog": "Whether the admin screens ask for a login is a setting now, under Settings then Account, instead of something you had to edit on the device. Your current arrangement carries over untouched - if a login is being asked for today it still will be after this update. The display never asks either way. The documentation also gained screenshots of each screen."
