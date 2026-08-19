@@ -28,20 +28,20 @@ class AuthController extends Controller
             'required' => (bool) config('dmp.auth.required'),
             'authenticated' => $request->user('sanctum') !== null,
             'needs_setup' => ! User::query()->exists() && (bool) config('dmp.auth.allow_setup'),
-            'user' => $request->user('sanctum')?->only(['id', 'name', 'email']),
+            'user' => $request->user('sanctum')?->only(['id', 'username']),
         ]);
     }
 
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
-            'email' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember', true))) {
             throw ValidationException::withMessages([
-                'email' => 'Those credentials do not match our records.',
+                'username' => 'Those credentials do not match our records.',
             ]);
         }
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
 
         return response()->json([
             'authenticated' => true,
-            'user' => $request->user()->only(['id', 'name', 'email']),
+            'user' => $request->user()->only(['id', 'username']),
         ]);
     }
 
@@ -84,14 +84,12 @@ class AuthController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
+            'username' => ['required', 'string', 'min:3', 'max:255', 'alpha_dash', 'unique:users,username'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'username' => $data['username'],
             'password' => Hash::make($data['password']),
         ]);
 
@@ -100,7 +98,7 @@ class AuthController extends Controller
 
         return response()->json([
             'authenticated' => true,
-            'user' => $user->only(['id', 'name', 'email']),
+            'user' => $user->only(['id', 'username']),
         ], 201);
     }
 }

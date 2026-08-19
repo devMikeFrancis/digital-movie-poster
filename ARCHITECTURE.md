@@ -113,6 +113,12 @@ First run offers to create the admin account, since an appliance has no other
 way to bootstrap one; that path closes permanently as soon as a user exists,
 and `DMP_ALLOW_SETUP=false` disables it in favour of `php artisan dmp:user`.
 
+The account is a username and a password. It carried an email address and a
+display name until it became clear nothing used them: no mailer is configured,
+there is no password reset and no verification, so the address was a login name
+that had to look like an address - and implied an account recovery that does
+not exist. The `password_resets` table went with it.
+
 One deliberate exception, because the kiosk browser cannot log in: the
 endpoints the display polls (`/api/posters`, `/api/settings`,
 `/api/now-playing/*`) stay open. They return no credentials — see #1.

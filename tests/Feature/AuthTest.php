@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -14,7 +15,7 @@ class AuthTest extends TestCase
     private function admin(string $password = 'correct-horse'): User
     {
         return User::factory()->create([
-            'email' => 'admin@example.test',
+            'username' => 'admin',
             'password' => Hash::make($password),
         ]);
     }
@@ -42,14 +43,13 @@ class AuthTest extends TestCase
     public function test_the_first_account_can_be_created_and_is_signed_in(): void
     {
         $this->postJson('/api/auth/setup', [
-            'name' => 'Mike',
-            'email' => 'mike@example.test',
+            'username' => 'mike',
             'password' => 'a-good-password',
             'password_confirmation' => 'a-good-password',
         ])->assertCreated()->assertJson(['authenticated' => true]);
 
         $this->assertAuthenticated();
-        $this->assertDatabaseHas('users', ['email' => 'mike@example.test']);
+        $this->assertDatabaseHas('users', ['username' => 'mike']);
     }
 
     public function test_setup_is_refused_once_an_account_exists(): void
@@ -57,8 +57,7 @@ class AuthTest extends TestCase
         $this->admin();
 
         $this->postJson('/api/auth/setup', [
-            'name' => 'Interloper',
-            'email' => 'someone@example.test',
+            'username' => 'interloper',
             'password' => 'a-good-password',
             'password_confirmation' => 'a-good-password',
         ])->assertStatus(409);
@@ -71,8 +70,7 @@ class AuthTest extends TestCase
         config(['dmp.auth.allow_setup' => false]);
 
         $this->postJson('/api/auth/setup', [
-            'name' => 'Mike',
-            'email' => 'mike@example.test',
+            'username' => 'mike',
             'password' => 'a-good-password',
             'password_confirmation' => 'a-good-password',
         ])->assertStatus(403);
@@ -83,8 +81,7 @@ class AuthTest extends TestCase
     public function test_setup_requires_a_confirmed_password_of_reasonable_length(): void
     {
         $this->postJson('/api/auth/setup', [
-            'name' => 'Mike',
-            'email' => 'mike@example.test',
+            'username' => 'mike',
             'password' => 'short',
             'password_confirmation' => 'nope',
         ])->assertStatus(422)->assertJsonValidationErrors('password');
@@ -95,7 +92,7 @@ class AuthTest extends TestCase
         $this->admin();
 
         $this->postJson('/api/auth/login', [
-            'email' => 'admin@example.test',
+            'username' => 'admin',
             'password' => 'correct-horse',
         ])->assertOk()->assertJson(['authenticated' => true]);
 
@@ -107,9 +104,9 @@ class AuthTest extends TestCase
         $this->admin();
 
         $this->postJson('/api/auth/login', [
-            'email' => 'admin@example.test',
+            'username' => 'admin',
             'password' => 'wrong',
-        ])->assertStatus(422)->assertJsonValidationErrors('email');
+        ])->assertStatus(422)->assertJsonValidationErrors('username');
 
         $this->assertGuest();
     }
@@ -122,7 +119,7 @@ class AuthTest extends TestCase
             ->assertUnauthorized();
 
         $this->postJson('/api/auth/login', [
-            'email' => 'admin@example.test',
+            'username' => 'admin',
             'password' => 'correct-horse',
         ])->assertOk();
 
@@ -152,7 +149,7 @@ class AuthTest extends TestCase
         }
 
         $this->postJson('/api/auth/login', [
-            'email' => 'admin@example.test',
+            'username' => 'admin',
             'password' => 'correct-horse',
         ])->assertStatus(429);
     }
@@ -160,16 +157,14 @@ class AuthTest extends TestCase
     public function test_the_artisan_command_creates_then_updates_the_single_account(): void
     {
         $this->artisan('dmp:user', [
-            '--email' => 'op@example.test',
-            '--name' => 'Operator',
+            '--username' => 'operator',
             '--password' => 'a-good-password',
         ])->assertSuccessful();
 
         $this->assertSame(1, User::count());
 
         $this->artisan('dmp:user', [
-            '--email' => 'op@example.test',
-            '--name' => 'Operator',
+            '--username' => 'operator',
             '--password' => 'a-different-password',
         ])->assertSuccessful();
 
@@ -177,11 +172,50 @@ class AuthTest extends TestCase
         $this->assertTrue(Hash::check('a-different-password', User::first()->password));
     }
 
+    public function test_a_username_must_be_a_sensible_identifier(): void
+    {
+        foreach (['ab', 'has spaces', 'has@symbol', ''] as $bad) {
+            $this->postJson('/api/auth/setup', [
+                'username' => $bad,
+                'password' => 'a-good-password',
+                'password_confirmation' => 'a-good-password',
+            ])->assertStatus(422)->assertJsonValidationErrors('username');
+        }
+
+        $this->assertSame(0, User::count());
+    }
+
+    public function test_a_username_can_contain_dashes_and_underscores(): void
+    {
+        $this->postJson('/api/auth/setup', [
+            'username' => 'movie_poster-admin',
+            'password' => 'a-good-password',
+            'password_confirmation' => 'a-good-password',
+        ])->assertCreated();
+
+        $this->assertDatabaseHas('users', ['username' => 'movie_poster-admin']);
+    }
+
+    public function test_the_account_never_carries_an_email(): void
+    {
+        // The device sends no mail, so there is nothing for an address to do.
+        $this->admin();
+
+        $this->assertNotContains('email', Schema::getColumnListing('users'));
+        $this->assertFalse(Schema::hasTable('password_resets'));
+
+        $body = $this->postJson('/api/auth/login', [
+            'username' => 'admin',
+            'password' => 'correct-horse',
+        ])->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('email', $body);
+    }
+
     public function test_the_artisan_command_rejects_a_short_password(): void
     {
         $this->artisan('dmp:user', [
-            '--email' => 'op@example.test',
-            '--name' => 'Operator',
+            '--username' => 'operator',
             '--password' => 'short',
         ])->assertFailed();
 

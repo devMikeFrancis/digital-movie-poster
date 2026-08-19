@@ -18,8 +18,7 @@ class IssueApiToken extends Command
 
         if (! $user) {
             $user = User::create([
-                'name' => 'DMP API',
-                'email' => 'api@digital-movie-poster.local',
+                'username' => 'dmp-api',
                 'password' => bcrypt(Str::random(40)),
             ]);
 

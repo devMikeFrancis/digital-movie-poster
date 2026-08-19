@@ -237,13 +237,19 @@ affected.
 
 ## Security
 
-The admin UI requires a login. The first time you open it on a new device it
-offers to create the administrator account; after that the same screen asks you
-to sign in. You can also manage the account from the console:
+The admin UI requires a login - a username and a password. The first time you
+open it on a new device it offers to create the administrator account; after
+that the same screen asks you to sign in. You can also manage the account from
+the console:
 
 ```bash
-php artisan dmp:user
+php artisan dmp:user                     # prompts
+php artisan dmp:user --username=mike     # prompts for the password only
 ```
+
+There is no email address on the account and no password reset: the device
+sends no mail, so an address would only be a login name that had to look like
+one. If you forget the password, `dmp:user` resets it from the console.
 
 Privileged endpoints — anything that writes, shells out, or returns credentials
 — accept either that session or a Sanctum bearer token, so integrations keep
