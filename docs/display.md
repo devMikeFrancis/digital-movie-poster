@@ -3,6 +3,12 @@
 What goes on screen, and how it changes. Everything here lives under
 **Settings → General** unless noted.
 
+![The display, showing the runtime, header, content rating, processing logo, audience rating and theatre name](images/display.png)
+
+Where these options live:
+
+![Settings, General tab, showing the display options and their help text](images/settings.png)
+
 ## How one poster gives way to the next
 
 **Transition Type** offers four:

@@ -3,6 +3,8 @@
 Putting a few posters to a vote and letting people in the room choose from
 their phones.
 
+![The display while a vote is open: Vote Now, a large QR code, and the address beneath it](images/voting-display.png)
+
 Put a few posters up for a vote and let people in the room choose from their
 phones. There is no wiki — this is the documentation.
 
@@ -45,6 +47,14 @@ no Redis.
    at that point: it stays on the Setup tab, and on the voting page for anyone
    still watching, labelled as the last session's winner until the next round
    starts.
+
+The admin screen, where a session is built and run:
+
+![The Voting screen, Setup tab: posters in the running, and the rules for the session](images/voting-setup.png)
+
+What a guest sees after scanning:
+
+![The voter page asking for a name](images/vote-page.png)
 
 The number of picks is enforced on the server as well as in the page, so a
 modified client cannot vote more times than the session allows.

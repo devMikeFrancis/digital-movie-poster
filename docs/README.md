@@ -2,6 +2,8 @@
 
 Everything beyond the overview in the [project README](../README.md).
 
+![The display](images/display.png)
+
 ## Getting it running
 
 - **[Installation](installation.md)** — what you need, preparing the SD card,
