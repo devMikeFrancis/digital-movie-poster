@@ -68,6 +68,24 @@ export const usePostersStore = defineStore('posters', {
         tvY7Limits: ['TV-Y', 'TV-Y7'],
     }),
     getters: {
+        /**
+         * The class prefix for the chosen transition. Held here so the poster,
+         * the header and the footer cannot drift apart on which effect they are
+         * running - they have to move together to look like one change.
+         *
+         * 'vertical' keeps the older 'slide' prefix so displays that already
+         * chose it are unaffected.
+         */
+        transitionPrefix() {
+            const prefixes = {
+                fade: 'fade',
+                vertical: 'slide',
+                crossfade: 'crossfade',
+                cut: 'cut',
+            };
+
+            return prefixes[this.settings.transition_type] || 'fade';
+        },
         mediaPosters() {
             return this.moviePosters.filter((poster) => {
                 if (poster.media_type === 'movie') {

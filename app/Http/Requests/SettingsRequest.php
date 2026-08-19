@@ -52,7 +52,7 @@ class SettingsRequest extends FormRequest
             'play_theme_music' => 'required|boolean',
             'use_global_prologos' => 'required|boolean',
             'use_global_prologos_if_no_poster_prologos' => 'required|boolean',
-            'transition_type' => 'required|string',
+            'transition_type' => 'required|in:fade,crossfade,vertical,cut',
             'poster_fill_screen' => 'required|boolean',
             'poster_fill_scrim' => 'required|in:none,subtle,standard,strong',
             'show_header_text' => 'required|boolean',
@@ -118,6 +118,7 @@ class SettingsRequest extends FormRequest
             // land on the sensible option rather than fail validation.
             'theater_name_position' => $this->input('theater_name_position') ?: 'bottom',
             'poster_fill_scrim' => $this->input('poster_fill_scrim') ?: 'standard',
+            'transition_type' => $this->input('transition_type') ?: 'fade',
             'jellyfin_service' => $this->boolean('jellyfin_service'),
             'show_header_border' => $this->boolean('show_header_border'),
             'validate_movie_titles' => $this->boolean('validate_movie_titles'),

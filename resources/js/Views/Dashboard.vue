@@ -30,13 +30,7 @@
                                 }"
                                 :style="blackBars(poster)"
                             >
-                                <Transition
-                                    :name="
-                                        settings.transition_type === 'fade'
-                                            ? 'fade-poster'
-                                            : 'slide-poster'
-                                    "
-                                >
+                                <Transition :name="transitionPrefix + '-poster'">
                                     <div
                                         v-if="poster.show"
                                         :style="
@@ -154,7 +148,7 @@ export default {
             'theme_music',
             'socket',
         ]),
-        ...mapGetters(usePostersStore, ['mediaPosters']),
+        ...mapGetters(usePostersStore, ['mediaPosters', 'transitionPrefix']),
         fillScreen() {
             return !!this.settings.poster_fill_screen;
         },
@@ -514,5 +508,36 @@ export default {
 }
 .slide-poster-enter-from {
     transform: translate3d(0, 100%, 0);
+}
+
+/*
+ * Cross-fade. Fade runs both halves at once, so mid-change the pair is briefly
+ * half transparent and the background shows through as a dip. Here the
+ * incoming poster fades in on top while the outgoing one holds at full
+ * opacity underneath and is only dropped once it is covered, so the screen
+ * never darkens between posters.
+ */
+.crossfade-poster-enter-active {
+    transition: opacity 1.6s ease;
+    z-index: 2;
+}
+
+.crossfade-poster-enter-from {
+    opacity: 0;
+}
+
+.crossfade-poster-leave-active {
+    transition: opacity 0.01s linear 1.6s;
+    z-index: 1;
+}
+
+.crossfade-poster-leave-to {
+    opacity: 0;
+}
+
+/* Cut. No animation at all - one poster replaces the next outright. */
+.cut-poster-enter-active,
+.cut-poster-leave-active {
+    transition: none;
 }
 </style>

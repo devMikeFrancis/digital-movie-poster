@@ -98,6 +98,24 @@ class SettingsApiTest extends TestCase
         }
     }
 
+    public function test_every_offered_transition_type_is_accepted(): void
+    {
+        foreach (['fade', 'crossfade', 'vertical', 'cut'] as $type) {
+            $this->putJson('/api/settings', $this->validPayload([
+                'transition_type' => $type,
+            ]))->assertOk();
+
+            $this->assertSame($type, Setting::first()->transition_type);
+        }
+    }
+
+    public function test_an_unknown_transition_type_is_rejected(): void
+    {
+        $this->putJson('/api/settings', $this->validPayload([
+            'transition_type' => 'barrel-roll',
+        ]))->assertStatus(422)->assertJsonValidationErrors('transition_type');
+    }
+
     public function test_the_theater_name_position_only_accepts_top_or_bottom(): void
     {
         $this->putJson('/api/settings', $this->validPayload([
