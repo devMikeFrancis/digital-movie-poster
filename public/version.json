@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.9",
-    "changelog": "Important if you are on 2.1.8. The four-hourly library check introduced there asked for something the display is not allowed to request, and the failure left the screen blank until it was reloaded - so a display would go blank about four hours after starting. It now reads the poster list the same way it does at boot, and keeps whatever is on screen up while it does it. Please take this update.",
+    "latest": "2.1.10",
+    "changelog": "A display that starts before the server is ready now waits and tries again, instead of sitting on the loading screen until someone reloads it - which is what happened if the Pi reached the browser first. Also credits version 1 to Don Jones, who created DMP, on the About page.",
     "past_updates": [
+        {
+            "version": "2.1.9",
+            "changelog": "Important if you are on 2.1.8. The four-hourly library check introduced there asked for something the display is not allowed to request, and the failure left the screen blank until it was reloaded - so a display would go blank about four hours after starting. It now reads the poster list the same way it does at boot, and keeps whatever is on screen up while it does it. Please take this update."
+        },
         {
             "version": "2.1.8",
             "changelog": "A display now picks up posters added after it started. It was meant to check every four hours and the arithmetic came to twenty-seven years, so the screen kept cycling whatever was in the library when it last loaded - saving a poster also tells the display to refresh now, so new titles appear straight away. Re-checking the library no longer empties the screen while it does it, and the poster clock can no longer end up running twice, which showed as posters changing at odd moments."
