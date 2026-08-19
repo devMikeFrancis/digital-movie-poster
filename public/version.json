@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.4",
-    "changelog": "Fixes the Cross-fade transition, which was not stacking the incoming poster over the outgoing one and so was not really cross-fading. If you chose Cross-fade or Cut and the display slid vertically instead, that was a display still running older code: it reads any unfamiliar transition as the vertical slide. Taking this update sorts it, and a browser left open on the display wants a reload afterwards.",
+    "latest": "2.1.5",
+    "changelog": "Fixes adding several posters in a row. After saving one, \"Reset to create new poster\" cleared the Media Type along with everything else, so the next save was refused for a missing media type with a blank field and no explanation on screen. The reset now leaves the form as it starts out, and clears the artwork and music file pickers with it.",
     "past_updates": [
+        {
+            "version": "2.1.4",
+            "changelog": "Fixes the Cross-fade transition, which was not stacking the incoming poster over the outgoing one and so was not really cross-fading. If you chose Cross-fade or Cut and the display slid vertically instead, that was a display still running older code: it reads any unfamiliar transition as the vertical slide. Taking this update sorts it, and a browser left open on the display wants a reload afterwards."
+        },
         {
             "version": "2.1.3",
             "changelog": "Two more ways for one poster to give way to the next. Cross-fade brings the new poster in over the old one, so the screen does not dip darker in between the way a plain fade does, and Cut swaps them outright with no animation. Fade and Vertical are unchanged, so a display already set to either looks exactly as it did."
