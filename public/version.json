@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.6",
-    "changelog": "Cross-fade really cross-fades now. The previous attempt at it did not take effect, so whether the arriving poster came in over the outgoing one or behind it depended on where the two sat in your poster list - going from the last poster back to the first it came in behind, and the change looked like a hard cut instead.",
+    "latest": "2.1.7",
+    "changelog": "Stops the display going blank. With Randomize Poster Order on, the next poster could be the one already up, and showing it hid it - leaving an empty screen until the following change. Separately, setting the Movie limit to G or the TV limit to TV-Y emptied the display for good, and a limit that excluded every poster stopped it starting at all. Worth taking if you use random order or either rating limit.",
     "past_updates": [
+        {
+            "version": "2.1.6",
+            "changelog": "Cross-fade really cross-fades now. The previous attempt at it did not take effect, so whether the arriving poster came in over the outgoing one or behind it depended on where the two sat in your poster list - going from the last poster back to the first it came in behind, and the change looked like a hard cut instead."
+        },
         {
             "version": "2.1.5",
             "changelog": "Fixes adding several posters in a row. After saving one, \"Reset to create new poster\" cleared the Media Type along with everything else, so the next save was refused for a missing media type with a blank field and no explanation on screen. The reset now leaves the form as it starts out, and clears the artwork and music file pickers with it."
