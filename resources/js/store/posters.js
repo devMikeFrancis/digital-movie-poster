@@ -5,6 +5,9 @@ import { defineStore } from 'pinia';
 /** How often a running display pulls the poster library again. */
 const POSTER_SYNC_MS = 1000 * 60 * 60 * 4;
 
+/** How long to wait before trying again when the first load fails. */
+const POSTER_RETRY_MS = 5000;
+
 export const usePostersStore = defineStore('posters', {
     state: () => ({
         loading: true,
@@ -139,6 +142,7 @@ export const usePostersStore = defineStore('posters', {
         },
         startSettingsInterval() {
             console.log('START SETTINGS INTERVAL');
+            this.stopSettingsInterval();
             this.settingsInterval = setInterval(() => {
                 this.getSettings();
             }, this.settingsIntervalTime);
@@ -150,7 +154,10 @@ export const usePostersStore = defineStore('posters', {
         getMoviePosters() {
             console.log('GET MOVIE POSTERS');
             this.stopTransitionImages();
-            axios
+
+            // Returned so a caller can wait for it. reloadMoviePosters already
+            // did; this one silently did not.
+            return axios
                 .get('/api/posters?show_in_rotation=true')
                 .then((response) => {
                     this.moviePosters = response.data.posters;
@@ -164,6 +171,14 @@ export const usePostersStore = defineStore('posters', {
                 })
                 .catch((e) => {
                     console.log(e.message);
+
+                    // The slideshow was stopped at the top of this method and
+                    // nothing else will start it, so giving up here leaves the
+                    // display on its loading screen for good. A Pi routinely
+                    // reaches the browser before the web server is answering,
+                    // which is exactly when this fails.
+                    this.loadingMessage = 'Waiting for DMP<br />to answer ...';
+                    setTimeout(() => this.getMoviePosters(), POSTER_RETRY_MS);
                 });
         },
         reloadMoviePosters() {

@@ -15,11 +15,11 @@
     "authors": [
         {
             "name": "Don Jones",
-            "role": "Creator"
+            "role": "Creator, version 1"
         },
         {
             "name": "Mike Francis",
-            "role": "Maintainer"
+            "role": "Maintainer, version 2 onwards"
         }
     ],
     "require": {

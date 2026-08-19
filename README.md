@@ -61,8 +61,14 @@ with the code so a change and its explanation arrive together.
 
 ## Credits
 
-Originally created by Don Jones. Maintained by
-[Mike Francis](https://github.com/devMikeFrancis).
+**Don Jones** created DMP and built it through version 1.x — the original
+concept, the poster display, and the media-server integrations it still runs on.
+
+**[Mike Francis](https://github.com/devMikeFrancis)** has maintained it since,
+and version 2.0 is a ground-up refresh of the architecture on that foundation:
+Laravel 9 to 13, SQLite in place of MariaDB, an authenticated admin with
+credentials encrypted at rest, and the display and voting work that has followed.
+Ongoing development continues here.
 
 ## License
 
