@@ -1,12 +1,16 @@
 <template>
     <header class="top-header" :style="'background-color:' + settings.header_bg_color">
-        <span
-            class="runtime"
-            v-if="settings.show_runtime && localRuntime"
-            :style="'color:' + settings.header_text_color"
-            >{{ localRuntime }} min</span
-        >
+        <Transition :name="transitionName">
+            <span
+                class="runtime"
+                v-if="settings.show_runtime && localRuntime"
+                :key="posterKey"
+                :style="'color:' + settings.header_text_color"
+                >{{ localRuntime }} min</span
+            >
+        </Transition>
         <h1
+            v-if="showHeaderText"
             :style="
                 headerSize +
                 headerFont +
@@ -40,7 +44,30 @@ export default {
         SpeakerConfig,
     },
     computed: {
-        ...mapState(usePostersStore, ['settings', 'nowPlaying', 'runtime', 'nowPlayingRuntime']),
+        ...mapState(usePostersStore, [
+            'settings',
+            'nowPlaying',
+            'runtime',
+            'nowPlayingRuntime',
+            'currentPosterId',
+        ]),
+        /**
+         * The settings API hands booleans back as 0 and 1, so this cannot just
+         * test against false - 0 !== false, and the header stayed on. Absent is
+         * still on: an install that predates this option should not have its
+         * header disappear.
+         */
+        showHeaderText() {
+            const value = this.settings.show_header_text;
+
+            return value === undefined || value === null ? true : !!Number(value);
+        },
+        transitionName() {
+            return this.settings.transition_type === 'fade' ? 'fade-meta' : 'slide-meta';
+        },
+        posterKey() {
+            return this.nowPlaying ? 'now-playing' : this.currentPosterId;
+        },
         headerFont() {
             if (this.settings.header_font === 'default') {
                 return '';
@@ -123,6 +150,37 @@ export default {
         letter-spacing: 3px;
         margin: 0;
     }
+}
+
+/*
+ * The runtime belongs to the poster, so it changes with it rather than
+ * snapping to the next film while the artwork is still fading.
+ */
+.fade-meta-enter-active,
+.fade-meta-leave-active {
+    transition: opacity 2.2s ease;
+}
+
+.fade-meta-enter-from,
+.fade-meta-leave-to {
+    opacity: 0;
+}
+
+.slide-meta-enter-active,
+.slide-meta-leave-active {
+    transition:
+        transform 1.2s ease,
+        opacity 1s ease;
+}
+
+.slide-meta-leave-to {
+    transform: translate3d(0, -100%, 0);
+    opacity: 0;
+}
+
+.slide-meta-enter-from {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0;
 }
 
 .runtime {

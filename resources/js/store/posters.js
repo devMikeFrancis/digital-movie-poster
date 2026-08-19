@@ -29,6 +29,11 @@ export const usePostersStore = defineStore('posters', {
         transitionImagesInterval: null,
         contentRating: '',
         mpaaRating: '',
+
+        // Which poster is on screen. The header and footer key their
+        // transitions off it so the details change with the artwork.
+        currentPosterId: null,
+
         rating: 0,
         audienceRating: 0,
         currentImage: 0,
@@ -183,6 +188,7 @@ export const usePostersStore = defineStore('posters', {
         },
         handlePosterView(poster) {
             console.log('HANDLE POSTER VIEW');
+            this.currentPosterId = poster.id;
             this.mpaaRating = poster.mpaa_rating;
             if (poster.audience_rating) {
                 this.audienceRating = poster.audience_rating / 2;
@@ -226,9 +232,12 @@ export const usePostersStore = defineStore('posters', {
             }
         },
         startSyncPosters() {
-            this.recentlyAddedInterval = setInterval(() => {
-                this.cachePosters();
-            }, 60000 * 60 * 60 * 1000 * 4); // Every 4 hours
+            this.recentlyAddedInterval = setInterval(
+                () => {
+                    this.cachePosters();
+                },
+                60000 * 60 * 60 * 1000 * 4
+            ); // Every 4 hours
         },
         withinMpaaLimit(rating) {
             let mpaaLimit = this.settings.mpaa_limit;

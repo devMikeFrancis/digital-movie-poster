@@ -9,9 +9,11 @@
             <div
                 id="recent-added-container"
                 class="poster-container"
+                :class="{ 'fill-screen': fillScreen }"
                 @click.prevent="gotoPosters()"
                 v-if="!isPlaying"
             >
+                <TheaterName v-if="theaterNameOn === 'top'" />
                 <TopHeader />
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
@@ -54,14 +56,17 @@
                     </div>
                 </div>
                 <BottomFooter />
+                <TheaterName v-if="theaterNameOn === 'bottom'" />
             </div>
             <transition name="fade" mode="out-in">
                 <div
                     id="now-playing-container"
                     class="poster-container"
+                    :class="{ 'fill-screen': fillScreen }"
                     v-if="isPlaying"
                     @click.prevent="gotoPosters()"
                 >
+                    <TheaterName v-if="theaterNameOn === 'top'" />
                     <TopHeader />
 
                     <div class="now-playing-container">
@@ -77,6 +82,7 @@
                     </div>
 
                     <BottomFooter />
+                    <TheaterName v-if="theaterNameOn === 'bottom'" />
                 </div>
             </transition>
         </div>
@@ -89,6 +95,7 @@ import { usePostersStore } from '@/store/posters';
 import TopHeader from '@/components/top-header.vue';
 import VotingScreen from '@/components/voting-screen.vue';
 import BottomFooter from '@/components/bottom-footer.vue';
+import TheaterName from '@/components/theater-name.vue';
 
 const $recentAdded = document.querySelector('#recent-added-container');
 let $video = document.getElementById('youtube-player');
@@ -105,6 +112,7 @@ export default {
         TopHeader,
         VotingScreen,
         BottomFooter,
+        TheaterName,
     },
     watch: {
         nowPlaying: {
@@ -147,6 +155,16 @@ export default {
             'socket',
         ]),
         ...mapGetters(usePostersStore, ['mediaPosters']),
+        fillScreen() {
+            return !!this.settings.poster_fill_screen;
+        },
+        theaterNameOn() {
+            if (!this.settings.show_theater_name || !this.settings.theater_name) {
+                return false;
+            }
+
+            return this.settings.theater_name_position === 'top' ? 'top' : 'bottom';
+        },
     },
     methods: {
         ...mapActions(usePostersStore, [
@@ -190,6 +208,14 @@ export default {
                     return '';
                 }
             }
+
+            // Edge to edge is the whole point of fill mode, and this inline
+            // style would otherwise win over the stylesheet and leave the
+            // artwork inset by 1.5vw and overflowing on the other side.
+            if (this.fillScreen) {
+                return '';
+            }
+
             return this.settings.remove_black_bars
                 ? ' left: 0; right: 0; '
                 : ' left: 1.5vw; right: 1.5vw; ';
@@ -290,6 +316,50 @@ export default {
     #trailer {
         height: 28vw;
         width: 100%;
+    }
+}
+
+/*
+ * Fill mode. The poster is normally letterboxed into a 2:3 box between the
+ * header and the footer; here the artwork covers the screen and everything
+ * else floats over it, which is what a display with nothing but artwork on it
+ * wants. The trailer keeps its own box - a video stretched to an arbitrary
+ * screen ratio looks wrong in a way a poster does not.
+ */
+.fill-screen {
+    /*
+     * The artwork is lifted out to cover the whole screen while the header,
+     * theatre name and footer stay in their normal places on top of it. Taking
+     * the poster's container out of the flow instead looked obvious and was
+     * wrong: with nothing left to grow, the header and footer collapsed into a
+     * stack in the middle of the screen.
+     */
+    .poster:not(.has-trailer) {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform: none;
+
+        > div {
+            aspect-ratio: auto;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+        }
+    }
+
+    .now-playing-poster {
+        position: fixed;
+        inset: 0;
+        background-size: cover;
+    }
+
+    .top-header,
+    .poster-footer,
+    .theater-name {
+        position: relative;
+        z-index: 2;
     }
 }
 
