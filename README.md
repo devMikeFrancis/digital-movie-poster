@@ -101,8 +101,15 @@ php artisan serve          # http://127.0.0.1:8000
 node socketserver/server.js # separate terminal, needs Redis
 ```
 
-Run the test suite with `php artisan test`, and check formatting with
+Run the PHP test suite with `php artisan test` and the front-end one with
+`npm test` (`npm run test:watch` while working). Check formatting with
 `./vendor/bin/pint`.
+
+Front-end tests live in `tests/js/` and run under Vitest with
+`@vue/test-utils`. They exist because the display and the admin forms are where
+the regressions have actually happened - a checkbox reading 0 instead of true, a
+select bound to null rendering blank, a form reset clearing a required field -
+and none of that is reachable from a PHP test.
 
 ---
 
