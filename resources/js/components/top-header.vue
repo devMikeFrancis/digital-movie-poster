@@ -32,7 +32,7 @@
     </header>
 </template>
 <script>
-import { mapState } from 'pinia';
+import { mapGetters, mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import SpeakerConfig from '@/components/speaker-config.vue';
 
@@ -51,6 +51,7 @@ export default {
             'nowPlayingRuntime',
             'currentPosterId',
         ]),
+        ...mapGetters(usePostersStore, ['transitionPrefix']),
         /**
          * The settings API hands booleans back as 0 and 1, so this cannot just
          * test against false - 0 !== false, and the header stayed on. Absent is
@@ -63,7 +64,7 @@ export default {
             return value === undefined || value === null ? true : !!Number(value);
         },
         transitionName() {
-            return this.settings.transition_type === 'fade' ? 'fade-meta' : 'slide-meta';
+            return this.transitionPrefix + '-meta';
         },
         posterKey() {
             return this.nowPlaying ? 'now-playing' : this.currentPosterId;
@@ -181,6 +182,28 @@ export default {
 .slide-meta-enter-from {
     transform: translate3d(0, 100%, 0);
     opacity: 0;
+}
+.crossfade-meta-enter-active {
+    transition: opacity 1.6s ease;
+    z-index: 2;
+}
+
+.crossfade-meta-enter-from {
+    opacity: 0;
+}
+
+.crossfade-meta-leave-active {
+    transition: opacity 0.01s linear 1.6s;
+    z-index: 1;
+}
+
+.crossfade-meta-leave-to {
+    opacity: 0;
+}
+
+.cut-meta-enter-active,
+.cut-meta-leave-active {
+    transition: none;
 }
 
 .runtime {

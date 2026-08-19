@@ -146,11 +146,17 @@
                                         v-model="settings.transition_type"
                                     >
                                         <option value="fade">Fade</option>
+                                        <option value="crossfade">Cross-fade</option>
                                         <option value="vertical">Vertical</option>
+                                        <option value="cut">Cut</option>
                                     </select>
 
                                     <div id="typeHelp" class="text-gray-400 text-sm">
-                                        Fade in/out or Vertical slide transition.
+                                        How one poster gives way to the next. Fade takes both
+                                        through the background, so the screen dips darker in
+                                        between; cross-fade brings the new one in over the old, so
+                                        it does not. Vertical slides upward, and cut swaps them
+                                        outright with no animation.
                                     </div>
                                 </div>
 
@@ -1743,6 +1749,12 @@ export default {
 
             if (!settings.poster_fill_scrim) {
                 settings.poster_fill_scrim = 'standard';
+            }
+
+            // Same trap as the rating limits: a select bound to null renders
+            // blank rather than showing the option it is really on.
+            if (!settings.transition_type) {
+                settings.transition_type = 'fade';
             }
 
             return settings;
