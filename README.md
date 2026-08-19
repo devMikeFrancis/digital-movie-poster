@@ -172,11 +172,16 @@ no Redis.
    holds the controls.
    Latecomers are welcome: anyone who scans and joins after voting has started
    picks up the clock where it is and votes with whatever time is left.
-7. The winner appears on that same display screen when the round ends. Ten
+7. **Close voting** ends the round early and shows the result there and then,
+   rather than waiting out the clock.
+8. The winner appears on that same display screen when the round ends. Ten
    seconds later the session closes itself and the display goes back to the
-   slideshow. **Close session** ends it sooner. The winner is not lost at that
-   point: it stays on the Setup tab, and on the voting page for anyone still
-   watching, labelled as the last session's winner until the next round starts.
+   slideshow. **Close session** ends it sooner. A session that is opened for
+   joining and never started closes on its own after ten minutes, so the
+   display is not left showing a vote nobody is running. The winner is not lost
+   at that point: it stays on the Setup tab, and on the voting page for anyone
+   still watching, labelled as the last session's winner until the next round
+   starts.
 
 The number of picks is enforced on the server as well as in the page, so a
 modified client cannot vote more times than the session allows.
