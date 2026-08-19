@@ -44,6 +44,11 @@ the header and footer** controls how heavy that gradient is — *None*, *Subtle*
 a lot before white text over it can be read. Standard is a reasonable starting
 point.
 
+Each end is shaded only when something is actually shown there. Turn off the
+header wording, the runtime, the ratings and the logos and a display shows the
+artwork alone, with no band across either end. It follows whichever end things
+are on, so moving the header or the theatre name moves the shading with it.
+
 A trailer keeps its own box even in fill mode: a video stretched to an arbitrary
 screen shape looks wrong in a way a poster does not.
 
