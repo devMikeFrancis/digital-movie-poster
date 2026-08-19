@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "dependencies": {
         "axios": "^1.19.0",
@@ -22,9 +24,12 @@
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-vue": "^6.0.8",
+        "@vue/test-utils": "^2.4.11",
+        "jsdom": "^30.0.1",
         "laravel-vite-plugin": "^3.2.0",
         "sass": "^1.102.0",
         "tailwindcss": "^4.3.3",
-        "vite": "^8.2.1"
+        "vite": "^8.2.1",
+        "vitest": "^4.1.11"
     }
 }

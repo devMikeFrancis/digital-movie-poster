@@ -67,7 +67,7 @@ jobs:
         run: ./vendor/bin/pint --test
 
   build:
-    name: Frontend build
+    name: Frontend tests and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -78,6 +78,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Run front-end tests
+        run: npm test
 
       - name: Build assets
         run: npm run build
