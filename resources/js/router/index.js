@@ -7,6 +7,7 @@ import PostersEdit from '../Views/PostersEdit.vue';
 import Voting from '../Views/Voting.vue';
 import About from '../Views/About.vue';
 import Login from '../Views/Login.vue';
+import Vote from '../Views/Vote.vue';
 
 const routes = [
     {
@@ -41,6 +42,14 @@ const routes = [
         name: 'PostersEdit',
         component: PostersEdit,
         meta: { requiresAuth: true },
+    },
+    {
+        // Public on purpose: this is what the QR code on the display points at,
+        // and voters are guests who have no account. It can only cast votes
+        // into a session an admin has opened.
+        path: '/vote',
+        name: 'Vote',
+        component: Vote,
     },
     {
         path: '/voting',

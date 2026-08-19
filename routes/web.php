@@ -41,6 +41,10 @@ Route::get('/voting', function () {
     return view('app');
 })->where('any', '.*');
 
+Route::get('/vote', function () {
+    return view('app');
+})->where('any', '.*');
+
 Route::get('/login', function () {
     return view('app');
 })->where('any', '.*');

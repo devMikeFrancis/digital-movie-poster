@@ -17,32 +17,14 @@
             </div>
         </div>
 
-        <div class="login-container" v-if="!loggedin">
-            <div class="inner">
-                <p class="text-2xl font-bold text-white text-center mb-3">
-                    Enter your name to begin voting
-                </p>
-                <div class="relative flex justify-center items-center">
-                    <input
-                        type="text"
-                        class="h-14 w-96 pl-8 pr-10 rounded-lg z-0 focus:shadow-sm focus:outline-none"
-                        placeholder="Your name..."
-                        v-model="name"
-                        autofocus
-                        @keyup.enter="signIn()"
-                        style="text-transform: capitalize"
-                    />
-                    <div class="absolute top-2 right-2">
-                        <button
-                            type="button"
-                            class="h-10 w-20 text-white rounded-lg bg-red-500 hover:bg-red-600"
-                            @click="signIn()"
-                        >
-                            Sign In
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="admin-voting-tabs">
+            <button type="button" :class="{ active: tab === 'setup' }" @click="tab = 'setup'">
+                Setup
+            </button>
+            <button type="button" :class="{ active: tab === 'live' }" @click="tab = 'live'">
+                Live session
+            </button>
+            <span class="session-state" :class="votingEnabled ? 'on' : 'off'">{{ sessionLabel }}</span>
         </div>
 
         <!-- ------ -->
@@ -149,20 +131,53 @@
                                     {{ startMessage }}
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                class="
-                                    h-10
-                                    px-3
-                                    text-white
-                                    rounded-lg
-                                    bg-blue-700
-                                    hover:bg-blue-400
-                                "
-                                @click="startVoting()"
-                            >
-                                Start Voting
-                            </button>
+                            <div class="mb-4">
+                                <label class="text-gray-300 block mb-1 font-bold">
+                                    Picks per voter
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    :max="selectionCap"
+                                    class="h-10 w-24 px-3 text-black rounded"
+                                    v-model="maxSelections"
+                                />
+                                <div class="text-gray-400 text-sm mt-1">
+                                    How many posters each person may choose. Setting this to the
+                                    number in the running lets everyone pick everything, which
+                                    usually ends in a tie.
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    class="h-10 px-3 text-white rounded-lg bg-green-700 hover:bg-green-600"
+                                    v-if="!votingEnabled"
+                                    @click="openVoting()"
+                                >
+                                    Open for joining
+                                </button>
+                                <button
+                                    type="button"
+                                    class="h-10 px-3 text-white rounded-lg bg-blue-700 hover:bg-blue-400"
+                                    :disabled="votingStarted"
+                                    @click="startVoting()"
+                                >
+                                    Start Voting
+                                </button>
+                                <button
+                                    type="button"
+                                    class="h-10 px-3 text-white rounded-lg bg-gray-700 hover:bg-gray-600"
+                                    v-if="votingEnabled"
+                                    @click="closeVoting()"
+                                >
+                                    Close session
+                                </button>
+                            </div>
+                            <p class="text-gray-400 text-sm mt-2" v-if="votingEnabled">
+                                A QR code is showing on the display. People can scan it to join.
+                            </p>
                         </div>
                     </div>
 
@@ -245,7 +260,10 @@ export default {
             loadingMessage: 'Loading',
             votingMessages: [],
             startMessages: [],
-            loggedin: false,
+            loggedin: true, // the admin screen no longer asks for a name
+            tab: 'setup',
+            votingEnabled: false,
+            maxSelections: 3,
             socket: '',
             users: [],
             name: '',
@@ -268,6 +286,22 @@ export default {
             resultMessage: '',
             winners: [],
         };
+    },
+    computed: {
+        sessionLabel() {
+            if (this.votingStarted) {
+                return 'Voting in progress';
+            }
+            return this.votingEnabled ? 'Open for joining' : 'No session';
+        },
+        selectionCap() {
+            // Never offer more picks than there are posters to pick from.
+            const inRunning = this.random
+                ? parseInt(this.posterLimit) || 0
+                : this.chosenPosters.length;
+
+            return Math.max(1, inRunning || 1);
+        },
     },
     watch: {
         vote(newValue, oldValue) {
@@ -292,6 +326,22 @@ export default {
 
             this.socket.on('connect', () => {
                 this.myId = this.socket.id;
+            });
+
+            this.socket.on('session', (state) => {
+                this.votingEnabled = state.votingEnabled;
+                this.votingStarted = state.votingStarted;
+
+                // Only adopt the server's figure once a session exists, or the
+                // idle default would overwrite what the admin has typed.
+                if (state.votingEnabled && state.maxSelections) {
+                    this.maxSelections = state.maxSelections;
+                }
+            });
+
+            this.socket.on('voting:disabled', () => {
+                this.votingEnabled = false;
+                this.votingStarted = false;
             });
 
             this.socket.on('users', (data) => {
@@ -373,6 +423,54 @@ export default {
                 this.chosenPosters.splice(this.chosenPosters.indexOf(poster), 1);
             }
         },
+        /**
+         * Opens the session so people can join. This is what makes the QR code
+         * appear on the display; voting itself still has to be started.
+         */
+        openVoting() {
+            this.startMessages = [];
+
+            const posters = this.postersForSession();
+            if (!posters) {
+                return false;
+            }
+
+            this.socket.emit('enable:voting', {
+                posters,
+                maxSelections: Math.min(parseInt(this.maxSelections) || 1, posters.length),
+                timeLimit: this.timeLimit,
+            });
+            this.tab = 'live';
+        },
+        closeVoting() {
+            this.socket.emit('disable:voting', {});
+        },
+        /**
+         * The posters going into the running, honouring the limit whether they
+         * were picked by hand or at random.
+         */
+        postersForSession() {
+            if (!this.random && this.chosenPosters.length === 0) {
+                this.startMessages.push('Please choose at least one poster.');
+                return null;
+            }
+
+            if (this.random && !parseInt(this.posterLimit)) {
+                this.startMessages.push('Enter how many random posters to use.');
+                return null;
+            }
+
+            if (parseInt(this.posterLimit) > this.posters.length) {
+                this.startMessages.push('You do not have that many posters.');
+                return null;
+            }
+
+            const chosen = this.random
+                ? this.getRandomPosters()
+                : this.chosenPosters.slice(0, parseInt(this.posterLimit) || this.chosenPosters.length);
+
+            return chosen.map((poster) => ({ ...poster, votes: 0, checked: false }));
+        },
         startVoting() {
             this.startMessages = [];
             let posters = this.chosenPosters;
@@ -401,12 +499,12 @@ export default {
                 posters[i].checked = false;
             });
 
-            const data = {
-                posters: posters,
+            this.socket.emit('start:voting', {
+                posters,
                 timeLimit: this.timeLimit,
-            };
-
-            this.socket.emit('start:voting', data);
+                maxSelections: Math.min(parseInt(this.maxSelections) || 1, posters.length),
+            });
+            this.tab = 'live';
         },
         getRandomPosters() {
             let limit = parseInt(this.posterLimit);
@@ -480,6 +578,47 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.admin-voting-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+
+    button {
+        padding: 8px 16px;
+        color: #888;
+        background-color: #333;
+        border-radius: 3px;
+
+        &:hover {
+            color: #ccc;
+            background-color: #444;
+        }
+
+        &.active {
+            color: #fff;
+            background-color: #555;
+        }
+    }
+
+    .session-state {
+        margin-left: auto;
+        font-size: 14px;
+        padding: 4px 10px;
+        border-radius: 3px;
+
+        &.on {
+            color: #bbf7d0;
+            background-color: #14532d;
+        }
+
+        &.off {
+            color: #9ca3af;
+            background-color: #1f2937;
+        }
+    }
+}
+
 .vote-container,
 .posters-container,
 .winner-container {

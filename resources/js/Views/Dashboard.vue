@@ -11,6 +11,7 @@
                 v-if="!isPlaying"
             >
                 <TopHeader />
+                <VotingQr />
                 <div class="recent-poster-container">
                     <div class="trailer-container has-trailer">
                         <div
@@ -85,6 +86,7 @@
 import { mapState, mapGetters, mapActions } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import TopHeader from '@/components/top-header.vue';
+import VotingQr from '@/components/voting-qr.vue';
 import BottomFooter from '@/components/bottom-footer.vue';
 
 const $recentAdded = document.querySelector('#recent-added-container');
@@ -99,6 +101,7 @@ export default {
     },
     components: {
         TopHeader,
+        VotingQr,
         BottomFooter,
     },
     watch: {
