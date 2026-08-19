@@ -65,8 +65,14 @@ and a display that already had that box was carried over to it, so nothing
 changed appearance on updating.
 
 The header can sit **above or below the poster**, and either plate can **span
-the width of the screen** instead of hugging its words — the rules stretch, the
-bulbs repeat across, and a plaque becomes a band.
+the width of the screen** instead of hugging its words. Every style spans in the
+way that style can: the rules stretch, the bulbs repeat across, a plaque becomes
+a band, and the words themselves spread out to reach both edges — except under
+*rules*, where the hairlines grow into the space instead and the words stay as
+they are.
+
+A spanned header keeps clear of the runtime and the speaker badge, which sit
+over the header rather than in the row with it.
 
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.
