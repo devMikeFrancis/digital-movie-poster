@@ -163,7 +163,11 @@ no Redis.
 6. Press **Start voting** on the **Live session** tab when everyone is in. That
    tab is the console for the running vote: who has joined, who has voted, and
    the count against each poster as it lands. Results appear when the timer
-   expires.
+   expires. **Join the vote** opens the voter page in a new tab so whoever is
+   running the session can take part too — keep the console tab open, since it
+   holds the controls.
+   Latecomers are welcome: anyone who scans and joins after voting has started
+   picks up the clock where it is and votes with whatever time is left.
 7. Thirty seconds after the results, the session closes itself and the QR code
    disappears. **Close session** ends it sooner.
 

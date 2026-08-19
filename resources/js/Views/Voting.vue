@@ -290,10 +290,22 @@
                                     >
                                         Reset votes
                                     </button>
+                                    <a
+                                        class="btn-plain btn-link"
+                                        :href="voteUrl"
+                                        target="_blank"
+                                        rel="noopener"
+                                    >
+                                        Join the vote
+                                    </a>
                                     <button type="button" class="btn-plain" @click="closeVoting()">
                                         Close session
                                     </button>
                                 </div>
+                                <p class="field-help">
+                                    Joining opens the voter page in a new tab, the same one the QR
+                                    code leads to. Keep this tab open to run the session.
+                                </p>
                             </div>
                         </template>
 
@@ -457,9 +469,18 @@ export default {
                 if (state.votingEnabled && state.maxSelections) {
                     this.maxSelections = state.maxSelections;
                 }
+
+                // Reopening this screen mid-vote means missing start:voting, so
+                // pick the running clock up from the broadcast rather than
+                // sitting on zero until the round ends.
+                if (state.votingStarted) {
+                    this.resumeTimer(state.timer);
+                }
             });
 
             this.socket.on('voting:disabled', () => {
+                this.stopReadyTimer();
+                this.stopTimer();
                 this.votingEnabled = false;
                 this.votingStarted = false;
                 this.runningPosters = [];
@@ -487,6 +508,8 @@ export default {
             });
 
             this.socket.on('end:voting', (data) => {
+                this.stopReadyTimer();
+                this.stopTimer();
                 this.resultStatus = data.results.status;
                 this.winners = data.results.winner;
                 this.votingStarted = data.votingStarted;
@@ -624,23 +647,46 @@ export default {
             return result;
         },
         startReadyTimer() {
-            clearInterval(this.readyInterval);
+            this.stopReadyTimer();
             this.readyInterval = setInterval(() => {
                 if (this.ready === 1) {
                     this.startTimer();
                 }
                 if (this.ready === 0) {
-                    clearInterval(this.readyInterval);
+                    this.stopReadyTimer();
                 } else {
                     this.ready--;
                 }
             }, 1000);
         },
-        startTimer() {
+        // Cleared handles are nulled rather than just cleared: a spent interval
+        // id stays truthy, and resumeTimer reads them to decide whether a clock
+        // is already running.
+        stopReadyTimer() {
+            clearInterval(this.readyInterval);
+            this.readyInterval = null;
+        },
+        stopTimer() {
             clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        },
+        /**
+         * Picks up a round already in progress. The get-ready countdown has
+         * been and gone by then, so the seconds given are simply what is left.
+         */
+        resumeTimer(seconds) {
+            if (this.timerInterval || this.readyInterval) {
+                return;
+            }
+
+            this.timer = seconds;
+            this.startTimer();
+        },
+        startTimer() {
+            this.stopTimer();
             this.timerInterval = setInterval(() => {
                 if (this.timer === 0) {
-                    clearInterval(this.timerInterval);
+                    this.stopTimer();
                 } else {
                     this.timer--;
                 }
@@ -668,8 +714,8 @@ export default {
         // Without this the socket outlives the screen: SPA navigation never
         // unloads the page, so the server keeps listing you as a voter and the
         // participant list fills with people who already left.
-        clearInterval(this.readyInterval);
-        clearInterval(this.timerInterval);
+        this.stopReadyTimer();
+        this.stopTimer();
         this.disconnectSocket();
     },
 };
@@ -810,6 +856,18 @@ export default {
     margin-top: 6px;
     font-size: 14px;
     color: #9ca3af;
+}
+
+/*
+ * A real anchor rather than window.open: this screen owns the session, and a
+ * popup that gets blocked navigates in place instead, taking the controls with
+ * it. target=_blank on a link is never blocked, and it still offers the usual
+ * open-in-new-tab gestures.
+ */
+.btn-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
 }
 
 .btn-primary,
