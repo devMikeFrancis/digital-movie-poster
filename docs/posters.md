@@ -3,6 +3,8 @@
 Getting artwork and details onto the display. For how they are shown once
 they are there, see [The display](display.md).
 
+![The Posters screen, listing the library with its rotation controls](images/posters.png)
+
 ## Artwork
 
 **Recommended poster size is 1400x2000 or higher, but retain the same ratio.**
@@ -10,6 +12,8 @@ they are there, see [The display](display.md).
 After you've added posters and are back on the DMP screen you can always return to the posters and settings configuration by clicking or tapping on the 'Coming Soon/Now Playing' header.
 
 ## Filling in poster data automatically
+
+![The poster editor, with the title search and the fields it fills in](images/poster-editor.png)
 
 Poster metadata and artwork come from the
 [TMDB API](https://developer.themoviedb.org/docs). Enter your TMDB API key in

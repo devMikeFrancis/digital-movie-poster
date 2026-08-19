@@ -2,6 +2,8 @@
 
 Taking a new release, and the two migrations that need doing by hand.
 
+![The About page, showing the installed version and the update button](images/about.png)
+
 Visit the `About` page to check for updates, or run `./update.sh` on the device.
 
 Unlike previous versions, `update.sh` refuses to run when the working tree has
