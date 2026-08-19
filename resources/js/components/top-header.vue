@@ -1,5 +1,12 @@
 <template>
-    <header class="top-header" :style="'background-color:' + settings.header_bg_color">
+    <header
+        class="top-header"
+        :class="{
+            'reserve-runtime': plateSpreads && settings.show_runtime,
+            'reserve-speaker': plateSpreads && speakerInHeader,
+        }"
+        :style="'background-color:' + settings.header_bg_color"
+    >
         <Transition :name="transitionName" mode="out-in">
             <span
                 class="runtime"
@@ -9,23 +16,31 @@
                 >{{ localRuntime }} min</span
             >
         </Transition>
-        <span v-if="showHeaderText" class="dmp-plate" :class="plateClasses" :style="plateVars">
-            <h1 class="dmp-plate-text" :style="headerSize + headerFont">{{ headerText }}</h1>
+        <span
+            v-if="showHeaderText"
+            ref="plate"
+            class="dmp-plate"
+            :class="plateClasses"
+            :style="plateVars"
+        >
+            <h1 ref="plateText" class="dmp-plate-text" :style="headerSize + headerFont">
+                {{ headerText }}
+            </h1>
         </span>
-        <SpeakerConfig
-            v-if="settings.speaker_config_location === 'top-right' && settings.show_speaker_config"
-        />
+        <SpeakerConfig v-if="speakerInHeader" />
     </header>
 </template>
 <script>
 import { mapGetters, mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 import SpeakerConfig from '@/components/speaker-config.vue';
+import spreadsText from '@/mixins/spreads-text';
 
 export default {
     data: function () {
         return {};
     },
+    mixins: [spreadsText],
     components: {
         SpeakerConfig,
     },
@@ -52,16 +67,45 @@ export default {
         transitionName() {
             return this.transitionPrefix + '-meta';
         },
-        plateClasses() {
+        speakerInHeader() {
+            return (
+                this.settings.speaker_config_location === 'top-right' &&
+                !!this.settings.show_speaker_config
+            );
+        },
+        plateStyleName() {
             const styles = ['plain', 'rules', 'marquee', 'plaque', 'neon'];
-            const chosen = styles.includes(this.settings.header_style)
+
+            return styles.includes(this.settings.header_style)
                 ? this.settings.header_style
                 : 'plain';
-
+        },
+        plateClasses() {
             return [
-                'dmp-plate--' + chosen,
+                'dmp-plate--' + this.plateStyleName,
                 { 'dmp-plate--full': !!this.settings.header_full_width },
             ];
+        },
+        /**
+         * Rules already fill the width - the hairlines grow into whatever the
+         * words leave behind, so spreading the words would leave them nothing
+         * to draw. Every other style spans something of its own and looks
+         * lopsided with a short line of type marooned in the middle of it.
+         */
+        plateSpreads() {
+            return !!this.settings.header_full_width && this.plateStyleName !== 'rules';
+        },
+        spreadKey() {
+            return [
+                this.showHeaderText,
+                this.headerText,
+                this.settings.header_font,
+                this.settings.header_font_size,
+                this.plateStyleName,
+                // These two decide how much room the line is left with.
+                this.settings.show_runtime,
+                this.speakerInHeader,
+            ].join('|');
         },
         /**
          * The decorations draw themselves in currentColor. A plaque keeps its
@@ -209,6 +253,24 @@ export default {
     transition: none;
 }
 
+/*
+ * The runtime and the speaker badge float over the header rather than sitting
+ * in the row with it, so a line of text spread to the full width runs straight
+ * underneath them. These keep it clear of the space they take.
+ *
+ * A fixed reserve rather than a measurement of the badges: the runtime changes
+ * with every poster, and reserving its exact width would shift the header text
+ * a little on every change. The numbers are the offset each badge is positioned
+ * at plus room for its longest sensible contents at its own type size.
+ */
+.top-header.reserve-runtime {
+    padding-left: 16vw;
+}
+
+.top-header.reserve-speaker {
+    padding-right: 13vw;
+}
+
 .runtime {
     position: absolute;
     top: 50%;
@@ -229,6 +291,10 @@ export default {
     .runtime {
         font-size: 1.4vw;
         left: 5%;
+    }
+    // Smaller type here, so the reserve above is more than it needs.
+    .top-header.reserve-runtime {
+        padding-left: 11vw;
     }
 }
 </style>

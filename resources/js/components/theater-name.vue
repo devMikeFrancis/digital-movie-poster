@@ -1,7 +1,9 @@
 <template>
     <div class="theater-name" :style="plateVars">
-        <span class="dmp-plate" :class="plateClasses">
-            <span class="dmp-plate-text" :style="nameFont">{{ settings.theater_name }}</span>
+        <span ref="plate" class="dmp-plate" :class="plateClasses">
+            <span ref="plateText" class="dmp-plate-text" :style="nameFont">{{
+                settings.theater_name
+            }}</span>
         </span>
     </div>
 </template>
@@ -9,6 +11,7 @@
 <script>
 import { mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
+import spreadsText from '@/mixins/spreads-text';
 
 /**
  * The name of the room the display is in, above or below the poster.
@@ -20,18 +23,37 @@ import { usePostersStore } from '@/store/posters';
  */
 export default {
     name: 'TheaterName',
+    mixins: [spreadsText],
     computed: {
         ...mapState(usePostersStore, ['settings']),
-        plateClasses() {
+        plateStyleName() {
             const styles = ['plain', 'rules', 'marquee', 'plaque', 'neon'];
-            const chosen = styles.includes(this.settings.theater_name_style)
+
+            return styles.includes(this.settings.theater_name_style)
                 ? this.settings.theater_name_style
                 : 'plain';
-
+        },
+        plateClasses() {
             return [
-                'dmp-plate--' + chosen,
+                'dmp-plate--' + this.plateStyleName,
                 { 'dmp-plate--full': !!this.settings.theater_name_full_width },
             ];
+        },
+        /**
+         * Rules already fill the width - the hairlines grow into whatever the
+         * words leave behind, so spreading the words would leave them nothing
+         * to draw. Every other style spans something of its own and looks
+         * lopsided with a short line of type marooned in the middle of it.
+         */
+        plateSpreads() {
+            return !!this.settings.theater_name_full_width && this.plateStyleName !== 'rules';
+        },
+        spreadKey() {
+            return [
+                this.settings.theater_name,
+                this.settings.header_font,
+                this.plateStyleName,
+            ].join('|');
         },
         /**
          * The decorations are drawn with currentColor, so they only need the
