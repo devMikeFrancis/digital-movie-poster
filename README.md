@@ -130,7 +130,13 @@ in for you.
 straight away and shows the artwork, so you can check it before saving. Without
 it the artwork is still downloaded, but not until you save.
 
-The artwork is downloaded, resized and converted to WebP on save.
+The artwork is downloaded, resized and converted to WebP on save. If that
+fails, the poster is not created and the reason is shown - rather than a poster
+appearing with no artwork.
+
+`IMAGE_DRIVER` chooses how images are processed. It prefers `imagick`, which
+`install.sh` puts on the Pi, and falls back to `gd` when the imagick extension
+is not installed - so a machine without it still works.
 
 ## Display on/off schedule
 

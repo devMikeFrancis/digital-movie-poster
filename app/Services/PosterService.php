@@ -55,8 +55,7 @@ class PosterService
         }
 
         if ($image) {
-            $savedImage = $this->saveImage($data['name'], $image, $data['media_type']);
-            $data['file_name'] = $savedImage['file_name'];
+            $data['file_name'] = $this->storeImageOrFail($data['name'], $image, $data['media_type']);
         }
 
         if (isset($data['music'])) {
@@ -85,8 +84,7 @@ class PosterService
         }
 
         if ($image) {
-            $savedImage = $this->saveImage($data['name'], $image, $data['media_type']);
-            $data['file_name'] = $savedImage['file_name'];
+            $data['file_name'] = $this->storeImageOrFail($data['name'], $image, $data['media_type']);
         }
 
         if (isset($data['music'])) {
@@ -142,6 +140,26 @@ class PosterService
             $poster->ordinal = $item['order'];
             $poster->save();
         }
+    }
+
+    /**
+     * Write the artwork, or stop.
+     *
+     * saveImage() reports failure rather than throwing, and both callers used
+     * to take its file name regardless - so a failed download produced a
+     * poster row pointing at a file that was never written, and the operator
+     * saw no error at all. The usual cause is a driver whose PHP extension is
+     * missing, which fails every single save.
+     */
+    private function storeImageOrFail(string $name, $image, string $mediaType): string
+    {
+        $saved = $this->saveImage($name, $image, $mediaType);
+
+        if (! $saved['success']) {
+            abort(422, 'The artwork could not be saved: '.$saved['message']);
+        }
+
+        return $saved['file_name'];
     }
 
     private function saveMusic($request)
