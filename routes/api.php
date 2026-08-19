@@ -52,6 +52,9 @@ Route::get('/kodi-now-playing', [ApiController::class, 'kodiNowPlaying']);
 */
 
 Route::middleware('dmp.auth')->group(function () {
+    // Change your own username or password. Requires the current password.
+    Route::put('/auth/account', [AuthController::class, 'updateAccount']);
+
     // Returns the full settings row, credentials included, for the admin UI.
     Route::get('/settings/full', [SettingController::class, 'full']);
     Route::put('/settings', [SettingController::class, 'update']);

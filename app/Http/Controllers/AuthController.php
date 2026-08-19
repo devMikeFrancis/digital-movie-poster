@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -50,6 +51,46 @@ class AuthController extends Controller
         return response()->json([
             'authenticated' => true,
             'user' => $request->user()->only(['id', 'username']),
+        ]);
+    }
+
+    /**
+     * Change the signed-in account's username or password.
+     *
+     * DMP has one operator account, so this edits your own login and nothing
+     * else. The current password is required either way: a left-open browser
+     * should not be enough to take the account over.
+     */
+    public function updateAccount(Request $request): JsonResponse
+    {
+        $user = $request->user('sanctum');
+
+        $data = $request->validate([
+            'username' => [
+                'required', 'string', 'min:3', 'max:255', 'alpha_dash',
+                Rule::unique('users', 'username')->ignore($user->id),
+            ],
+            // Blank leaves the password alone.
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'current_password' => ['required', 'current_password'],
+        ]);
+
+        $user->username = $data['username'];
+
+        $changedPassword = ! empty($data['password']);
+
+        if ($changedPassword) {
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        // Keep this browser signed in, but make the old session id useless.
+        $request->session()->regenerate();
+
+        return response()->json([
+            'user' => $user->only(['id', 'username']),
+            'password_changed' => $changedPassword,
         ]);
     }
 

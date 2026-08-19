@@ -253,9 +253,11 @@ php artisan dmp:user                     # prompts
 php artisan dmp:user --username=mike     # prompts for the password only
 ```
 
-There is no email address on the account and no password reset: the device
-sends no mail, so an address would only be a login name that had to look like
-one. If you forget the password, `dmp:user` resets it from the console.
+You can also change your username and password from **Settings → Account**,
+which needs your current password. `dmp:user` is the way back in if you forget
+it, since there is no email address on the account and no password reset: the
+device sends no mail, so an address would only be a login name that had to look
+like one.
 
 Privileged endpoints — anything that writes, shells out, or returns credentials
 — accept either that session or a Sanctum bearer token, so integrations keep

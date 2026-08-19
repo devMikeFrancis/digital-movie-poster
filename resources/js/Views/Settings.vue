@@ -33,6 +33,14 @@
                                         >Poster Sources</a
                                     >
                                 </li>
+                                <li>
+                                    <a
+                                        href="#account"
+                                        class="text-sm md:text-md"
+                                        @click.prevent="setTab($event)"
+                                        >Account</a
+                                    >
+                                </li>
                             </ul>
 
                             <div class="settings-bar-actions">
@@ -1297,6 +1305,108 @@
                                     <div id="kodipassHelp" class="text-gray-400 text-sm"></div>
                                 </div>
                             </div>
+                            <div id="account" class="tab-content">
+                                <p class="text-gray-400 text-sm mb-7">
+                                    DMP has a single operator account. This changes the login you
+                                    are signed in with; it does not affect API tokens, which are
+                                    issued from the console with
+                                    <code class="text-gray-300">php artisan dmp:token</code>.
+                                </p>
+
+                                <div class="mb-5">
+                                    <label for="account-username" class="text-gray-300 block mb-2 font-bold">
+                                        Username
+                                    </label>
+                                    <input
+                                        type="text"
+                                        class="text-black w-full"
+                                        id="account-username"
+                                        v-model="account.username"
+                                        autocomplete="username"
+                                        autocapitalize="none"
+                                        spellcheck="false"
+                                    />
+                                    <div class="text-gray-400 text-sm">
+                                        Letters, numbers, dashes and underscores. At least three
+                                        characters.
+                                    </div>
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <h3 class="text-white font-bold text-lg mb-1">Change password</h3>
+                                <p class="text-gray-400 text-sm mb-5">
+                                    Leave these blank to keep your current password.
+                                </p>
+
+                                <div class="mb-5">
+                                    <label for="account-password" class="text-gray-300 block mb-2 font-bold">
+                                        New password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        class="text-black w-full"
+                                        id="account-password"
+                                        v-model="account.password"
+                                        autocomplete="new-password"
+                                    />
+                                    <div class="text-gray-400 text-sm">At least eight characters.</div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label for="account-password-confirm" class="text-gray-300 block mb-2 font-bold">
+                                        Confirm new password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        class="text-black w-full"
+                                        id="account-password-confirm"
+                                        v-model="account.password_confirmation"
+                                        autocomplete="new-password"
+                                    />
+                                </div>
+
+                                <hr class="mt-3 mb-7 border-gray-700" />
+
+                                <div class="mb-5">
+                                    <label for="account-current" class="text-gray-300 block mb-2 font-bold">
+                                        Current password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        class="text-black w-full"
+                                        id="account-current"
+                                        v-model="account.current_password"
+                                        autocomplete="current-password"
+                                    />
+                                    <div class="text-gray-400 text-sm">
+                                        Required to save any change here, so a browser left open is
+                                        not enough to take the account over.
+                                    </div>
+                                </div>
+
+                                <div
+                                    v-if="accountMessage"
+                                    class="px-4 py-3 rounded mb-4"
+                                    :class="accountFailed ? 'bg-red-900 text-white' : 'bg-green-900 text-white'"
+                                    role="alert"
+                                >
+                                    <p>{{ accountMessage }}</p>
+                                    <div v-for="(err, i) in accountErrors" :key="'acct-' + i">
+                                        {{ err }}
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="btn text-white px-4 py-2 rounded-sm"
+                                    style="background-color: #2563eb"
+                                    :disabled="savingAccount"
+                                    @click.prevent="saveAccount"
+                                >
+                                    {{ savingAccount ? 'Updating…' : 'Update account' }}
+                                </button>
+                            </div>
                         </div>
                         <!-- / .tabs-content -->
 
@@ -1311,6 +1421,7 @@
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import MainNav from '@/partials/MainNav.vue';
+import { useAuthStore } from '@/store/auth';
 
 export default {
     data: function () {
@@ -1326,6 +1437,16 @@ export default {
             savedSnapshot: '',
             // The navigation held back while the unsaved-changes prompt is up.
             pendingLeave: null,
+            account: {
+                username: '',
+                password: '',
+                password_confirmation: '',
+                current_password: '',
+            },
+            savingAccount: false,
+            accountMessage: '',
+            accountFailed: false,
+            accountErrors: [],
             settings: {
                 plex_token: '',
                 plex_ip_address: '',
@@ -1480,6 +1601,53 @@ export default {
             event.preventDefault();
             event.returnValue = '';
         },
+        /**
+         * The account form is deliberately separate from the settings save
+         * bar: it posts elsewhere, needs the current password, and should not
+         * be swept along by "Save settings".
+         */
+        saveAccount() {
+            if (this.savingAccount) {
+                return;
+            }
+
+            this.savingAccount = true;
+            this.accountMessage = '';
+            this.accountFailed = false;
+            this.accountErrors = [];
+
+            axios
+                .put('/api/auth/account', this.account)
+                .then(({ data }) => {
+                    this.accountMessage = data.password_changed
+                        ? 'Account updated. Your new password applies the next time you sign in.'
+                        : 'Account updated.';
+                    this.account.password = '';
+                    this.account.password_confirmation = '';
+                    this.account.current_password = '';
+                    useAuthStore().loadStatus(true);
+                })
+                .catch((error) => {
+                    this.accountFailed = true;
+                    const body = error.response && error.response.data;
+                    this.accountMessage = (body && body.message) || 'The account could not be updated.';
+
+                    const errors = (body && body.errors) || {};
+                    Object.keys(errors).forEach((field) => {
+                        if (errors[field] instanceof Array) {
+                            errors[field].forEach((err) => this.accountErrors.push(err));
+                        }
+                    });
+
+                    // Laravel repeats the first error in "message".
+                    if (this.accountErrors.length) {
+                        this.accountMessage = 'That change could not be saved:';
+                    }
+                })
+                .finally(() => {
+                    this.savingAccount = false;
+                });
+        },
         markClean() {
             this.savedSnapshot = JSON.stringify(this.settings);
         },
@@ -1599,6 +1767,11 @@ export default {
             this.socket = io('http://' + location.hostname + ':3000');
         }
         window.addEventListener('beforeunload', this.warnBeforeUnload);
+
+        const auth = useAuthStore();
+        Promise.resolve(auth.loadStatus()).then(() => {
+            this.account.username = auth.user ? auth.user.username : '';
+        });
     },
     beforeUnmount() {
         window.removeEventListener('beforeunload', this.warnBeforeUnload);
