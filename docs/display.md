@@ -14,9 +14,10 @@ What goes on screen, and how it changes. Everything here lives under
 | **Vertical** | The new poster slides up as the old one leaves. |
 | **Cut** | No animation. One poster replaces the next outright. |
 
-**Poster Display Speed** is how long each poster stays up, in milliseconds —
-`15000` is fifteen seconds. It is the gap between changes, not counting the
-transition itself.
+**Poster Display Speed** is how often the poster changes, in milliseconds —
+`15000` is fifteen seconds. The transition runs at the start of that time, so a
+fifteen second setting with a cross-fade is about thirteen seconds of stillness
+and a second and a half of movement.
 
 The details around the poster — the runtime in the header, and the content
 rating, processing logos and star rating in the footer — belong to the poster on
@@ -49,8 +50,9 @@ are unaffected.
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.
 
-The wording itself, the fonts, sizes and colours are all under **Settings →
-Theme**.
+The wording — what it says instead of *Coming Soon* and *Now Playing* — is on
+the same **General** tab. The fonts, sizes, colours and borders are under
+**Settings → Theme**.
 
 ## Limiting what is shown
 
@@ -70,10 +72,13 @@ Only posters with **Show in rotation** on are cycled. Order comes from the
 drag-and-drop arrangement on the Posters screen, unless **Randomize Poster
 Order** is on.
 
-A running display checks for newly added posters every four hours, and saving a
-poster tells it to refresh straight away. **Refresh Movie Posters** in the
-sidebar makes it pull the library again on demand — useful after editing posters
-directly in the database, or if a display has been left running for a long time.
+A running display re-reads the library every four hours, and saving a poster
+tells it to refresh straight away. **Refresh Movie Posters** in the sidebar
+makes it pull the library again on demand — useful after editing posters
+directly in the database.
+
+A refresh keeps whatever is on screen up rather than clearing it, so it is not
+visible unless the poster showing has itself left the rotation.
 
 ## Rotating the picture
 
