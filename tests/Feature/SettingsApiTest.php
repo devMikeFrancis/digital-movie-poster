@@ -51,6 +51,53 @@ class SettingsApiTest extends TestCase
         $this->assertSame('top', $settings->theater_name_position);
     }
 
+    public function test_the_fill_scrim_defaults_to_standard_and_accepts_the_named_strengths(): void
+    {
+        $this->assertSame('standard', Setting::first()->poster_fill_scrim);
+
+        $this->putJson('/api/settings', $this->validPayload([
+            'poster_fill_scrim' => 'none',
+        ]))->assertOk();
+
+        $this->assertSame('none', Setting::first()->poster_fill_scrim);
+    }
+
+    public function test_the_fill_scrim_rejects_anything_else(): void
+    {
+        $this->putJson('/api/settings', $this->validPayload([
+            'poster_fill_scrim' => 'very',
+        ]))->assertStatus(422)->assertJsonValidationErrors('poster_fill_scrim');
+    }
+
+    public function test_a_payload_without_a_fill_scrim_falls_back_to_standard(): void
+    {
+        $payload = $this->validPayload();
+        unset($payload['poster_fill_scrim']);
+
+        $this->putJson('/api/settings', $payload)->assertOk();
+
+        $this->assertSame('standard', Setting::first()->poster_fill_scrim);
+    }
+
+    public function test_the_new_flags_are_real_booleans_for_the_admin_form(): void
+    {
+        // A checkbox bound with v-model only ticks for a real true. Handing the
+        // form a 1 left the box empty while the option was on, and saving that
+        // form turned the option off.
+        $this->putJson('/api/settings', $this->validPayload([
+            'poster_fill_screen' => true,
+            'show_header_text' => true,
+            'show_theater_name' => true,
+        ]))->assertOk();
+
+        $payload = $this->getJson('/api/settings/full')->assertOk()->json();
+
+        foreach (['poster_fill_screen', 'show_header_text', 'show_theater_name'] as $flag) {
+            $this->assertTrue($payload[$flag], $flag.' should come back as a real boolean');
+            $this->assertIsBool($payload[$flag], $flag.' should come back as a real boolean');
+        }
+    }
+
     public function test_the_theater_name_position_only_accepts_top_or_bottom(): void
     {
         $this->putJson('/api/settings', $this->validPayload([
@@ -78,6 +125,7 @@ class SettingsApiTest extends TestCase
             ->assertOk()
             ->assertJsonStructure([
                 'poster_fill_screen',
+                'poster_fill_scrim',
                 'show_header_text',
                 'show_theater_name',
                 'theater_name',
