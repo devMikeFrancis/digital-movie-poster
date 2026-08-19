@@ -86,7 +86,6 @@ class SettingsRequest extends FormRequest
             'plex_movie_sections' => 'nullable',
             'plex_tv_sections' => 'nullable',
             'speaker_config' => 'nullable|string|max:20',
-            'speaker_config_location' => 'nullable|string',
             'show_speaker_config' => 'required|boolean',
         ];
     }

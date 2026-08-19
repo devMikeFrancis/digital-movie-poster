@@ -552,7 +552,7 @@
                                         <span class="ml-2">Show Runtime</span>
                                     </label>
                                     <div id="show-runtimeHelp" class="text-gray-400 text-sm">
-                                        Displays the movie runtime in the top left corner.
+                                        Shown in the footer, beside the rating.
                                     </div>
                                 </div>
                                 <div class="mb-5">
@@ -627,22 +627,9 @@
                                             id="speakerConfigHelp"
                                             class="text-gray-400 text-sm mt-1"
                                         >
-                                            Such as 5.1, 7.1.2 or 9.4.6.
+                                            Such as 5.1, 7.1.2 or 9.4.6. It sits in the footer with
+                                            the rating and the logos.
                                         </div>
-
-                                        <label
-                                            for="speaker-config-location"
-                                            class="text-gray-300 block mt-3 mb-2 font-bold"
-                                            >Where it sits</label
-                                        >
-                                        <select
-                                            class="text-black"
-                                            id="speaker-config-location"
-                                            v-model="settings.speaker_config_location"
-                                        >
-                                            <option value="bottom">Bottom</option>
-                                            <option value="top-right">Top right</option>
-                                        </select>
                                     </div>
                                 </div>
                                 <hr class="mt-3 mb-7 border-gray-700" />

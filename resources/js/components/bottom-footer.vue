@@ -9,7 +9,22 @@
         <Transition :name="transitionName" mode="out-in">
             <div class="footer-row" :key="posterKey">
                 <ContentRating />
+
+                <span
+                    class="runtime"
+                    v-if="settings.show_runtime && localRuntime"
+                    :style="'color:' + settings.footer_text_color"
+                    >{{ localRuntime }} min</span
+                >
+
                 <ProcessingLogos />
+
+                <!--
+                    Not a processing logo, and it used to be rendered inside
+                    that component - so switching the logos off took the speaker
+                    badge with it, however the badge's own setting was left.
+                -->
+                <SpeakerConfig />
 
                 <div class="audience-rating" v-if="settings.show_audience_rating">
                     <star-rating
@@ -35,6 +50,7 @@ import { usePostersStore } from '@/store/posters';
 
 import StarRating from 'vue-star-rating';
 import ProcessingLogos from '@/components/processing-logos.vue';
+import SpeakerConfig from '@/components/speaker-config.vue';
 import ContentRating from '@/components/content-rating.vue';
 
 export default {
@@ -47,6 +63,7 @@ export default {
     components: {
         StarRating,
         ProcessingLogos,
+        SpeakerConfig,
         ContentRating,
     },
     computed: {
@@ -55,11 +72,18 @@ export default {
             'nowPlaying',
             'rating',
             'audienceRating',
+            'runtime',
+            'nowPlayingRuntime',
             'currentPosterId',
         ]),
         ...mapGetters(usePostersStore, ['transitionPrefix']),
         localRating() {
             return this.nowPlaying ? this.rating : this.audienceRating;
+        },
+        localRuntime() {
+            const rt = this.nowPlaying ? this.nowPlayingRuntime : this.runtime;
+
+            return rt ? rt.toFixed(0) : false;
         },
         transitionName() {
             return this.transitionPrefix + '-meta';
@@ -165,6 +189,19 @@ export default {
 .cut-meta-leave-active {
     transition: none;
 }
+/*
+ * Sits beside the content rating at the left of the row, and rides the row's
+ * own swap - it used to be positioned over the header with a Transition of its
+ * own to do the same job.
+ */
+.runtime {
+    font-size: 2vw;
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+    margin-left: 1.5vw;
+}
+
 .audience-rating {
     display: flex;
     align-items: center;
@@ -186,6 +223,19 @@ export default {
         min-height: 13.5vh;
         padding: 2.8vh;
     }
+    /*
+ * Sits beside the content rating at the left of the row, and rides the row's
+ * own swap - it used to be positioned over the header with a Transition of its
+ * own to do the same job.
+ */
+    .runtime {
+        font-size: 2vw;
+        font-weight: 400;
+        line-height: 1;
+        white-space: nowrap;
+        margin-left: 1.5vw;
+    }
+
     .audience-rating {
         width: 14vh;
     }

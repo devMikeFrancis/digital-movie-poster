@@ -190,11 +190,9 @@ export default {
             const textShown =
                 headerText === undefined || headerText === null ? true : !!Number(headerText);
 
-            return !!(
-                textShown ||
-                settings.show_runtime ||
-                (settings.show_speaker_config && settings.speaker_config_location === 'top-right')
-            );
+            // The header carries only the wording now; the runtime and the
+            // speaker badge moved down to the footer.
+            return textShown;
         },
         footerHasContent() {
             const settings = this.settings;
@@ -203,7 +201,8 @@ export default {
                 settings.show_mpaa_rating ||
                 settings.show_processing_logos ||
                 settings.show_audience_rating ||
-                (settings.show_speaker_config && settings.speaker_config_location === 'bottom')
+                settings.show_runtime ||
+                settings.show_speaker_config
             );
         },
         topHasContent() {

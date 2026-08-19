@@ -76,7 +76,6 @@ class Setting extends Model
         'plex_show_movie_now_playing',
         'plex_show_tv_now_playing',
         'speaker_config',
-        'speaker_config_location',
         'show_speaker_config',
     ];
 

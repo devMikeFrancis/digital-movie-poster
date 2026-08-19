@@ -54,10 +54,6 @@ describe('shading only where there is something to shade', () => {
         expect(sides(dashboard({ show_header_text: true }))).toEqual({ top: true, bottom: false });
     });
 
-    it('shades the top for the runtime alone', () => {
-        expect(sides(dashboard({ show_runtime: true }))).toEqual({ top: true, bottom: false });
-    });
-
     it.each([
         ['the content rating', 'show_mpaa_rating'],
         ['the processing logos', 'show_processing_logos'],
@@ -80,13 +76,14 @@ describe('shading only where there is something to shade', () => {
             .toEqual({ top: false, bottom: true });
     });
 
-    it('follows the speaker config to its own corner', () => {
-        const on = { show_speaker_config: true };
-
-        expect(sides(dashboard({ ...on, speaker_config_location: 'top-right' })))
-            .toEqual({ top: true, bottom: false });
-        expect(sides(dashboard({ ...on, speaker_config_location: 'bottom' })))
-            .toEqual({ top: false, bottom: true });
+    it('shades the footer for the speaker config and the runtime', () => {
+        // Both moved down from the header, so neither asks for shading at the
+        // top any more.
+        expect(sides(dashboard({ show_speaker_config: true }))).toEqual({
+            top: false,
+            bottom: true,
+        });
+        expect(sides(dashboard({ show_runtime: true }))).toEqual({ top: false, bottom: true });
     });
 
     it('suppresses each end independently', () => {
