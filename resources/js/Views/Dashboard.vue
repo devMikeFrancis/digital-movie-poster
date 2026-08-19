@@ -429,11 +429,18 @@ export default {
      * it was covered up. A gradient behind the two ends keeps the text
      * readable over whatever happens to be there.
      */
+    /*
+     * Above anything the cross-fade puts on a poster. Those wrappers are given
+     * 1 and 2 while a change is running, and the entering one keeps its 2 until
+     * the outgoing poster has gone - so at 2 the chrome tied with it and lost
+     * on document order, and the header, the theatre name and the footer
+     * disappeared under the artwork and stayed there.
+     */
     .top-header,
     .poster-footer,
     .theater-name {
         position: relative;
-        z-index: 2;
+        z-index: 4;
         background-color: transparent !important;
     }
 
@@ -444,7 +451,8 @@ export default {
         left: 0;
         right: 0;
         height: var(--scrim-height, 30vh);
-        z-index: 1;
+        // Over the poster, under the text it is there to back.
+        z-index: 3;
         pointer-events: none;
     }
 
