@@ -60,6 +60,7 @@ class SettingsRequest extends FormRequest
             'show_theater_name' => 'required|boolean',
             'theater_name' => 'nullable|string|max:120',
             'theater_name_position' => 'required|in:top,bottom',
+            'theater_name_style' => 'required|in:plain,rules,marquee,plaque,neon',
             'jellyfin_service' => 'required|boolean',
             'jellyfin_ip_address' => 'required_if:jellyfin_service,true|nullable|string',
             'jellyfin_token' => 'required_if:jellyfin_service,true|nullable|string',
@@ -119,6 +120,7 @@ class SettingsRequest extends FormRequest
             // admin UI always sends it, but a payload that leaves it out should
             // land on the sensible option rather than fail validation.
             'theater_name_position' => $this->input('theater_name_position') ?: 'bottom',
+            'theater_name_style' => $this->input('theater_name_style') ?: 'plain',
             'poster_fill_scrim' => $this->input('poster_fill_scrim') ?: 'standard',
             'transition_type' => $this->input('transition_type') ?: 'fade',
             'jellyfin_service' => $this->boolean('jellyfin_service'),

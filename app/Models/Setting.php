@@ -46,6 +46,7 @@ class Setting extends Model
         'show_theater_name',
         'theater_name',
         'theater_name_position',
+        'theater_name_style',
         'jellyfin_service',
         'jellyfin_ip_address',
         'jellyfin_token',

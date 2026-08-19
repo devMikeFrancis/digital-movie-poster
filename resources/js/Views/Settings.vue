@@ -252,6 +252,32 @@
                                             <option value="top">Above the poster</option>
                                             <option value="bottom">Below the poster</option>
                                         </select>
+
+                                        <label
+                                            for="theater-name-style"
+                                            class="text-gray-300 block mt-3 mb-2 font-bold"
+                                        >
+                                            Name plate
+                                        </label>
+                                        <select
+                                            class="text-black"
+                                            id="theater-name-style"
+                                            aria-describedby="theaterNameStyleHelp"
+                                            v-model="settings.theater_name_style"
+                                        >
+                                            <option value="plain">Plain</option>
+                                            <option value="rules">Rules either side</option>
+                                            <option value="marquee">Marquee bulbs</option>
+                                            <option value="plaque">Plaque</option>
+                                            <option value="neon">Neon glow</option>
+                                        </select>
+                                        <div
+                                            id="theaterNameStyleHelp"
+                                            class="text-gray-400 text-sm mt-1"
+                                        >
+                                            All of them are drawn in the header's text colour and
+                                            font, so the name matches the rest of the screen.
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1559,6 +1585,7 @@ export default {
                 show_theater_name: false,
                 theater_name: '',
                 theater_name_position: 'bottom',
+                theater_name_style: 'plain',
                 mpaa_limit: '',
                 tv_limit: '',
                 plex_token: '',
@@ -1781,6 +1808,10 @@ export default {
 
             if (!settings.theater_name_position) {
                 settings.theater_name_position = 'bottom';
+            }
+
+            if (!settings.theater_name_style) {
+                settings.theater_name_style = 'plain';
             }
 
             if (!settings.poster_fill_scrim) {

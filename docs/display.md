@@ -56,6 +56,20 @@ are unaffected.
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.
 
+**Name plate** decides how it is dressed. All five are drawn in the header's
+text colour, so the name matches the rest of the screen:
+
+| | |
+| :--- | :--- |
+| **Plain** | The name on its own. The default, and what a display already showing its name keeps. |
+| **Rules either side** | Hairlines flanking the name — reads as a caption rather than a label. |
+| **Marquee bulbs** | A row of bulbs above and below. The one that reads as a cinema from across a room. |
+| **Plaque** | A bordered plate that hugs the name, like an engraved sign. |
+| **Neon glow** | A soft halo in the same colour. Best in a dark room, and best with a colour that is not white. |
+
+![The display with the theater name in the marquee style, bulbs above and below
+the name](images/theater-name.png)
+
 The wording — what it says instead of *Coming Soon* and *Now Playing* — is on
 the same **General** tab. The fonts, sizes, colours and borders are under
 **Settings → Theme**.
