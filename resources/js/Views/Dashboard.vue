@@ -9,7 +9,7 @@
             <div
                 id="recent-added-container"
                 class="poster-container"
-                :class="{ 'fill-screen': fillScreen }"
+                :class="[{ 'fill-screen': fillScreen }, scrimClass]"
                 @click.prevent="gotoPosters()"
                 v-if="!isPlaying"
             >
@@ -62,7 +62,7 @@
                 <div
                     id="now-playing-container"
                     class="poster-container"
-                    :class="{ 'fill-screen': fillScreen }"
+                    :class="[{ 'fill-screen': fillScreen }, scrimClass]"
                     v-if="isPlaying"
                     @click.prevent="gotoPosters()"
                 >
@@ -157,6 +157,11 @@ export default {
         ...mapGetters(usePostersStore, ['mediaPosters']),
         fillScreen() {
             return !!this.settings.poster_fill_screen;
+        },
+        scrimClass() {
+            const choice = this.settings.poster_fill_scrim || 'standard';
+
+            return this.fillScreen ? 'scrim-' + choice : '';
         },
         theaterNameOn() {
             if (!this.settings.show_theater_name || !this.settings.theater_name) {
@@ -383,20 +388,50 @@ export default {
         position: fixed;
         left: 0;
         right: 0;
-        height: 30vh;
+        height: var(--scrim-height, 30vh);
         z-index: 1;
         pointer-events: none;
     }
 
     &::before {
         top: 0;
-        background: linear-gradient(to bottom, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0));
+        background: linear-gradient(
+            to bottom,
+            rgb(0 0 0 / var(--scrim-alpha, 0.85)),
+            rgb(0 0 0 / 0)
+        );
     }
 
     &::after {
         bottom: 0;
-        background: linear-gradient(to top, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0));
+        background: linear-gradient(to top, rgb(0 0 0 / var(--scrim-alpha, 0.85)), rgb(0 0 0 / 0));
     }
+}
+
+/*
+ * How heavily the ends are shaded. A dark poster needs none of this; a bright
+ * one needs quite a lot before white text on it is readable, and that is a
+ * judgement about a particular room and screen rather than something worth
+ * guessing at.
+ */
+.scrim-none::before,
+.scrim-none::after {
+    display: none;
+}
+
+.scrim-subtle {
+    --scrim-height: 20vh;
+    --scrim-alpha: 0.6;
+}
+
+.scrim-standard {
+    --scrim-height: 30vh;
+    --scrim-alpha: 0.85;
+}
+
+.scrim-strong {
+    --scrim-height: 42vh;
+    --scrim-alpha: 0.95;
 }
 
 .poster {

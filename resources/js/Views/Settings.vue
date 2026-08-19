@@ -166,9 +166,34 @@
                                     </label>
                                     <div id="fillScreenHelp" class="text-gray-400 text-sm">
                                         The poster takes the whole display instead of sitting in a
-                                        box between the header and footer, which sit over it
+                                        box between the header and footer, which float over it
                                         instead. It is scaled to fit rather than cropped, so it
                                         keeps its shape and nothing is cut off.
+                                    </div>
+
+                                    <div v-if="settings.poster_fill_screen" class="mt-3">
+                                        <label
+                                            for="fill-scrim"
+                                            class="text-gray-300 block mb-2 font-bold"
+                                        >
+                                            Shading behind the header and footer
+                                        </label>
+                                        <select
+                                            class="text-black"
+                                            id="fill-scrim"
+                                            aria-describedby="fillScrimHelp"
+                                            v-model="settings.poster_fill_scrim"
+                                        >
+                                            <option value="none">None</option>
+                                            <option value="subtle">Subtle</option>
+                                            <option value="standard">Standard</option>
+                                            <option value="strong">Strong</option>
+                                        </select>
+                                        <div id="fillScrimHelp" class="text-gray-400 text-sm mt-1">
+                                            Darkens the top and bottom of the screen so the header
+                                            and footer text stays readable over the artwork. A dark
+                                            poster needs none of it; a bright one needs quite a lot.
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1487,6 +1512,7 @@ export default {
             accountErrors: [],
             settings: {
                 poster_fill_screen: false,
+                poster_fill_scrim: 'standard',
                 show_header_text: true,
                 show_theater_name: false,
                 theater_name: '',
@@ -1713,6 +1739,10 @@ export default {
 
             if (!settings.theater_name_position) {
                 settings.theater_name_position = 'bottom';
+            }
+
+            if (!settings.poster_fill_scrim) {
+                settings.poster_fill_scrim = 'standard';
             }
 
             return settings;

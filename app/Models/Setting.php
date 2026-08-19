@@ -40,6 +40,7 @@ class Setting extends Model
         'use_global_prologos_if_no_poster_prologos',
         'transition_type',
         'poster_fill_screen',
+        'poster_fill_scrim',
         'show_header_text',
         'show_theater_name',
         'theater_name',
@@ -92,6 +93,15 @@ class Setting extends Model
     protected $casts = [
         'plex_movie_sections' => 'array',
         'plex_tv_sections' => 'array',
+
+        // Cast rather than given an accessor apiece like the older flags: an
+        // integer here reaches the admin UI as 1, and a checkbox bound with
+        // v-model only ticks for a real true - so the box showed empty while
+        // the option was on, and saving that form turned it off.
+        'poster_fill_screen' => 'boolean',
+        'show_header_text' => 'boolean',
+        'show_theater_name' => 'boolean',
+
         'plex_token' => EncryptedCredential::class,
         'jellyfin_token' => EncryptedCredential::class,
         'kodi_username' => EncryptedCredential::class,

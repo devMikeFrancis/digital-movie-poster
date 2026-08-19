@@ -54,6 +54,7 @@ class SettingsRequest extends FormRequest
             'use_global_prologos_if_no_poster_prologos' => 'required|boolean',
             'transition_type' => 'required|string',
             'poster_fill_screen' => 'required|boolean',
+            'poster_fill_scrim' => 'required|in:none,subtle,standard,strong',
             'show_header_text' => 'required|boolean',
             'show_theater_name' => 'required|boolean',
             'theater_name' => 'nullable|string|max:120',
@@ -116,6 +117,7 @@ class SettingsRequest extends FormRequest
             // admin UI always sends it, but a payload that leaves it out should
             // land on the sensible option rather than fail validation.
             'theater_name_position' => $this->input('theater_name_position') ?: 'bottom',
+            'poster_fill_scrim' => $this->input('poster_fill_scrim') ?: 'standard',
             'jellyfin_service' => $this->boolean('jellyfin_service'),
             'show_header_border' => $this->boolean('show_header_border'),
             'validate_movie_titles' => $this->boolean('validate_movie_titles'),
