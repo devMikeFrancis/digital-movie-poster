@@ -1,6 +1,6 @@
 {
     "latest": "2.1.0",
-    "changelog": "Movie voting from a QR code: open a session from the Voting screen, a code appears on the display, and people vote from their phones without an account. Also adds title search with artwork lookup, username-and-password sign-in with an Account tab for changing it, and a clearer Poster Sources tab that warns before you leave with unsaved changes. Updating from 2.0.0 works from this screen; from 1.x, re-run install.sh on the device.",
+    "changelog": "Movie voting from a QR code: open a session from the Voting screen, a code appears on the display, and people vote from their phones without an account - including anyone who joins after voting has started. Also adds title search with artwork lookup, username-and-password sign-in with an Account tab for changing it, and a clearer Poster Sources tab that warns before you leave with unsaved changes. Updating from 2.0.0 works from this screen; from 1.x, re-run install.sh on the device.",
     "past_updates": [
         {
             "version": "2.0.0",
