@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\AdminAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class AuthController extends Controller
     public function status(Request $request): JsonResponse
     {
         return response()->json([
-            'required' => (bool) config('dmp.auth.required'),
+            'required' => AdminAccess::loginRequired(),
             'authenticated' => $request->user('sanctum') !== null,
             'needs_setup' => ! User::query()->exists() && (bool) config('dmp.auth.allow_setup'),
             'user' => $request->user('sanctum')?->only(['id', 'username']),

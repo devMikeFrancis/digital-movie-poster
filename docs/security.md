@@ -29,9 +29,21 @@ php artisan dmp:token "my integration"   # prints the token once
 The endpoints the kiosk display polls stay open, because the display has no way
 to sign in. They return no credentials.
 
-Set `DMP_REQUIRE_LOGIN=false` to turn all of this off and go back to an open
-admin UI. Only do that on a network you fully trust. DMP is still a LAN
-appliance: do not expose it to the internet.
+**Settings → Account → Ask for a login to reach these screens** turns all of
+this off and goes back to an open admin UI. Only do that on a network you fully
+trust: anything that can reach the device can then change settings, delete
+posters, read your media-server credentials and press the button that runs an
+update script on the Pi. DMP is a LAN appliance either way — do not expose it to
+the internet.
+
+The display never asks for a login regardless; the setting covers the poster,
+settings and voting screens.
+
+`DMP_REQUIRE_LOGIN` in `.env` is the fallback used before the database has been
+read — on a fresh install, or if the settings row is missing. It seeded the
+setting when this moved into the UI, so an install that had deliberately turned
+the login off kept it off. Anything unreadable falls back to requiring a login,
+so a database problem cannot quietly unlock the device.
 
 Media-server credentials (Plex and Jellyfin tokens, the Kodi login, and both
 TMDB keys) are **encrypted at rest** using `APP_KEY`, so a copied

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\User;
+use App\Support\AdminAccess;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -17,6 +18,11 @@ abstract class TestCase extends BaseTestCase
         // without this every session-authenticated test would 500 on a missing
         // session store.
         $this->withHeader('Referer', config('app.url'));
+
+        // Whether a login is needed is resolved once and remembered for the
+        // request. Tests share a process, so it has to be forgotten between
+        // them or the first answer decides every later one.
+        AdminAccess::forget();
     }
 
     /**

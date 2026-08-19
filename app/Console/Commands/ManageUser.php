@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Support\AdminAccess;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -65,9 +66,9 @@ class ManageUser extends Command
             $this->info('Created the admin account ('.$username.').');
         }
 
-        if (! config('dmp.auth.required')) {
+        if (! AdminAccess::loginRequired()) {
             $this->newLine();
-            $this->warn('DMP_REQUIRE_LOGIN is false, so the admin UI is not asking for this login yet.');
+            $this->warn('The admin UI is not asking for a login yet - see Settings, or DMP_REQUIRE_LOGIN.');
         }
 
         return self::SUCCESS;

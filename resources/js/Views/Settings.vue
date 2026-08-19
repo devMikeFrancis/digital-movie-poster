@@ -1365,6 +1365,41 @@
                                     Change the username and password you sign in with.
                                 </p>
 
+                                <div class="mb-7 pb-6 border-b border-gray-700">
+                                    <label class="text-gray-300 inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="require-login"
+                                            aria-describedby="requireLoginHelp"
+                                            v-model="settings.require_login"
+                                        />
+                                        <span class="ml-2 font-bold">
+                                            Ask for a login to reach these screens
+                                        </span>
+                                    </label>
+
+                                    <div id="requireLoginHelp" class="text-gray-400 text-sm mt-2">
+                                        On by default. The display itself never asks for a login
+                                        either way — this covers the poster, settings and voting
+                                        screens.
+                                    </div>
+
+                                    <div
+                                        v-if="!settings.require_login"
+                                        class="mt-3 p-3 rounded-sm text-sm"
+                                        style="background-color: #4a1d1d; color: #fecaca"
+                                    >
+                                        <strong
+                                            >Anyone who can reach this device can change anything on
+                                            it</strong
+                                        >
+                                        — settings, posters, your media server credentials, and the
+                                        update button that runs a script on the Pi. Only leave this
+                                        off on a network you trust, and never on one reachable from
+                                        the internet.
+                                    </div>
+                                </div>
+
                                 <div class="mb-5">
                                     <label
                                         for="account-username"
@@ -1517,6 +1552,7 @@ export default {
             accountFailed: false,
             accountErrors: [],
             settings: {
+                require_login: true,
                 poster_fill_screen: false,
                 poster_fill_scrim: 'standard',
                 show_header_text: true,
