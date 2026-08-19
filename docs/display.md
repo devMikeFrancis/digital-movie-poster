@@ -1,13 +1,10 @@
 # The display
 
-What goes on screen, and how it changes. Everything here lives under
-**Settings → General** unless noted.
+What goes on screen, and how it changes. Everything here lives on the
+**Display** screen, under one of its three tabs — *Slideshow*, *Header & name*
+or *Poster details*.
 
 ![The display, showing the runtime, header, content rating, processing logo, audience rating and theatre name](images/display.png)
-
-Where these options live:
-
-![Settings, General tab, showing the display options and their help text](images/settings.png)
 
 ## How one poster gives way to the next
 
@@ -92,9 +89,9 @@ screen:
 ![The display with the theater name in the marquee style, bulbs above and below
 the name](images/theater-name.png)
 
-The wording — what it says instead of *Coming Soon* and *Now Playing* — is on
-the same **General** tab. The fonts, sizes, colours and borders are under
-**Settings → Theme**.
+The wording — what it says instead of *Coming Soon* and *Now Playing* — and the
+font, size and colours are all on the same **Header & name** tab, next to the
+text they apply to.
 
 ## Processing logos
 

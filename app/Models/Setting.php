@@ -19,15 +19,12 @@ class Setting extends Model
         'plex_ip_address',
         'plex_token',
         'poster_display_speed',
-        'poster_display_limit',
         'coming_soon_text',
         'now_playing_text',
         'show_mpaa_rating',
         'show_audience_rating',
         'show_processing_logos',
-        'show_dolby_atmos_horizontal',
         'show_dolby_atmos_vertical',
-        'show_dolby_vision_horizontal',
         'show_dolby_vision_vertical',
         'show_dts',
         'show_dolby_51',
@@ -60,10 +57,8 @@ class Setting extends Model
         'kodi_username',
         'kodi_password',
         'tmdb_api_key_v3',
-        'tmdb_api_key_v4',
         'header_bg_color',
         'header_text_color',
-        'show_header_border',
         'header_border_color',
         'header_font',
         'header_font_size',
@@ -116,7 +111,6 @@ class Setting extends Model
         'kodi_username' => EncryptedCredential::class,
         'kodi_password' => EncryptedCredential::class,
         'tmdb_api_key_v3' => EncryptedCredential::class,
-        'tmdb_api_key_v4' => EncryptedCredential::class,
     ];
 
     /**
@@ -130,7 +124,6 @@ class Setting extends Model
         'kodi_username',
         'kodi_password',
         'tmdb_api_key_v3',
-        'tmdb_api_key_v4',
     ];
 
     protected function plexService(): Attribute

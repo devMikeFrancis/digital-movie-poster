@@ -7,46 +7,29 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| Every path the Vue router knows about has to be served the app shell, or a
+| reload on that path answers 404 instead of reaching the front end. These were
+| ten copies of the same closure, which meant adding a screen and forgetting
+| this file left the new page working until the first hard refresh.
+|
+| Deliberately a list rather than a catch-all: an unknown path should still be
+| a 404 rather than an app shell that renders nothing.
 |
 */
 
-Route::get('/', function () {
-    return view('app');
-})->where('any', '.*');
+$spaRoutes = [
+    '/',
+    '/dashboard',
+    '/posters',
+    '/posters/{any}',
+    '/display',
+    '/settings',
+    '/about',
+    '/voting',
+    '/vote',
+    '/login',
+];
 
-Route::get('/dashboard', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/posters', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/posters/{any}', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/settings', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/about', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/voting', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/vote', function () {
-    return view('app');
-})->where('any', '.*');
-
-Route::get('/login', function () {
-    return view('app');
-})->where('any', '.*');
-
-// require __DIR__.'/auth.php';
+foreach ($spaRoutes as $path) {
+    Route::get($path, fn () => view('app'))->where('any', '.*');
+}

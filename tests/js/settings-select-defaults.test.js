@@ -1,31 +1,17 @@
-import { mount } from '@vue/test-utils';
-import { createPinia } from 'pinia';
-import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('axios', () => ({
-    default: {
-        get: vi.fn(() => Promise.resolve({ data: {} })),
-        post: vi.fn(() => Promise.resolve({ data: {} })),
-    },
-}));
-
-vi.mock('socket.io-client', () => ({ io: vi.fn(() => ({ on: vi.fn(), disconnect: vi.fn() })) }));
-
-import Settings from '@/Views/Settings.vue';
+import { describe, expect, it } from 'vitest';
+import settingsForm from '@/mixins/settings-form';
 
 /**
  * Regression: a select bound to null matches no option - not the one whose
  * value is the empty string - so the rating limits rendered blank on any
  * install that had never set one, and the field looked broken. Nothing about
  * what is stored changes; null and '' both mean no limit.
+ *
+ * This lives on the mixin both settings screens use, so it is called directly
+ * rather than through whichever screen happens to render the select today.
  */
 function settings() {
-    return mount(Settings, {
-        global: {
-            plugins: [createPinia()],
-            stubs: { MainNav: true, 'router-link': true },
-        },
-    });
+    return { vm: settingsForm.methods };
 }
 
 describe('settings that reach a select', () => {

@@ -33,7 +33,6 @@ class PublicSettingResource extends JsonResource
         'kodi_username',
         'kodi_password',
         'tmdb_api_key_v3',
-        'tmdb_api_key_v4',
 
         // Network topology: the display talks to this server, not to the
         // media servers, so it has no use for these.

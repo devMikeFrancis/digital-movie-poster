@@ -47,6 +47,9 @@
                     <router-link class="hover:text-gray-500" to="/voting">Voting</router-link>
                 </li>
                 <li class="py-2 px-4 mb-3">
+                    <router-link class="hover:text-gray-500" to="/display">Display</router-link>
+                </li>
+                <li class="py-2 px-4 mb-3">
                     <router-link class="hover:text-gray-500" to="/settings">Settings</router-link>
                 </li>
                 <li class="py-2 px-4 mb-5">
@@ -109,7 +112,7 @@ export default {
         this.updateWindowSize();
         window.addEventListener('resize', this.updateWindowSize);
     },
-    beforeDestroyed() {
+    beforeUnmount() {
         window.removeEventListener('resize', this.updateWindowSize);
     },
 };

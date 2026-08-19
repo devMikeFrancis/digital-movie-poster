@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class TheaterNameTest extends TestCase
@@ -98,48 +97,19 @@ class TheaterNameTest extends TestCase
         $this->assertTrue($settings->theater_name_full_width);
     }
 
-    public function test_a_header_that_had_a_border_keeps_its_box(): void
-    {
-        // show_header_border drew the same box the plaque style draws, so the
-        // migration carried it across rather than leaving those displays with a
-        // bare header.
-        $this->assertSame(
-            'plaque',
-            $this->headerStyleAfterMigratingFrom(true),
-            'a display with the border should come out as a plaque'
-        );
-
-        $this->assertSame('plain', $this->headerStyleAfterMigratingFrom(false));
-    }
-
-    private function headerStyleAfterMigratingFrom(bool $hadBorder): string
-    {
-        DB::table('settings')->update([
-            'show_header_border' => $hadBorder,
-            'header_style' => 'plain',
-        ]);
-
-        // What the migration does.
-        DB::table('settings')
-            ->where('show_header_border', true)
-            ->update(['header_style' => 'plaque']);
-
-        return Setting::first()->header_style;
-    }
-
     /** @param  array<string, mixed>  $overrides */
     private function validPayload(array $overrides = []): array
     {
         $booleans = [
             'plex_service', 'plex_sync_movies', 'plex_sync_tv', 'plex_show_movie_now_playing',
             'plex_show_tv_now_playing', 'random_order', 'show_mpaa_rating', 'show_audience_rating',
-            'show_processing_logos', 'show_dolby_atmos_horizontal', 'show_dolby_atmos_vertical',
-            'show_dolby_vision_horizontal', 'show_dolby_vision_vertical', 'show_dts', 'show_dolby_51',
+            'show_processing_logos', 'show_dolby_atmos_vertical',
+            'show_dolby_vision_vertical', 'show_dts', 'show_dolby_51',
             'show_imax', 'show_auro_3d', 'use_cec_power', 'show_runtime', 'play_theme_music',
             'use_global_prologos', 'use_global_prologos_if_no_poster_prologos', 'poster_fill_screen',
             'show_header_text', 'show_theater_name', 'require_login', 'jellyfin_service',
             'header_full_width', 'theater_name_full_width',
-            'kodi_service', 'show_header_border', 'validate_movie_titles', 'remove_black_bars',
+            'kodi_service', 'validate_movie_titles', 'remove_black_bars',
             'show_speaker_config',
         ];
 

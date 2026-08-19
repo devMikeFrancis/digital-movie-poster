@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 import Dashboard from '../Views/Dashboard.vue';
 import Settings from '../Views/Settings.vue';
+import Display from '../Views/Display.vue';
 import Posters from '../Views/Posters.vue';
 import PostersEdit from '../Views/PostersEdit.vue';
 import Voting from '../Views/Voting.vue';
@@ -24,6 +25,14 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: Login,
+    },
+    {
+        // What the poster screen looks like. Separate from /settings, which is
+        // how the box is wired up rather than what it draws.
+        path: '/display',
+        name: 'Display',
+        component: Display,
+        meta: { requiresAuth: true },
     },
     {
         path: '/settings',
