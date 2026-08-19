@@ -2,6 +2,9 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { defineStore } from 'pinia';
 
+/** How often a running display pulls the poster library again. */
+const POSTER_SYNC_MS = 1000 * 60 * 60 * 4;
+
 export const usePostersStore = defineStore('posters', {
     state: () => ({
         loading: true,
@@ -254,13 +257,24 @@ export const usePostersStore = defineStore('posters', {
                 this.useSettingsProLogos();
             }
         },
+        // Four hours, which is what the arithmetic here was meant to say. It
+        // came to a little over twenty-seven years, so a display never picked
+        // up a poster added after it started - the screen kept cycling whatever
+        // was in the library the last time it loaded.
         startSyncPosters() {
-            this.recentlyAddedInterval = setInterval(
-                () => {
-                    this.cachePosters();
-                },
-                60000 * 60 * 60 * 1000 * 4
-            ); // Every 4 hours
+            this.recentlyAddedInterval = setInterval(() => {
+                this.cachePosters();
+            }, POSTER_SYNC_MS);
+        },
+        /**
+         * Tells any display on the network to pull the library again. The same
+         * command the Refresh Movie Posters button sends, so that adding a
+         * poster does not need a second, manual step to be seen.
+         */
+        requestDisplayReload() {
+            if (this.socket && typeof this.socket.emit === 'function') {
+                this.socket.emit('dispatch:command', { command: 'reload' });
+            }
         },
         withinMpaaLimit(rating) {
             let mpaaLimit = this.settings.mpaa_limit;
@@ -474,12 +488,26 @@ export const usePostersStore = defineStore('posters', {
                 .then((response) => {
                     this.stopTransitionImages();
                     this.moviePosters = response.data.posters;
-                    setTimeout(() => {
-                        if (this.loading === true) {
+
+                    // The list that arrives has nothing marked as showing, so
+                    // put a poster up before starting the clock again.
+                    this.setInitialPosterView();
+
+                    if (this.loading) {
+                        setTimeout(() => {
                             this.loading = false;
                             this.startTransitionImages();
-                        }
-                    }, this.bootTime);
+                        }, this.bootTime);
+
+                        return;
+                    }
+
+                    // Not booting, so the screen is live and carries straight
+                    // on. Restarting used to be skipped whenever loading was
+                    // false, which is every routine sync: the transitions
+                    // stopped, the list was replaced with one that had nothing
+                    // showing, and the display sat empty from then on.
+                    this.startTransitionImages();
                 })
                 .catch((e) => {
                     console.log(e.message);
@@ -587,6 +615,12 @@ export const usePostersStore = defineStore('posters', {
         },
         startTransitionImages() {
             console.log('START TRANSITIONS');
+
+            // Cleared first so a second start cannot leave the previous timer
+            // running: two clocks on the same posters change them at odd
+            // intervals, and one change can land before the last has finished.
+            this.stopTransitionImages();
+
             window.transitionImagesInterval = setInterval(() => {
                 this.transitionImages();
             }, this.settings.poster_display_speed);
