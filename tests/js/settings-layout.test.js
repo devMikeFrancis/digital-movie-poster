@@ -96,7 +96,6 @@ describe('every setting has exactly one home', () => {
             'show_audience_rating',
             'show_speaker_config',
             'speaker_config',
-            'speaker_config_location',
             'show_processing_logos',
             'show_dolby_51',
             'show_dolby_atmos_vertical',

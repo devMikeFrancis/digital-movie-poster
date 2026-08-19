@@ -1,15 +1,8 @@
 <template>
-    <div
-        :class="{ 'speaker-config-bottom': settings.speaker_config_location === 'bottom' }"
-        v-if="settings.show_speaker_config"
-    >
+    <div class="speaker-config-bottom" v-if="settings.show_speaker_config">
         <span
-            class="speaker-config rounded-md px-1 border-3"
-            :class="{
-                'speaker-config-top': settings.speaker_config_location === 'top-right',
-                'speaker-config-bottom': settings.speaker_config_location === 'bottom',
-            }"
-            :style="'border-color:' + color + '; text-color: ' + color"
+            class="speaker-config speaker-config-bottom rounded-md px-1 border-3"
+            :style="'border-color:' + settings.footer_text_color"
         >
             <span class="speaker-config-text">{{ settings.speaker_config }}</span>
         </span>
@@ -19,25 +12,19 @@
 import { mapState } from 'pinia';
 import { usePostersStore } from '@/store/posters';
 
+/**
+ * The room's speaker layout, in the footer with the rest of what describes the
+ * screen rather than the film.
+ *
+ * It could once sit at the top right instead, floating over the header. That
+ * put it in the way of a header spread across the width, and the top of the
+ * screen now carries only the header wording and the theatre name.
+ */
 export default {
     name: 'SpeakerConfig',
-    data: function () {
-        return {};
-    },
     computed: {
         ...mapState(usePostersStore, ['settings']),
-        color() {
-            if (this.settings.speaker_config_location === 'bottom') {
-                return this.settings.footer_text_color;
-            }
-            if (this.settings.speaker_config_location === 'top-right') {
-                return this.settings.header_text_color;
-            }
-            return '#ffffff';
-        },
     },
-    methods: {},
-    mounted() {},
 };
 </script>
 <style lang="scss" scoped>
@@ -45,13 +32,6 @@ export default {
     font-size: 2vw;
     font-weight: 400;
     line-height: 1;
-}
-.speaker-config-top {
-    position: absolute;
-    right: 4%;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.8vw;
 }
 
 .speaker-config-bottom {

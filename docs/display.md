@@ -22,10 +22,10 @@ or *Poster details*.
 fifteen second setting with a cross-fade is about thirteen seconds of stillness
 and a second and a half of movement.
 
-The details around the poster — the runtime in the header, and the content
-rating, processing logos and star rating in the footer — belong to the poster on
-screen, so they change with it under the same transition rather than snapping to
-the next film while the artwork is still fading.
+The details around the poster — the content rating, the runtime, the processing
+logos, the speaker badge and the star rating, all in the footer — belong to the
+poster on screen, so they change with it under the same transition rather than
+snapping to the next film while the artwork is still fading.
 
 ## Filling the screen
 
@@ -42,8 +42,8 @@ a lot before white text over it can be read. Standard is a reasonable starting
 point.
 
 Each end is shaded only when something is actually shown there. Turn off the
-header wording, the runtime, the ratings and the logos and a display shows the
-artwork alone, with no band across either end. It follows whichever end things
+header wording, the theatre name, the ratings, the runtime and the logos and a
+display shows the artwork alone, with no band across either end. It follows whichever end things
 are on, so moving the header or the theatre name moves the shading with it.
 
 A trailer keeps its own box even in fill mode: a video stretched to an arbitrary
@@ -52,12 +52,13 @@ screen shape looks wrong in a way a poster does not.
 ## The text on screen
 
 **Show the Coming Soon / Now Playing text** turns the header wording off for a
-display that should show only artwork. The runtime and the rest of the header
-are unaffected.
+display that should show only artwork. With it off and no theatre name at the
+top, nothing is drawn there at all — the top of the screen carries the wording
+and the theatre name and nothing else.
 
 **Header plate** dresses the wording with the same five options as the theatre
 name below — plain, rules, marquee bulbs, plaque or neon. *Plaque* is the box
-the header used to have; it keeps its own border colour from the **Theme** tab,
+the header used to have; it keeps its own border colour, set on the same tab,
 and a display that already had that box was carried over to it, so nothing
 changed appearance on updating.
 
@@ -68,8 +69,9 @@ a band, and the words themselves spread out to reach both edges — except under
 *rules*, where the hairlines grow into the space instead and the words stay as
 they are.
 
-A spanned header keeps clear of the runtime and the speaker badge, which sit
-over the header rather than in the row with it.
+A spanned plate takes a small gutter at each end rather than running into the
+bezel, which matters most for a plaque — its border would otherwise sit on the
+very edge of the screen and read as cut off.
 
 **Show the theater name** puts the name of the room the display is in above or
 below the poster, in whichever font the header is using.

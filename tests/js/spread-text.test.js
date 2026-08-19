@@ -142,56 +142,42 @@ describe('which theatre name plates spread', () => {
     });
 });
 
-describe('the header keeping clear of the badges over it', () => {
+describe('a header spread across the width', () => {
     beforeEach(() => setActivePinia(createPinia()));
 
     /**
-     * Regression: the runtime and the speaker badge are positioned over the
-     * header rather than laid out in the row with it, so a line spread to the
-     * full width ran straight underneath both of them.
+     * The runtime and the speaker badge used to float over the header, and a
+     * line spread to the full width ran straight underneath both. They live in
+     * the footer now, so the header has the width to itself - but a plaque
+     * still needs a gutter, or its border sits on the very edge of the screen.
      */
-    it('reserves the runtime end when a spread header shows one', () => {
+    it('takes a gutter so a bordered plate is not flush with the screen edge', () => {
         const header = plate(TopHeader, {
             show_header_text: true,
             header_full_width: true,
-            show_runtime: true,
+            header_style: 'plaque',
         });
 
-        expect(header.classes()).toContain('reserve-runtime');
+        expect(header.classes()).toContain('top-header--spread');
     });
 
-    it('reserves the speaker end when a spread header shows the badge', () => {
-        const header = plate(TopHeader, {
-            show_header_text: true,
-            header_full_width: true,
-            show_speaker_config: true,
-            speaker_config_location: 'top-right',
-        });
-
-        expect(header.classes()).toContain('reserve-speaker');
-    });
-
-    it('does not reserve the speaker end when the badge sits under the poster', () => {
-        const header = plate(TopHeader, {
-            show_header_text: true,
-            header_full_width: true,
-            show_speaker_config: true,
-            speaker_config_location: 'bottom',
-        });
-
-        expect(header.classes()).not.toContain('reserve-speaker');
-    });
-
-    it('reserves nothing on a header that hugs its words', () => {
+    it('takes no gutter when the plate hugs its words', () => {
         const header = plate(TopHeader, {
             show_header_text: true,
             header_full_width: false,
-            show_runtime: true,
-            show_speaker_config: true,
-            speaker_config_location: 'top-right',
         });
 
-        expect(header.classes()).not.toContain('reserve-runtime');
-        expect(header.classes()).not.toContain('reserve-speaker');
+        expect(header.classes()).not.toContain('top-header--spread');
+    });
+
+    it('no longer carries the runtime or the speaker badge', () => {
+        const header = plate(TopHeader, {
+            show_header_text: true,
+            show_runtime: true,
+            show_speaker_config: true,
+        });
+
+        expect(header.find('.runtime').exists()).toBe(false);
+        expect(header.findComponent({ name: 'SpeakerConfig' }).exists()).toBe(false);
     });
 });
