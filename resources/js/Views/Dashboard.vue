@@ -518,6 +518,13 @@ export default {
  * never darkens between posters.
  */
 .crossfade-poster-enter-active {
+    /*
+     * Positioned so the z-index below is not ignored. The poster's inner div is
+     * static by default, which made both stacking orders inert - and stacking
+     * is the whole mechanism here, since the incoming poster has to be painted
+     * over the outgoing one for the screen not to dip.
+     */
+    position: relative;
     transition: opacity 1.6s ease;
     z-index: 2;
 }
@@ -527,6 +534,7 @@ export default {
 }
 
 .crossfade-poster-leave-active {
+    position: relative;
     transition: opacity 0.01s linear 1.6s;
     z-index: 1;
 }
