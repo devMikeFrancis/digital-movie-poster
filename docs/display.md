@@ -44,6 +44,11 @@ the header and footer** controls how heavy that gradient is — *None*, *Subtle*
 a lot before white text over it can be read. Standard is a reasonable starting
 point.
 
+Each end is shaded only when something is actually shown there. Turn off the
+header wording, the runtime, the ratings and the logos and a display shows the
+artwork alone, with no band across either end. It follows whichever end things
+are on, so moving the header or the theatre name moves the shading with it.
+
 A trailer keeps its own box even in fill mode: a video stretched to an arbitrary
 screen shape looks wrong in a way a poster does not.
 
@@ -84,6 +89,20 @@ the name](images/theater-name.png)
 The wording — what it says instead of *Coming Soon* and *Now Playing* — is on
 the same **General** tab. The fonts, sizes, colours and borders are under
 **Settings → Theme**.
+
+## Processing logos
+
+**Which logos to show** decides where the Dolby Atmos, Dolby Vision, DTS:X,
+Auro-3D, IMAX and 5.1 badges come from:
+
+| | |
+| :--- | :--- |
+| **Only the ones each title supports** | The formats set on the poster when you edit it. |
+| **Each title's own, or the ones above if it has none** | Falls back to the global set for titles you have not filled in. |
+| **The ones above, on every title** | Ignores what each title supports and shows the same badges everywhere. |
+
+The last one is why a film with no Atmos soundtrack can end up displaying the
+Atmos logo. Choose the first if the badges should mean something.
 
 ## Limiting what is shown
 

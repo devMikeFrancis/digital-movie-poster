@@ -9,7 +9,7 @@
             <div
                 id="recent-added-container"
                 class="poster-container"
-                :class="[{ 'fill-screen': fillScreen }, scrimClass]"
+                :class="[{ 'fill-screen': fillScreen }, scrimClass, scrimSides]"
                 @click.prevent="gotoPosters()"
                 v-if="!isPlaying"
             >
@@ -63,7 +63,7 @@
                 <div
                     id="now-playing-container"
                     class="poster-container"
-                    :class="[{ 'fill-screen': fillScreen }, scrimClass]"
+                    :class="[{ 'fill-screen': fillScreen }, scrimClass, scrimSides]"
                     v-if="isPlaying"
                     @click.prevent="gotoPosters()"
                 >
@@ -164,6 +164,59 @@ export default {
             const choice = this.settings.poster_fill_scrim || 'standard';
 
             return this.fillScreen ? 'scrim-' + choice : '';
+        },
+        /**
+         * The shading exists to keep text readable over artwork, so an end with
+         * nothing on it does not get any - otherwise a display showing only a
+         * poster still had a dark band across the top and bottom of it.
+         *
+         * Worked out from the settings rather than from what happens to be on
+         * screen: a scrim that came and went with each poster's runtime would
+         * be worse than one that is simply there or not.
+         */
+        scrimSides() {
+            if (!this.fillScreen) {
+                return '';
+            }
+
+            return [
+                this.topHasContent ? '' : 'no-scrim-top',
+                this.bottomHasContent ? '' : 'no-scrim-bottom',
+            ].filter(Boolean);
+        },
+        headerHasContent() {
+            const settings = this.settings;
+            const headerText = settings.show_header_text;
+            const textShown =
+                headerText === undefined || headerText === null ? true : !!Number(headerText);
+
+            return !!(
+                textShown ||
+                settings.show_runtime ||
+                (settings.show_speaker_config && settings.speaker_config_location === 'top-right')
+            );
+        },
+        footerHasContent() {
+            const settings = this.settings;
+
+            return !!(
+                settings.show_mpaa_rating ||
+                settings.show_processing_logos ||
+                settings.show_audience_rating ||
+                (settings.show_speaker_config && settings.speaker_config_location === 'bottom')
+            );
+        },
+        topHasContent() {
+            return (
+                (this.headerOn === 'top' && this.headerHasContent) || this.theaterNameOn === 'top'
+            );
+        },
+        bottomHasContent() {
+            return (
+                (this.headerOn === 'bottom' && this.headerHasContent) ||
+                this.theaterNameOn === 'bottom' ||
+                this.footerHasContent
+            );
         },
         headerOn() {
             return this.settings.header_position === 'bottom' ? 'bottom' : 'top';
@@ -484,6 +537,15 @@ export default {
  */
 .scrim-none::before,
 .scrim-none::after {
+    display: none;
+}
+
+/* Nothing at that end to make readable, so nothing to shade. */
+.no-scrim-top::before {
+    display: none;
+}
+
+.no-scrim-bottom::after {
     display: none;
 }
 
