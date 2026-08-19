@@ -320,11 +320,16 @@ export default {
 }
 
 /*
- * Fill mode. The poster is normally letterboxed into a 2:3 box between the
- * header and the footer; here the artwork covers the screen and everything
- * else floats over it, which is what a display with nothing but artwork on it
- * wants. The trailer keeps its own box - a video stretched to an arbitrary
- * screen ratio looks wrong in a way a poster does not.
+ * Fill mode. The poster is normally boxed between the header and the footer;
+ * here it takes the whole screen and everything else floats over it, which is
+ * what a display with nothing but artwork on it wants.
+ *
+ * Scaled to fit rather than cropped: a 2:3 poster on a 16:9 screen comes out
+ * full height, which is the point, and nothing is ever cut off - cropping to
+ * cover loses the top and bottom of the artwork, which on a poster is usually
+ * the title and the billing block. The trailer keeps its own box; a video
+ * stretched to an arbitrary screen ratio looks wrong in a way a poster does
+ * not.
  */
 .fill-screen {
     /*
@@ -345,14 +350,16 @@ export default {
             aspect-ratio: auto;
             width: 100%;
             height: 100%;
-            background-size: cover;
+            background-size: contain;
+            background-position: center;
         }
     }
 
     .now-playing-poster {
         position: fixed;
         inset: 0;
-        background-size: cover;
+        background-size: contain;
+        background-position: center;
     }
 
     .top-header,

@@ -165,10 +165,10 @@
                                         <span class="ml-2">Fill the screen with the poster</span>
                                     </label>
                                     <div id="fillScreenHelp" class="text-gray-400 text-sm">
-                                        The artwork covers the whole display instead of sitting in a
-                                        2:3 box, and the header and footer sit over it. Posters are
-                                        cropped to fit, so the edges of a tall poster will be lost
-                                        on a wide screen.
+                                        The poster takes the whole display instead of sitting in a
+                                        box between the header and footer, which sit over it
+                                        instead. It is scaled to fit rather than cropped, so it
+                                        keeps its shape and nothing is cut off.
                                     </div>
                                 </div>
 
