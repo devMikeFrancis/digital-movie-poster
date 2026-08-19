@@ -1,7 +1,11 @@
 {
-    "latest": "2.1.13",
-    "changelog": "Whether the admin screens ask for a login is a setting now, under Settings then Account, instead of something you had to edit on the device. Your current arrangement carries over untouched - if a login is being asked for today it still will be after this update. The display never asks either way. The documentation also gained screenshots of each screen.",
+    "latest": "2.1.14",
+    "changelog": "The Coming Soon wording and your theater name can now be dressed as a proper sign - plain, with rules either side, marquee bulbs, a plaque or a neon glow - and either can span the width of the screen or sit above or below the poster. A header that already had its box keeps it, and anything else looks exactly as it did until you choose otherwise. Also fixes the header, theater name and footer disappearing under a poster that fills the screen.",
     "past_updates": [
+        {
+            "version": "2.1.13",
+            "changelog": "Whether the admin screens ask for a login is a setting now, under Settings then Account, instead of something you had to edit on the device. Your current arrangement carries over untouched - if a login is being asked for today it still will be after this update. The display never asks either way. The documentation also gained screenshots of each screen."
+        },
         {
             "version": "2.1.12",
             "changelog": "The runtime, rating, logos and stars around a poster now swap cleanly when the poster changes. They were fading in over the previous set rather than replacing it, so for a moment both were readable at once."
