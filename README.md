@@ -20,7 +20,7 @@ the rough edges are.
 -   Show Runtime
 -   Movie trailers
 -   Movie theme music
--   Movie Voting! See Wiki for more info
+-   Movie voting — guests vote from their phones by scanning a QR code on the display
 
 Open to new features/suggestions/requests. Please use Github issues.
 
@@ -137,6 +137,38 @@ appearing with no artwork.
 `IMAGE_DRIVER` chooses how images are processed. It prefers `imagick`, which
 `install.sh` puts on the Pi, and falls back to `gd` when the imagick extension
 is not installed - so a machine without it still works.
+
+## Movie voting
+
+Put a few posters up for a vote and let people in the room choose from their
+phones. There is no wiki — this is the documentation.
+
+**Requirements.** Voting rides on the Node socket server in `socketserver/`.
+`install.sh` sets it up; locally, run `node socketserver/server.js` alongside
+`php artisan serve`. The socket server also talks to Redis for now-playing, but
+it keeps running and retrying without it, so voting works on a machine that has
+no Redis.
+
+1. Sign in and go to **Voting**. The **Setup** tab is where you build a
+   session — no name needed, it is the admin screen.
+2. Choose posters by hand, or tick **Pick them at random** and set how many go
+   into the running.
+3. Set **Picks per voter** — how many posters each person may choose. Note that
+   allowing as many picks as there are posters lets everyone vote for
+   everything, which usually ends in a tie.
+4. Press **Open for joining**. A QR code appears in the corner of the display.
+5. People scan it, land on `/vote`, and enter a name. That page is public on
+   purpose: voters are guests and have no account. It cannot change any
+   setting — it can only cast votes into a session you opened.
+6. Press **Start voting** on the **Live session** tab when everyone is in. That
+   tab is the console for the running vote: who has joined, who has voted, and
+   the count against each poster as it lands. Results appear when the timer
+   expires.
+7. Thirty seconds after the results, the session closes itself and the QR code
+   disappears. **Close session** ends it sooner.
+
+The number of picks is enforced on the server as well as in the page, so a
+modified client cannot vote more times than the session allows.
 
 ## Display on/off schedule
 
