@@ -5,8 +5,8 @@
             <div v-if="!votingEnabled && !showResults" class="text-center">
                 <h1 class="text-white text-2xl font-bold mb-2">No vote running</h1>
                 <p class="text-gray-400">
-                    Nobody has opened a vote yet. Leave this page open — it will wake up on its
-                    own when one starts.
+                    Nobody has opened a vote yet. Leave this page open — it will wake up on its own
+                    when one starts.
                 </p>
             </div>
 
@@ -47,7 +47,11 @@
             <div v-else-if="votingStarted">
                 <div class="flex items-baseline justify-between mb-4">
                     <h1 class="text-white text-xl font-bold">
-                        {{ maxSelections === 1 ? 'Pick your favourite' : 'Pick up to ' + maxSelections }}
+                        {{
+                            maxSelections === 1
+                                ? 'Pick your favourite'
+                                : 'Pick up to ' + maxSelections
+                        }}
                     </h1>
                     <span class="text-white text-2xl font-bold">{{ timer }}</span>
                 </div>
@@ -80,10 +84,7 @@
                 <h1 class="text-white text-2xl font-bold mb-4">{{ resultMessage }}</h1>
                 <div class="poster-grid justify-center">
                     <div v-for="winner in winners" :key="winner.id" class="winner">
-                        <img
-                            :src="'/storage/posters/' + winner.file_name"
-                            :alt="winner.name"
-                        />
+                        <img :src="'/storage/posters/' + winner.file_name" :alt="winner.name" />
                         <span class="text-white text-sm">
                             {{ winner.votes }} vote<span v-if="winner.votes !== 1">s</span>
                         </span>
@@ -118,6 +119,8 @@ export default {
             voters: [],
             chosen: [],
             timer: 0,
+            countdown: null,
+            pendingStart: null,
             showResults: false,
             resultMessage: '',
             winners: [],
@@ -135,6 +138,17 @@ export default {
 
                 if (state.posters && state.posters.length) {
                     this.posters = state.posters;
+                }
+
+                // Someone who scans the code after voting has already started
+                // never receives start:voting, so take the running clock from
+                // the session broadcast instead. Without this their ballot
+                // renders with a timer of zero and every poster disabled: they
+                // can watch the vote but cannot join in.
+                if (state.votingStarted) {
+                    this.resumeCountdown(state.timer);
+                } else {
+                    this.stopCountdown();
                 }
 
                 if (!state.votingEnabled) {
@@ -155,6 +169,7 @@ export default {
             });
 
             this.socket.on('end:voting', (data) => {
+                this.stopCountdown();
                 this.votingStarted = false;
                 this.timer = 0;
                 this.winners = data.results.winner;
@@ -173,19 +188,46 @@ export default {
                 this.chosen = [];
             });
         },
+        /**
+         * Called when this client saw the vote start: show the full time, then
+         * begin counting after the five second "Get Ready" the other screens
+         * show.
+         */
         startCountdown(seconds) {
-            clearInterval(this.countdown);
-            // Matches the five second "Get Ready" the other screens show.
+            this.stopCountdown();
             this.timer = seconds;
-            setTimeout(() => {
-                this.countdown = setInterval(() => {
-                    if (this.timer > 0) {
-                        this.timer--;
-                    } else {
-                        clearInterval(this.countdown);
-                    }
-                }, 1000);
+            this.pendingStart = setTimeout(() => {
+                this.pendingStart = null;
+                this.tickFrom(this.timer);
             }, 5020);
+        },
+        /**
+         * Called when this client arrived to find a vote already running. There
+         * is no "Get Ready" to wait out - the seconds given are what is left.
+         */
+        resumeCountdown(seconds) {
+            if (this.countdown || this.pendingStart) {
+                return;
+            }
+
+            this.tickFrom(seconds);
+        },
+        tickFrom(seconds) {
+            this.stopCountdown();
+            this.timer = seconds;
+            this.countdown = setInterval(() => {
+                if (this.timer > 0) {
+                    this.timer--;
+                } else {
+                    this.stopCountdown();
+                }
+            }, 1000);
+        },
+        stopCountdown() {
+            clearInterval(this.countdown);
+            clearTimeout(this.pendingStart);
+            this.countdown = null;
+            this.pendingStart = null;
         },
         join() {
             if (!this.name.trim()) {
@@ -215,7 +257,7 @@ export default {
         this.connect();
     },
     beforeUnmount() {
-        clearInterval(this.countdown);
+        this.stopCountdown();
         if (this.socket) {
             this.socket.disconnect();
         }
