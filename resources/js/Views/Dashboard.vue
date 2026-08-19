@@ -362,11 +362,40 @@ export default {
         background-position: center;
     }
 
+    /*
+     * The chrome floats over the artwork rather than sitting on it. With its
+     * configured background colour it was an opaque bar at each end, hiding
+     * about a third of a full-height poster - the artwork was never cropped,
+     * it was covered up. A gradient behind the two ends keeps the text
+     * readable over whatever happens to be there.
+     */
     .top-header,
     .poster-footer,
     .theater-name {
         position: relative;
         z-index: 2;
+        background-color: transparent !important;
+    }
+
+    &::before,
+    &::after {
+        content: '';
+        position: fixed;
+        left: 0;
+        right: 0;
+        height: 30vh;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    &::before {
+        top: 0;
+        background: linear-gradient(to bottom, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0));
+    }
+
+    &::after {
+        bottom: 0;
+        background: linear-gradient(to top, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0));
     }
 }
 
