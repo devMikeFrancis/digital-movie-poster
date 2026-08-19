@@ -61,10 +61,21 @@ let timer = 0;
 let lastWinner = {};
 let status = 'none';
 
-// socket id -> array of poster ids that voter has chosen. Holding the whole
+// voter id -> array of poster ids that voter has chosen. Holding the whole
 // selection per voter, rather than incrementing counters, means a reconnect or
 // a dropped message cannot leave the tally drifting away from reality.
+//
+// Keyed by voter id rather than socket id, and deliberately outliving the
+// socket: people vote on a phone and then lock it or switch apps, and a
+// backgrounded tab has its websocket closed. Dropping the selection with the
+// connection threw those votes away and could hand the round to the wrong
+// poster. The voter id is what makes that safe - it is a stable name for a
+// ballot, so someone coming back updates the vote they already cast instead of
+// casting a second one.
 const selections = new Map();
+
+// socket id -> voter id, so a disconnect knows whose ballot it belongs to.
+const socketVoters = new Map();
 
 // Results stay up for this long, then the session closes and the QR disappears.
 const RESULTS_VISIBLE_MS = Number(process.env.VOTING_RESULTS_MS || 30000);
@@ -169,9 +180,29 @@ io.on('connection', (socket) => {
     socket.emit('session', sessionState());
 
     socket.on('new:user', (data) => {
-        users.push({ id: socket.id, name: data.name, voted: false });
-        selections.set(socket.id, []);
+        const voterId = String((data && data.voterId) || socket.id);
+        socketVoters.set(socket.id, voterId);
 
+        const existing = users.find((user) => user.id === voterId);
+
+        if (existing) {
+            // Same person returning - a reload, or a phone waking up. Keep the
+            // ballot they already cast and put them back on the list.
+            existing.name = data.name || existing.name;
+            existing.connected = true;
+        } else {
+            users.push({ id: voterId, name: data.name, voted: false, connected: true });
+        }
+
+        if (!selections.has(voterId)) {
+            selections.set(voterId, []);
+        }
+
+        // Hand back whatever this voter has already chosen so a page that
+        // reloaded mid-round shows their picks rather than an empty ballot.
+        socket.emit('your:votes', { posterIds: selections.get(voterId) });
+
+        tally();
         io.emit('users', { users });
         socket.emit('status', {
             votingStarted,
@@ -241,20 +272,22 @@ io.on('connection', (socket) => {
     // A voter's complete selection, capped server side so a modified client
     // cannot vote more times than the session allows.
     socket.on('set:votes', (data) => {
-        if (!votingStarted) {
+        const voterId = socketVoters.get(socket.id);
+
+        if (!votingStarted || !voterId) {
             return;
         }
 
         const chosen = Array.isArray(data && data.posterIds) ? data.posterIds : [];
-        selections.set(socket.id, chosen.slice(0, maxSelections));
+        selections.set(voterId, chosen.slice(0, maxSelections));
 
         users = users.map((user) =>
-            user.id === socket.id ? { ...user, voted: selections.get(socket.id).length > 0 } : user
+            user.id === voterId ? { ...user, voted: selections.get(voterId).length > 0 } : user
         );
 
         tally();
 
-        io.emit('user:voted', { user_id: socket.id });
+        io.emit('user:voted', { user_id: voterId });
         io.emit('users', { users });
         broadcastSession();
     });
@@ -273,10 +306,34 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        users = users.filter((user) => user.id !== socket.id);
-        selections.delete(socket.id);
-        tally();
+        const voterId = socketVoters.get(socket.id);
+        socketVoters.delete(socket.id);
 
+        if (!voterId) {
+            return;
+        }
+
+        // Their ballot stays in the tally for the rest of the round. Someone who
+        // put their phone away has still voted, and closing the tab is not a way
+        // to take a vote back.
+        const stillOpen = [...socketVoters.values()].includes(voterId);
+
+        if (!stillOpen) {
+            users = users.map((user) =>
+                user.id === voterId ? { ...user, connected: false } : user
+            );
+        }
+
+        // A voter who never cast anything leaves no trace: keeping them would
+        // pad the count with people who have gone.
+        const chosen = selections.get(voterId);
+
+        if (!stillOpen && (!chosen || chosen.length === 0)) {
+            users = users.filter((user) => user.id !== voterId);
+            selections.delete(voterId);
+        }
+
+        tally();
         io.emit('users', { users });
         broadcastSession();
     });
